@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "peopleCounter.h"
-
+#include <jpeglib.h>
 
 // PRIORITY COMPLETION ORDER
 //  (1) ReadImageFrame
@@ -26,6 +26,7 @@ void freeFrame(frame_t *img){
 
 void readImageFrame(frame_t *img, char *fileName){
     //TODO: Initialize frame structure from img
+    //See for reference - http://numberduck.com/Blog/?nPostId=2
 }
 
 void frameSubtraction(frame_t *img, frame_t *img2, frame_t *res){

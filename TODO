@@ -1,5 +1,4 @@
-(1) Convert the jpg frames to pgm in the frames folder
-(2) Add the pgm reader (pgm.c and pgm.h) to convert the images to useable formats.  --- "http://stackoverflow.com/questions/6085390/how-to-read-a-pgm-image-file-in-a-2d-double-array-in-c"
+
 (3) Go into the program final.c and see code priorities there
 (4) Be sure to write test code to test your functions.
 (5) Get statistics/graphs based on areas the boxes are in/direction of travel
