@@ -70,6 +70,40 @@ int readImageFrame(frame_t *frame, char *fileName){
 
 int frameSubtraction(frame_t *frame, frame_t *frame2, frame_t *res){
     //TODO: subtract two frames and give back the resulting frame
+    //Frames are not the same size and we're screwed
+    if((frame->image->width != frame2->image->width) || 
+        (frame->image->height != frame2->image->height)){
+        printf("The frame sizes are not the same!");
+        return -1;
+    }
+
+    int frameWidth = frame->image->width;
+    int frameHeight = frame->image->height;
+    unsigned char frameL= 0;
+    unsigned char frame2L = 0;
+    unsigned char frameA = 0;
+    unsigned char frame2A = 0;
+    unsigned char frameB = 0;
+    unsigned char frame2B = 0;
+
+    //Subtract frames
+    for(int i = 0; i < frameWidth; i++){
+        for(int j = 0; i < frameHeight; j++){
+            //Get L values
+            frameL = frame->image->data[i * frameWidth + j]->frameL;
+            frame2L = frame2->image->data[i * frameWidth + j]->frameL;
+            //Get A values
+            frameA = frame->image->data[i * frameWidth + j]->frameA;
+            frame2A = frame2->image->data[i * frameWidth + j]->frame2A;
+            //Get B values
+            frameB = frame->image->data[i * frameWidth + j]->frameB;
+            frame2B = frame2->image->data[i * frameWidth + j]->frame2B;
+            //Set pixel values in res
+            res->image->data[i * frameWidth + j]->frameL = frame2L - frameL;
+            res->image->data[i * frameWidth + j]->frameA = frame2A - frameA;
+            res->image->data[i * frameWidth + j]->frameB = frame2B - frameB;
+        }
+    }
     return 0;
 }
 
