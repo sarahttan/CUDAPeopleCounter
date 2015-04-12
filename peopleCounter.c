@@ -13,11 +13,12 @@
 #endif
 
 // PRIORITY COMPLETION ORDER
-//  (1) ReadImageFrame - testing in progress 
 //  (2) FrameSubtraction
 //  (3) BlobDetection
 //  (4) MergeBlobs
-//  (5) FreeFrame - testing in progress
+//  (5) BlobDirection
+//  (6) GetBoundingBoxes
+//  (20) extractFrames
 
 // Input: movie file name
 //          - use imagemagick to get frames and put them in a folder.

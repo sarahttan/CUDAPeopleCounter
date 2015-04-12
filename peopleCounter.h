@@ -8,6 +8,7 @@ typedef struct box_s {
     int height;     //height of bounding box (pixels)
     int width;      //width of bounding box (pixels)
     int dir;        //direction of box travel (degrees)
+    int tag;        //tag of the bounding box
 } box_t;
 
 typedef struct frame_s {
