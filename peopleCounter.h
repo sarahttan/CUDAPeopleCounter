@@ -61,4 +61,9 @@ int findBlobDirection(frame_t *frame, frame_t *frame2, frame_t *res);
 // OUTPUT: boxes array
 box_t *getBoundingBoxes(frame_t *frame);
 
+// print the frame to a jpg image
+// INPUT: frame - image frame
+// OUTPUT: 1 - if an error occurred, 0 - otherwise
+int frameToJPG(frame_t *frame);
+
 #endif

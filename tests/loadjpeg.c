@@ -15,10 +15,10 @@ int main(int argc, char *argv[])
     printf("Loading image %s, result=%d\n",filename,result);
     printf("Image height = %d, width = %d\n",myImage.height, myImage.width);
 
-    pixel_t p = myImage.rgbImage[0];
+    pixel_t p = myImage.data[0];
     printf("Pixel[0] has values (%u, %u, %u)\n", p.L, p.A, p.B);
     // free the memory
-    free( myImage.rgbImage );
+    free( myImage.data );
 
     return 0;
 }

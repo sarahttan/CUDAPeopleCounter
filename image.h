@@ -9,7 +9,7 @@ typedef struct pixel_s {
 typedef struct Image_s {
     int width;
     int height;
-    pixel_t *rgbImage;
+    pixel_t *data;
 } Image_t;
 
 // loadJpg function found in readjpeg.c 

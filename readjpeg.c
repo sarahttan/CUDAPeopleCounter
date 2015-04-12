@@ -49,7 +49,7 @@ int loadJpg(const char* Name, Image_t *pImage)
         printf("NO MEM FOR JPEG CONVERT!\n");
         return 0;
     }
-    pImage->rgbImage = pDummy;
+    pImage->data = pDummy;
 
 
     row_stride = width * cinfo.output_components ;

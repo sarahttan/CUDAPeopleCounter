@@ -13,6 +13,7 @@
 #endif
 
 // PRIORITY COMPLETION ORDER
+//  (1) FrameToJPG
 //  (2) FrameSubtraction
 //  (3) BlobDetection
 //  (4) MergeBlobs
@@ -22,8 +23,6 @@
 
 // Input: movie file name
 //          - use imagemagick to get frames and put them in a folder.
-//        output frames directory - malloc here
-
 int extractFrames(char *fileName){
     // TODO: extractFrames from movie here
     return 0;
@@ -35,8 +34,8 @@ int freeFrame(frame_t *frame){
         return 1;
     }
     if (frame->image != NULL) {
-        if (frame->image->rgbImage != NULL){
-            free(frame->image->rgbImage);
+        if (frame->image->data != NULL){
+            free(frame->image->data);
         }
         free(frame->image);
     }
@@ -70,7 +69,7 @@ int readImageFrame(frame_t *frame, char *fileName){
 }
 
 int frameSubtraction(frame_t *frame, frame_t *frame2, frame_t *res){
-    //TODO: subtract two grames and give back the resulting frame
+    //TODO: subtract two frames and give back the resulting frame
     return 0;
 }
 
@@ -95,4 +94,9 @@ int findBlobDirection(frame_t *frame, frame_t *frame2, frame_t *res){
 box_t *getBoundingBoxes(frame_t *frame) {
     //TODO: based on the image, get the bounding boxes and return them
     return NULL;
+}
+
+int frameToJPG(frame_t *frame){
+    //TODO: save the given frame as a jpg image.  
+    return 0;
 }

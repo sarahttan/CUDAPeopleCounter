@@ -17,7 +17,7 @@ int main(int argc, char *argv[]){
         return 1;
     }
     
-    pixel_t p = frame->image->rgbImage[0];
+    pixel_t p = frame->image->data[0];
     printf("Pixel[0] has values (%u, %u, %u)\n", p.L, p.A, p.B);
 
  
