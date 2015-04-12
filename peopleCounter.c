@@ -4,37 +4,67 @@
 #include "peopleCounter.h"
 
 #include <jpeglib.h>
+
+#define DEBUG
+#ifdef DEBUG
+#define LOG_ERR(...) fprintf(stderr, __VA_ARGS__)
+#else
+#define LOG_ERR(...)
+#endif
+
 // PRIORITY COMPLETION ORDER
-//  (1) ReadImageFrame
+//  (1) ReadImageFrame - testing in progress 
 //  (2) FrameSubtraction
 //  (3) BlobDetection
 //  (4) MergeBlobs
-//
+//  (5) FreeFrame - testing in progress
 
 // Input: movie file name
 //          - use imagemagick to get frames and put them in a folder.
 //        output frames directory - malloc here
+
 int extractFrames(char *fileName){
     // TODO: extractFrames from movie here
     return 0;
 }
 
 int freeFrame(frame_t *frame){
-    // TODO: Free the rest of the frames structure here.
+    if (frame == NULL) {
+        printf("freeFrame: Unable to free frame, frame pointer invalid\n");
+        return 1;
+    }
+    if (frame->image != NULL) {
+        if (frame->image->rgbImage != NULL){
+            free(frame->image->rgbImage);
+        }
+        free(frame->image);
+    }
+
+    if (frame->boxes != NULL) {
+        free(frame->boxes);
+    }
     free(frame);
     return 0;
 }
 
 int readImageFrame(frame_t *frame, char *fileName){
-    //TODO: Initialize frame structure from img
-    //See for reference - http://numberduck.com/Blog/?nPostId=2
+    // Load image into the structure
     Image_t *img = (Image_t *)(malloc(sizeof(struct Image_s))); 
-    if (loadJpg(fileName, img) == 1){
-        printf("Unable to read image at [%s]\n", fileName);
+    if (img == NULL) {
+        printf("readImageFrame: Unable to malloc img pointer\n");
+        return -1;
+    }
+    if (loadJpg(fileName, img) == 0){
+        printf("readImageFrame: Unable to read image at [%s]\n", fileName);
         return -1;
     }
     frame->image = img;
+   
+    // Initialize the other variables in the structure
+    frame->boxes = NULL;
     
+
+    LOG_ERR("readImageFrame: Image height = %d, width = %d\n", img->height, img->width);
     return 0;
 }
 

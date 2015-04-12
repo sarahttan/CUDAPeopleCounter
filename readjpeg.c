@@ -86,7 +86,7 @@ int loadJpg(const char* Name, Image_t *pImage)
 
 }
 
-
+/*
 int main(int argc, char *argv[])
 {
     Image_t myImage;
@@ -106,4 +106,4 @@ int main(int argc, char *argv[])
 
     return 0;
 }
-
+*/
