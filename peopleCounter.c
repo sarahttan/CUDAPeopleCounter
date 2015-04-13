@@ -21,7 +21,7 @@
 //  (3) BlobDetection
 //  (4) MergeBlobs
 //  (5) BlobDirection  (testing in progress)
-//  (6) GetBoundingBoxes
+//  (6) Test freeFrame on box linked list
 //  (20) extractFrames
 
 // Input: movie file name
@@ -44,6 +44,13 @@ int freeFrame(frame_t *frame){
     }
 
     if (frame->boxes != NULL) {
+        box_t *temp = frame->boxes->next;
+        box_t *temp2;
+        while(temp != NULL){
+            temp2 = temp;
+            temp = temp->next;
+            free(temp2);
+        }  
         free(frame->boxes);
     }
     free(frame);
@@ -110,9 +117,48 @@ int frameSubtraction(frame_t *frame, frame_t *frame2, frame_t *res){
     return 0;
 }
 
+
+int createNewBox(frame_t *frame) {
+    //TODO: create a new bounding box in the frame
+    return 0;
+}
+
+int deleteBox(frame_t *frame, box_t *b){
+    //TODO: remove bounding box from frame
+    return 0;
+}
+
+int blurImage(frame_t *frame) {
+    //TODO: blurImage before use in segmentation
+    return 0;
+}
+
+int thresholdImage(frame_t *frame) {
+    //TODO: thresholdImage for use in segmentation - create a binary image
+    return 0;
+}
+
+int segmentImage(frame_t *frame) {
+    //segment the image (label each connected component a different label)
+    if (blurImage(frame) != 0) {
+        printf("segmentImage: blurImage failure code\n");
+        return 1;
+    }
+    if (thresholdImage(frame) != 0) {
+        printf("segmentImage: thresholdImage failure code\n");
+        return 1;
+    }
+
+    //TODO: add Segmentation code here - watershed
+
+    return 0;
+}
+
+
 int blobDetection(frame_t *frame){
     //TODO: detect blobs in the current frame and fill out the box struct
     //      --- look into segmentation of images (blur the image first then segment)
+    // don't add a blob smaller than a certain size.
 
     return 0;
 }
