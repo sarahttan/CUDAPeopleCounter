@@ -1,9 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "peopleCounter.h"
 
 #include <jpeglib.h>
+
+#define PI 3.14159265
 
 #define DEBUG
 #ifdef DEBUG
@@ -14,10 +17,10 @@
 
 // PRIORITY COMPLETION ORDER
 //  (1) FrameToJPG
-//  (2) FrameSubtraction
+//  (2) FrameSubtraction (testing in progress)
 //  (3) BlobDetection
 //  (4) MergeBlobs
-//  (5) BlobDirection
+//  (5) BlobDirection  (testing in progress)
 //  (6) GetBoundingBoxes
 //  (20) extractFrames
 
@@ -121,13 +124,31 @@ int mergeBlobs(frame_t *frame){
 }
 
 int findBlobDirection(frame_t *frame, frame_t *frame2, frame_t *res){
-    //TODO: based on the distance and similarities between blobs in the two images, associate the closest blob to each other and then update the direction 
+    //based on the distance and similarities between blobs in the two images, associate the closest blob to each other and then update the direction
+    if ((frame == NULL) && (frame2 == NULL) && (res == NULL)){
+        printf("findBlobDirection: Can't find Blob dir - frame is not initialized\n");
+    }
+
+    if ((frame->boxes == NULL) && (frame2->boxes == NULL) && (res->boxes == NULL)){
+        printf("findBlobDirection: Can't find blob dir - frame->boxes not initialized\n");
+    }
+
+    int x1 = frame->boxes->centroid_x;
+    int y1 = frame->boxes->centroid_y;
+    int x2 = frame2->boxes->centroid_x;
+    int y2 = frame2->boxes->centroid_y;
+
+    res->boxes->dir = atan2((y2-y1),(x2-x1))* 180 / PI * -1;
     return 0;
 }
 
 box_t *getBoundingBoxes(frame_t *frame) {
-    //TODO: based on the image, get the bounding boxes and return them
-    return NULL;
+    //based on the image, get the bounding boxes and return them
+    if (frame == NULL){
+        printf("getBoundingBoxes: Can't get bounding box, frame is NULL\n");
+        return NULL;
+    }
+    return frame->boxes;
 }
 
 int frameToJPG(frame_t *frame){
