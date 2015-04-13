@@ -90,18 +90,18 @@ int frameSubtraction(frame_t *frame, frame_t *frame2, frame_t *res){
     for(int i = 0; i < frameWidth; i++){
         for(int j = 0; i < frameHeight; j++){
             //Get L values
-            frameL = frame->image->data[i * frameWidth + j]->frameL;
-            frame2L = frame2->image->data[i * frameWidth + j]->frameL;
+            frameL = frame->image->data[i * frameWidth + j].L;
+            frame2L = frame2->image->data[i * frameWidth + j].L;
             //Get A values
-            frameA = frame->image->data[i * frameWidth + j]->frameA;
-            frame2A = frame2->image->data[i * frameWidth + j]->frame2A;
+            frameA = frame->image->data[i * frameWidth + j].A;
+            frame2A = frame2->image->data[i * frameWidth + j].A;
             //Get B values
-            frameB = frame->image->data[i * frameWidth + j]->frameB;
-            frame2B = frame2->image->data[i * frameWidth + j]->frame2B;
+            frameB = frame->image->data[i * frameWidth + j].B;
+            frame2B = frame2->image->data[i * frameWidth + j].B;
             //Set pixel values in res
-            res->image->data[i * frameWidth + j]->frameL = frame2L - frameL;
-            res->image->data[i * frameWidth + j]->frameA = frame2A - frameA;
-            res->image->data[i * frameWidth + j]->frameB = frame2B - frameB;
+            res->image->data[i * frameWidth + j].L = frame2L - frameL;
+            res->image->data[i * frameWidth + j].A = frame2A - frameA;
+            res->image->data[i * frameWidth + j].B = frame2B - frameB;
         }
     }
     return 0;
