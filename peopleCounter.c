@@ -546,8 +546,56 @@ box_t *getBoundingBoxes(frame_t *frame) {
         printf("getBoundingBoxes: Can't get bounding box, frame is NULL\n");
         return NULL;
     }
+    if (frame->boxes == NULL){
+        LOG_ERR("getBoundingBoxes: no bounding boxes found\n");
+        return NULL;
+    }
+
+    //TODO: fix this to copy over all boxes and return completely new pointer
+    box_t *newB = (box_t *)(malloc(sizeof(struct box_s)));
+    box_t *tmp = frame->boxes;
+
+    while(tmp != NULL) {
+        
+    }    
+
 
     return frame->boxes;
+}
+
+//TODO: Testing in progress
+frame_t *copyFrame(frame_t *frame) {
+    if (frame == NULL) {
+        LOG_ERR("copyFrame: frame is NULL\n");
+        return NULL;
+    }
+    frame_t *newF = malloc(sizeof(struct frame_s));
+    if (frame->boxes == NULL) {
+        newF->boxes = NULL;
+    } else {
+        newF->boxes = malloc(sizeof(struct box_s));
+        newF->boxes = getBoundingBoxes(frame);
+    }
+    if (frame->image == NULL) {
+        newF->image = NULL;
+    } else {
+        newF->image = malloc(sizeof(struct Image_s));
+        newF->image->width = frame->image->width;
+        newF->image->height = newF->image->height;
+        if (frame->image->data == NULL) {
+            newF->image->data = NULL;
+        } else {
+            // copy over all of the image data in single for loop
+            //  - will be really slow
+            int i;
+            for (i = 0; i < frame->image->width*frame->image->height; i++){
+                newF->image->data[i].L = frame->image->data[i].L;
+                newF->image->data[i].A = frame->image->data[i].A;
+                newF->image->data[i].B = frame->image->data[i].B;
+            }
+        }
+    }
+    return newF; 
 }
 
 //TODO: Testing in progress
@@ -555,8 +603,19 @@ int drawBoxOnImage(frame_t *frame, frame_t *res) {
     // draws a white box for every bounding box given the values of frame
     if ((frame == NULL) || (res == NULL)) {
         printf("drawBoxOnImage: Can't draw box, frame is NULL\n");
+        return 1;
     }
-    
+
+    if ((frame->image == NULL) || (res->image == NULL)) {
+        printf("drawBoxOnImage: Can't draw box, frame->image is NULL\n");
+        return 1;
+    }    
+
+    if ((frame->image->data == NULL) || (res->image->data == NULL)) {
+        printf("drawBoxOnImage: Can't draw box, image data is empty\n");
+        return 1;
+    }
+
     // initialize
     box_t *head = frame->boxes;
     box_t *tmp = head;
