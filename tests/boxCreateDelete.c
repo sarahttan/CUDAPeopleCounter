@@ -38,8 +38,9 @@ int main(int argc, char *argv[]){
             cy = (rand() % 1000);
             h = (rand() % 1000);
             w = (rand() % 500);
-            printf("Creating box with centroid (%d, %d), width = %d, height = %d\n",cx, cy, h, w);
+            printf("Creating box with centroid (%d, %d), width = %d, height = %d",cx, cy, h, w);
             createNewBox(frame, cx, cy, h, w);
+            printf(": tag = %d\n", frame->boxes->tag);
             //printf("Subtracting from num_boxes_c\n");
             num_boxes_c--;
             break;

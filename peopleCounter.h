@@ -57,14 +57,30 @@ int mergeBlobs(frame_t *frame);
 // OUTPUT: 1 - if an error occurred, 0 - otherwise
 int findBlobDirection(frame_t *frame, frame_t *frame2, frame_t *res);
 
+// create a new box given the centroid, height and width
+// INPUT: frame - frame to add image to
+//        cx - x component of centroid
+//        cy - y component of centroid
+//        height - height of bounding box
+//        width - width of bounding box
+// OUTPUT: 1 - if an error occurred, 0 - otherwise
 int createNewBox(frame_t *frame, int cx, int cy, int height, int width);
 
+// delete a given box from the frame
+// INPUT: frame - frame to delete box from
+//        b - box to delete
+// OUTPUT: 1 - if an error occurred, 0 - otherwise
 int deleteBox(frame_t *frame, box_t *b);
 
-// get the bounding box information from the frame
-// INPUT: frame - image frame
-// OUTPUT: boxes array
-box_t *getBoundingBoxes(frame_t *frame);
+// copy and return the bounding box information from the frame
+// INPUT: frame - image frame to copy boxes from
+// OUTPUT: boxes linked list (malloced)
+box_t *copyBoundingBoxes(frame_t *frame);
+
+// copy and return a new frame from the given frame
+// INPUT: frame - image frame to copy
+// OUTPUT: new malloced frame
+frame_t *copyFrame(frame_t *frame);
 
 // print the frame to a jpg image
 // INPUT: frame - image frame

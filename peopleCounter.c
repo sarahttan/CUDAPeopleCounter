@@ -21,7 +21,6 @@ typedef struct { q_elem_t *buf; int n, alloc; } pri_queue_t, *pri_queue;
 
 // PRIORITY COMPLETION ORDER
 //  (1) FrameToJPG
-//  (2) FrameSubtraction (testing in progress)
 //  (4) Test print boxes
 //  (3) BlobDetection
 //  (4) MergeBlobs
@@ -82,7 +81,6 @@ int readImageFrame(frame_t *frame, char *fileName){
     return 0;
 }
 
-//TODO: fix FrameSubtraction - DOES NOT WORK = segfault
 int frameSubtraction(frame_t *frame, frame_t *frame2, frame_t *res){
     //subtract two frames and give back the resulting frame
     //Frames are not the same size and we're screwed
@@ -163,6 +161,7 @@ int createNewBox(frame_t *frame, int c_x, int c_y, int height, int width) {
     newB->centroid_y = c_y;
     newB->height = height;
     newB->width = width;
+    newB->dir = 0; 
 
     // Update tag
     if (frame->boxes == NULL){
@@ -577,8 +576,7 @@ int findBlobDirection(frame_t *frame, frame_t *frame2, frame_t *res){
     return 0;
 }
 
-//TODO: Testing in progress
-box_t *getBoundingBoxes(frame_t *frame) {
+box_t *copyBoundingBoxes(frame_t *frame) {
     //based on the image, get the bounding boxes and return them 
     //mallocs a new set of boxes
     if (frame == NULL){
@@ -590,7 +588,6 @@ box_t *getBoundingBoxes(frame_t *frame) {
         return NULL;
     }
 
-    //TODO: fix this to copy over all boxes and return completely new pointer
     box_t *tmp = frame->boxes;
     box_t *head;
     box_t *newB;
@@ -614,30 +611,33 @@ box_t *getBoundingBoxes(frame_t *frame) {
     return head;
 }
 
-//TODO: Testing in progress
 frame_t *copyFrame(frame_t *frame) {
     if (frame == NULL) {
         LOG_ERR("copyFrame: frame is NULL\n");
         return NULL;
     }
-    frame_t *newF = malloc(sizeof(struct frame_s));
+
+    LOG_ERR("copyFrame: Creating new frame\n");
+    frame_t *newF = (frame_t *)malloc(sizeof(struct frame_s));
     if (frame->boxes == NULL) {
         newF->boxes = NULL;
     } else {
-        newF->boxes = malloc(sizeof(struct box_s));
-        newF->boxes = getBoundingBoxes(frame);
+        LOG_ERR("copyFrame: Copying over existing boxes\n");
+        newF->boxes = copyBoundingBoxes(frame);
     }
     if (frame->image == NULL) {
         newF->image = NULL;
     } else {
-        newF->image = malloc(sizeof(struct Image_s));
+        newF->image = (Image_t *)malloc(sizeof(struct Image_s));
         newF->image->width = frame->image->width;
         newF->image->height = newF->image->height;
         if (frame->image->data == NULL) {
             newF->image->data = NULL;
         } else {
+            LOG_ERR("copyFrame: Copying over all image data\n");
             // copy over all of the image data in single for loop
             //  - will be really slow
+            newF->image->data = (pixel_t *)(malloc(sizeof(struct pixel_s) *frame->image->width*frame->image->height));
             int i;
             for (i = 0; i < frame->image->width*frame->image->height; i++){
                 newF->image->data[i].L = frame->image->data[i].L;
