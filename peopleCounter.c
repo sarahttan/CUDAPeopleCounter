@@ -22,13 +22,10 @@ typedef struct { q_elem_t *buf; int n, alloc; } pri_queue_t, *pri_queue;
 // PRIORITY COMPLETION ORDER
 //  (1) FrameToJPG
 //  (2) FrameSubtraction (testing in progress)
-//  (2) Test create boxes
-//  (3) Test delete boxes
 //  (4) Test print boxes
 //  (3) BlobDetection
 //  (4) MergeBlobs
 //  (5) BlobDirection  (testing in progress)
-//  (6) Test freeFrame on box linked list
 //  (20) extractFrames
 
 // Input: movie file name
@@ -85,8 +82,9 @@ int readImageFrame(frame_t *frame, char *fileName){
     return 0;
 }
 
+//TODO: fix FrameSubtraction - DOES NOT WORK = segfault
 int frameSubtraction(frame_t *frame, frame_t *frame2, frame_t *res){
-    //TODO: subtract two frames and give back the resulting frame
+    //subtract two frames and give back the resulting frame
     //Frames are not the same size and we're screwed
     if((frame->image->width != frame2->image->width) || 
         (frame->image->height != frame2->image->height)){
@@ -192,14 +190,14 @@ int blurImage(frame_t *frame) {
     //TODO: blurImage before use in segmentation
     return 0;
 }
-
+#if 0
 int randomNum(int last) {
     int n;
     n = rand() % last;
     return n;
 }
 
-/* first element in array not used to simplify indices */
+// first element in array not used to simplify indices */
 pri_queue priq_new(int size)
 {
   if (size < 4) size = 4;
@@ -224,7 +222,7 @@ void priq_push(pri_queue q, void *data, int pri)
     b = q->buf;
  
   n = q->n++;
-  /* append at end, then up heap */
+  // append at end, then up heap */
   while ((m = n / 2) && pri < b[m].pri) {
     b[n] = b[m];
     n = m;
@@ -233,7 +231,7 @@ void priq_push(pri_queue q, void *data, int pri)
   b[n].pri = pri;
 }
  
-/* remove top item. returns 0 if empty. *pri can be null. */
+// remove top item. returns 0 if empty. *pri can be null. */
 void * priq_pop(pri_queue q, int *pri)
 {
   void *out;
@@ -244,7 +242,7 @@ void * priq_pop(pri_queue q, int *pri)
   out = b[1].data;
   if (pri) *pri = b[1].pri;
  
-  /* pull last item to top, then down heap. */
+  // pull last item to top, then down heap. */
   --q->n;
  
   int n = 1, m;
@@ -460,7 +458,7 @@ int checkSurrounding(frame_t *frame, frame_t *res, frame_t *visisted, int randWi
 }
 
 }
-int thresholdImage(frame_t *frame, frame_t *res, frame_t *visisted) {
+int thresholdImage(frame_t *frame, frame_t *res, frame_t *visited) {
     //TODO: thresholdImage for use in segmentation - create a binary image
     int frameWidth = frame->image->width;
     int randWidth;
@@ -506,6 +504,11 @@ int thresholdImage(frame_t *frame, frame_t *res, frame_t *visisted) {
 
     return 0;
 }
+#endif
+
+int thresholdImage(frame_t *frame) {
+    return 0;
+}
 
 int segmentImage(frame_t *frame) {
     //segment the image (label each connected component a different label)
@@ -538,7 +541,6 @@ int mergeBlobs(frame_t *frame){
     return 0;
 }
 
-//TODO: Testing in progress
 int findBlobDirection(frame_t *frame, frame_t *frame2, frame_t *res){
     //based on the distance and similarities between blobs in the two images, associate the closest blob to each other and then update the direction
     if ((frame == NULL) || (frame2 == NULL) || (res == NULL)){
@@ -575,7 +577,7 @@ box_t *getBoundingBoxes(frame_t *frame) {
     box_t *tmp = frame->boxes;
 
     while(tmp != NULL) {
-        
+            
     }    
 
 

@@ -1,4 +1,4 @@
-all: readjpeg readImage blobDir boxCreDel
+all: readjpeg readImage blobDir boxCreDel frameSub
 
 readjpeg: readjpeg.c tests/loadjpeg.c
 	gcc -ljpeg -Wall -o readjpeg readjpeg.c tests/loadjpeg.c
@@ -12,5 +12,8 @@ blobDir: tests/blobDirTest.c readjpeg.c peopleCounter.c
 boxCreDel: tests/boxCreateDelete.c readjpeg.c peopleCounter.c
 	gcc -ljpeg -Wall -std=c99 -lm -o boxCreateDelete readjpeg.c peopleCounter.c tests/boxCreateDelete.c
 
+frameSub: tests/frameSubTest.c readjpeg.c peopleCounter.c
+	gcc -ljpeg -Wall -std=c99 -lm -o frameSubTest readjpeg.c peopleCounter.c tests/frameSubTest.c
+
 clean:
-	rm readjpeg readImageTest blobDirTest boxCreateDelete
+	rm readjpeg readImageTest blobDirTest boxCreateDelete frameSubTest
