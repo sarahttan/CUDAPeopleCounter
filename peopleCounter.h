@@ -57,6 +57,10 @@ int mergeBlobs(frame_t *frame);
 // OUTPUT: 1 - if an error occurred, 0 - otherwise
 int findBlobDirection(frame_t *frame, frame_t *frame2, frame_t *res);
 
+int createNewBox(frame_t *frame, int cx, int cy, int height, int width);
+
+int deleteBox(frame_t *frame, box_t *b);
+
 // get the bounding box information from the frame
 // INPUT: frame - image frame
 // OUTPUT: boxes array

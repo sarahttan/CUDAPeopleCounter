@@ -124,12 +124,24 @@ int frameSubtraction(frame_t *frame, frame_t *frame2, frame_t *res){
     return 0;
 }
 
-
-//TODO: Testing in progress
 // Create a new box with centroid (c_x, c_y), height and width
 int createNewBox(frame_t *frame, int c_x, int c_y, int height, int width) {
     //create a new bounding box in the frame
-    
+
+    if (height > frame->image->height) {
+        LOG_ERR("createNewBox: unable to create box of height larger than image\n");
+        return 1;
+    }
+    if (width > frame->image->width) {
+        LOG_ERR("createNewBox: unable to create box of width larger than image\n");
+        return 1;
+    }
+
+    if ((width == 0) || (height == 0)) {
+        LOG_ERR("createNewBox: unable to create box of width/height of 0\n");
+        return 1;
+    }
+
     // initialize values
     box_t *newB = (box_t *)malloc(sizeof(box_t));
     newB->centroid_x = c_x;
@@ -150,14 +162,21 @@ int createNewBox(frame_t *frame, int c_x, int c_y, int height, int width) {
     return 0;
 }
 
-//TODO: Testing in progress
 int deleteBox(frame_t *frame, box_t *b){
     box_t *tmp = frame->boxes;
     if (tmp == NULL) {
         printf("deleteBox: No boxes found\n");
         return 1;
     }
-    while (tmp != NULL) {
+
+    // Check if its the first box in the list
+    if (tmp == b) {
+        frame->boxes = NULL;
+        return 0;
+    }
+
+    // Check the remaining boxes in the list
+    while (tmp->next != NULL) {
         if (tmp->next == b) {
             tmp->next = b->next;
             free(b);
