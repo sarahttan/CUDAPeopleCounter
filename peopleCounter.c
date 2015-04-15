@@ -86,10 +86,20 @@ int readImageFrame(frame_t *frame, char *fileName){
 int frameSubtraction(frame_t *frame, frame_t *frame2, frame_t *res){
     //subtract two frames and give back the resulting frame
     //Frames are not the same size and we're screwed
+    if ((frame == NULL) || (frame2 == NULL) || (res == NULL)) {
+        printf("frameSubtraction: frames are not initialized\n");
+        return 1;
+    }
+    
+    if ((frame->image == NULL) || (frame2->image == NULL) || (res->image == NULL)) {
+        printf("frameSubtraction: frame->image not initialized\n");
+        return 1;
+    }
+
     if((frame->image->width != frame2->image->width) || 
         (frame->image->height != frame2->image->height)){
-        printf("The frame sizes are not the same!");
-        return -1;
+        printf("frameSutraction: The frame sizes are not the same!");
+        return 1;
     }
 
     int frameWidth = frame->image->width;
@@ -101,9 +111,15 @@ int frameSubtraction(frame_t *frame, frame_t *frame2, frame_t *res){
     unsigned char frameB = 0;
     unsigned char frame2B = 0;
 
+    //printf("Frame->image->data length = %lx\n", sizeof(frame->image->data)/(sizeof(struct pixel_s)));
+
     //Subtract frames
     for(int i = 0; i < frameHeight; i++){
-        for(int j = 0; i < frameWidth; j++){
+        for(int j = 0; j < frameWidth; j++){
+            if ((&frame->image->data[i*frameWidth+j] == NULL) || (&frame2->image->data[i*frameWidth+j] == NULL) || (&res->image->data[i*frameWidth+j] == NULL)) {
+                printf("frameSubtraction: pixel is null (%d, %d)\n", i, j);
+                return 1;
+            }
             //Get L values
             frameL = frame->image->data[i * frameWidth + j].L;
             frame2L = frame2->image->data[i * frameWidth + j].L;
@@ -117,6 +133,7 @@ int frameSubtraction(frame_t *frame, frame_t *frame2, frame_t *res){
             res->image->data[i * frameWidth + j].L = frame2L - frameL;
             res->image->data[i * frameWidth + j].A = frame2A - frameA;
             res->image->data[i * frameWidth + j].B = frame2B - frameB;
+            //printf("(i,j) = (%d, %d)\n", i,j);
         }
     }
     return 0;
@@ -562,7 +579,8 @@ int findBlobDirection(frame_t *frame, frame_t *frame2, frame_t *res){
 
 //TODO: Testing in progress
 box_t *getBoundingBoxes(frame_t *frame) {
-    //based on the image, get the bounding boxes and return them
+    //based on the image, get the bounding boxes and return them 
+    //mallocs a new set of boxes
     if (frame == NULL){
         printf("getBoundingBoxes: Can't get bounding box, frame is NULL\n");
         return NULL;
@@ -573,15 +591,27 @@ box_t *getBoundingBoxes(frame_t *frame) {
     }
 
     //TODO: fix this to copy over all boxes and return completely new pointer
-    box_t *newB = (box_t *)(malloc(sizeof(struct box_s)));
     box_t *tmp = frame->boxes;
+    box_t *head;
+    box_t *newB;
 
     while(tmp != NULL) {
-            
+        newB = (box_t *)(malloc(sizeof(struct box_s)));
+        newB->centroid_x = tmp->centroid_x;
+        newB->centroid_y = tmp->centroid_y;
+        newB->height = tmp->height;
+        newB->width = tmp->width;
+        newB->dir = tmp->dir;
+        newB->tag = tmp->tag;
+        newB->next = tmp->next;
+
+        if (tmp == frame->boxes){
+            head = newB;    
+        }
+        tmp = tmp->next;
     }    
 
-
-    return frame->boxes;
+    return head;
 }
 
 //TODO: Testing in progress

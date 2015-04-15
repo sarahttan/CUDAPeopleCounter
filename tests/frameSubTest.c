@@ -12,6 +12,8 @@ int main(int argc, char *argv[]){
 
     readImageFrame(frame, "./frames/frame01.jpg");
     readImageFrame(frame2, "./frames/frame04.jpg");
+    readImageFrame(res, "./frames/frame01.jpg");
+
     if (frameSubtraction(frame, frame2, res) != 0) {
         printf("Error in frame subtraction\n");
     }
@@ -19,6 +21,7 @@ int main(int argc, char *argv[]){
     int i;
     pixel_t rP, fP, f2P;
 
+    printf("Starting comparison for frame subtraction\n");
     for (i = 0; i < frame->image->height*frame->image->width; i++){
         rP = res->image->data[i];
         fP = frame->image->data[i];
