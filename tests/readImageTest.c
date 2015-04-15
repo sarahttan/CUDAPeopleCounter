@@ -24,17 +24,11 @@ int main(int argc, char *argv[]){
     printf("Data array is size %ld\n", sizeof(frame->image->data)/sizeof(frame->image->data[0]));
     
     int i,j;
-    for (i = 0; i < frame->image->width; i++) {
-        for (j = 0; j < frame->image->height; j++) {
-        p = frame->image->data[i*frame->image->width+j];
-        printf("Pixel[%d, %d] has vals L = %d, A = %d, B = %d\n", i,j, p.L, p.A, p.B);
-        #if 0
-        printf("At pixel %d\n", i);
+    for (i = 0; i < frame->image->width*frame->image->height; i++) {
+        p = frame->image->data[i];
         if ((p.L < 0) || (p.A < 0) || (p.B < 0)){
             printf("Pixel[%d] not initialized\n", i);
             return 1;
-        }
-        #endif
         }
     }
 
