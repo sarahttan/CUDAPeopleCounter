@@ -44,7 +44,7 @@ int loadJpg(const char* Name, Image_t *pImage)
     height = cinfo.output_height;
 
     //unsigned char * pDummy = (unsigned char *) malloc (width*height*4*sizeof(char));
-    pixel_t *pDummy = (pixel_t *) malloc (sizeof(struct pixel_s));
+    pixel_t *pDummy = (pixel_t *) malloc (sizeof(struct pixel_s)*width*height);
     if (pDummy == NULL){
         printf("NO MEM FOR JPEG CONVERT!\n");
         return 0;
@@ -72,6 +72,7 @@ int loadJpg(const char* Name, Image_t *pImage)
            pDummy->A = g;
            pDummy->L = r;
            //*(pDummy++) = a;
+           pDummy++;
        }
    }
    fclose(infile);
