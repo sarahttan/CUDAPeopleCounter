@@ -5,11 +5,6 @@
 #include "peopleCounter.h"
 
 #include <jpeglib.h>
-typedef struct { void * data; int pri; } q_elem_t;
-typedef struct { q_elem_t *buf; int n, alloc; } pri_queue_t, *pri_queue;
- 
-#define priq_purge(q) (q)->n = 1
-#define priq_size(q) ((q)->n - 1)
 #define PI 3.14159265
 
 #define DEBUG
@@ -206,334 +201,30 @@ int blurImage(frame_t *frame) {
     //TODO: blurImage before use in segmentation
     return 0;
 }
-int randomNum(int last) {
-    int n;
-    n = rand() % last;
-    return n;
-}
 
-// first element in array not used to simplify indices */
-pri_queue priq_new(int size)
-{
-  if (size < 4) size = 4;
-
-  pri_queue q = malloc(sizeof(pri_queue_t));
-  q->buf = malloc(sizeof(q_elem_t) * size);
-  q->alloc = size;
-  q->n = 1;
- 
-  return q;
-}
-
-void priq_push(pri_queue q, int *data, int pri)
-{
-  q_elem_t *b;
-  int n, m;
- 
-  if (q->n >= q->alloc) {
-    q->alloc *= 2;
-    b = q->buf = realloc(q->buf, sizeof(q_elem_t) * q->alloc);
-  } else
-    b = q->buf;
- 
-  n = q->n++;
-  // append at end, then up heap */
-  while ((m = n / 2) && pri < b[m].pri) {
-    b[n] = b[m];
-    n = m;
-  }
-  b[n].data = data;
-  b[n].pri = pri;
-}
-
-// remove top item. returns 0 if empty. *pri can be null. */
-void * priq_pop(pri_queue q, int *pri)
-{
-  void *out;
-  if (q->n == 1) return 0;
- 
-  q_elem_t *b = q->buf;
- 
-  out = b[1].data;
-  if (pri) *pri = b[1].pri;
- 
-  // pull last item to top, then down heap. */
-  --q->n;
- 
-  int n = 1, m;
-  while ((m = n * 2) < q->n) {
-    if (m + 1 < q->n && b[m].pri > b[m + 1].pri) m++;
- 
-    if (b[q->n].pri <= b[m].pri) break;
-    b[n] = b[m];
-    n = m;
-  }
- 
-  b[n] = b[q->n];
-  if (q->n < q->alloc / 2 && q->n >= 16)
-    q->buf = realloc(q->buf, (q->alloc /= 2) * sizeof(b[0]));
- 
-  return out;
-}
-
-int checkAndFill(frame_t *frame, frame_t *res, frame_t *visited, int randWidth, int randHeight, pri_queue p){
-    int nextPixel;
+int thresholdImage(frame_t *frame, frame_t *res) {
     int frameWidth = frame->image->width;
     int frameHeight = frame->image->height;
-    int widthNext;
-    int heightNext;
-    int converted;
-    unsigned char currentVal = -1;
-
-    //Left Most
-    if(randWidth != 0){
-        widthNext = randWidth - 1;
-        //Left Top Corner
-        if(randHeight != 0){
-            heightNext = randHeight - 1;
-            nextPixel = heightNext * frameWidth + widthNext;
-            if(visited->image->data[heightNext * frameWidth + widthNext].L == 1){
-                currentVal = res->image->data[heightNext * frameWidth + widthNext].L;
-            }
-        }
-        //Left Bottom Corner
-        if(randHeight != (frameHeight - 1)){
-            heightNext = randHeight + 1;
-            nextPixel = heightNext * frameWidth + widthNext;
-            if(visited->image->data[heightNext * frameWidth + widthNext].L == 1){
-                if (currentVal == -1)
-                    currentVal = res->image->data[heightNext * frameWidth + widthNext].L;
-                else{
-                    if(currentVal != res->image->data[heightNext * frameWidth + widthNext].L)
-                        return -1;
-                }
-            }
-        }
-        //Left Middle
-        nextPixel = heightNext * frameWidth + widthNext;
-        if(visited->image->data[heightNext * frameWidth + widthNext].L == 1){
-            if (currentVal == -1)
-                currentVal = res->image->data[heightNext * frameWidth + widthNext].L;
-            else{
-                if(currentVal != res->image->data[heightNext * frameWidth + widthNext].L)
-                    return -1;
-            }
-        }
-    }
-    //Right Most
-    if(randWidth != frameWidth - 1){
-        widthNext = randWidth + 1;
-        //Right Top Corner
-        if(randHeight != 0){
-            heightNext = randHeight - 1;
-            nextPixel = heightNext * frameWidth + widthNext;
-            if(visited->image->data[heightNext * frameWidth + widthNext].L == 1){
-                if (currentVal == -1)
-                    currentVal = res->image->data[heightNext * frameWidth + widthNext].L;
-                else{
-                    if(currentVal != res->image->data[heightNext * frameWidth + widthNext].L)
-                        return -1;
-                }
-            }
-        }
-        //Right Bottom Corner
-        if(randHeight != (frameHeight - 1)){
-            heightNext = randHeight + 1;
-            nextPixel = heightNext * frameWidth + widthNext;
-            if(visited->image->data[heightNext * frameWidth + widthNext].L == 1){
-                if (currentVal == -1)
-                    currentVal = res->image->data[heightNext * frameWidth + widthNext].L;
-                else{
-                    if(currentVal != res->image->data[heightNext * frameWidth + widthNext].L)
-                        return -1;
-                }
-            }
-        }
-        //Right Middle
-        nextPixel = heightNext * frameWidth + widthNext;
-        if(visited->image->data[heightNext * frameWidth + widthNext].L == 0){
-            visited->image->data[heightNext * frameWidth + widthNext].L = 1;
-            priq_push(p, &nextPixel, 0);
-        }
-    }
-    //Middle Column
-    widthNext = randWidth;
-    //Middle Top
-    if(randHeight != 0){
-        heightNext = randHeight - 1;
-        nextPixel = heightNext * frameWidth + widthNext;
-        if(visited->image->data[heightNext * frameWidth + widthNext].L == 1){
-            if (currentVal == -1)
-                currentVal = res->image->data[heightNext * frameWidth + widthNext].L;
-            else{
-                if(currentVal != res->image->data[heightNext * frameWidth + widthNext].L)
-                    return -1;
-            }
-        }
-    }
-    //Middle Bottom
-    if(randHeight != (frameHeight - 1)){
-        heightNext = randHeight + 1;
-        nextPixel = heightNext * frameWidth + widthNext;
-        if(visited->image->data[heightNext * frameWidth + widthNext].L == 1){
-            if (currentVal == -1)
-                currentVal = res->image->data[heightNext * frameWidth + widthNext].L;
-            else{
-                if(currentVal != res->image->data[heightNext * frameWidth + widthNext].L)
-                    return -1;
-            }
-        }
-    }
-
-    converted = (int)(currentVal);
-    return converted;
-}
-
-int checkSurrounding(frame_t *frame, frame_t *res, frame_t *visited, int randWidth, int randHeight, pri_queue p){
-    int nextPixel;
-    int frameWidth = frame->image->width;
-    int frameHeight = frame->image->height;
-    int widthNext;
-    int heightNext;
-
-    //Left Most
-    if(randWidth != 0){
-        widthNext = randWidth - 1;
-        //Left Top Corner
-        if(randHeight != 0){
-            heightNext = randHeight - 1;
-            nextPixel = heightNext * frameWidth + widthNext;
-            if(visited->image->data[heightNext * frameWidth + widthNext].L == 0){
-                visited->image->data[heightNext * frameWidth + widthNext].L = 1;
-                priq_push(p, &nextPixel, 0);
-            }
-        }
-        //Left Bottom Corner
-        if(randHeight != (frameHeight - 1)){
-            heightNext = randHeight + 1;
-            nextPixel = heightNext * frameWidth + widthNext;
-            if(visited->image->data[heightNext * frameWidth + widthNext].L == 0){
-                visited->image->data[heightNext * frameWidth + widthNext].L = 1;
-                priq_push(p, &nextPixel, 0);
-            }
-        }
-        //Left Middle
-        nextPixel = heightNext * frameWidth + widthNext;
-        if(visited->image->data[heightNext * frameWidth + widthNext].L == 0){
-            visited->image->data[heightNext * frameWidth + widthNext].L = 1;
-            priq_push(p, &nextPixel, 0);
-        }
-    }
-    //Right Most
-    if(randWidth != frameWidth - 1){
-        widthNext = randWidth + 1;
-        //Right Top Corner
-        if(randHeight != 0){
-            heightNext = randHeight - 1;
-            nextPixel = heightNext * frameWidth + widthNext;
-            if(visited->image->data[heightNext * frameWidth + widthNext].L == 0){
-                visited->image->data[heightNext * frameWidth + widthNext].L = 1;
-                priq_push(p, &nextPixel, 0);
-            }
-        }
-        //Right Bottom Corner
-        if(randHeight != (frameHeight - 1)){
-            heightNext = randHeight + 1;
-            nextPixel = heightNext * frameWidth + widthNext;
-            if(visited->image->data[heightNext * frameWidth + widthNext].L == 0){
-                visited->image->data[heightNext * frameWidth + widthNext].L = 1;
-                priq_push(p, &nextPixel, 0);
-            }
-        }
-        //Right Middle
-        nextPixel = heightNext * frameWidth + widthNext;
-        if(visited->image->data[heightNext * frameWidth + widthNext].L == 0){
-            visited->image->data[heightNext * frameWidth + widthNext].L = 1;
-            priq_push(p, &nextPixel, 0);
-        }
-    }
-    //Middle Column
-    widthNext = randWidth;
-    //Middle Top
-    if(randHeight != 0){
-        heightNext = randHeight - 1;
-        nextPixel = heightNext * frameWidth + widthNext;
-        if(visited->image->data[heightNext * frameWidth + widthNext].L == 0){
-            visited->image->data[heightNext * frameWidth + widthNext].L = 1;
-            priq_push(p, &nextPixel, 0);
-        }
-    }
-    //Middle Bottom
-    if(randHeight != (frameHeight - 1)){
-        heightNext = randHeight + 1;
-        nextPixel = heightNext * frameWidth + widthNext;
-        if(visited->image->data[heightNext * frameWidth + widthNext].L == 0){
-            visited->image->data[heightNext * frameWidth + widthNext].L = 1;
-            priq_push(p, &nextPixel, 0);
-        }
-    }
-    return 0;
-}
-
-int thresholdImage(frame_t *frame, frame_t *res, frame_t *visited) {
-    //TODO: thresholdImage for use in segmentation - create a binary image
-    int frameWidth = frame->image->width;
-    int randWidth;
-    int frameHeight = frame->image->height;
-    int randHeight;
     int sigDiff = 10;
-    int numStarting = 10;
-    int pixelVal;
-    int popPixel;
-    unsigned char curPixel;
-    pri_queue q = priq_new(0);
 
-    for(int i = 0; i < numStarting; i++){
-        randWidth = randomNum(frameWidth);
-        randHeight = randomNum(frameHeight);
-        curPixel = frame->image->data[randHeight * frameWidth + randWidth].L;
-        if(visited->image->data[randHeight * frameWidth + randWidth].L == 0){ 
-            visited->image->data[randHeight * frameWidth + randWidth].L = 1;    
-            if(curPixel < sigDiff)
-                res->image->data[randHeight * frameWidth + randWidth].L = 0;
+    for(int i = 0; i < frameHeight; i++){
+        for(int j = 0; j < frameWidth; j++){
+            if(frame->image->data[i * frameWidth + j].L > sigDiff)
+                res->image->data[i * frameWidth + j].L = 1;
             else
-                res->image->data[randHeight * frameWidth + randWidth].L = 1;
-            checkSurrounding(frame, res, visited, randWidth, randHeight, q);
+                res->image->data[i * frameWidth + j].L = 0;          
         }
     }
-
-    while(priq_size(q) != 0){
-        popPixel = priq_pop(q, 0);
-        curPixel = frame->image->data[popPixel].L;
-        pixelVal = checkAndFill(frame, res, visited, randWidth, randHeight, q);
-        if(pixelVal != -1)
-            res->image->data[popPixel].L = pixelVal;
-        else{
-            if(curPixel < sigDiff)
-                res->image->data[popPixel].L = 0;
-            else
-                res->image->data[popPixel].L = 1;
-        }
-        randWidth = popPixel % frameHeight;
-        randHeight = popPixel / frameHeight;
-        checkSurrounding(frame, res, visited, randWidth, randHeight, q);
-    }
-
     return 0;
 }
 
-
-// int thresholdImage(frame_t *frame) {
-//     return 0;
-// }
-
-int segmentImage(frame_t *frame, frame_t *res, frame_t *visited)  {
+int segmentImage(frame_t *frame, frame_t *res)  {
     //segment the image (label each connected component a different label)
     if (blurImage(frame) != 0) {
         printf("segmentImage: blurImage failure code\n");
         return 1;
     }
-    if (thresholdImage(frame, res, visited) != 0) {
+    if (thresholdImage(frame, res) != 0) {
         printf("segmentImage: thresholdImage failure code\n");
         return 1;
     }
