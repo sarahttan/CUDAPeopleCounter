@@ -206,7 +206,6 @@ int blurImage(frame_t *frame) {
     //TODO: blurImage before use in segmentation
     return 0;
 }
-#if 0
 int randomNum(int last) {
     int n;
     n = rand() % last;
@@ -225,8 +224,8 @@ pri_queue priq_new(int size)
  
   return q;
 }
- 
-void priq_push(pri_queue q, void *data, int pri)
+
+void priq_push(pri_queue q, int *data, int pri)
 {
   q_elem_t *b;
   int n, m;
@@ -246,7 +245,7 @@ void priq_push(pri_queue q, void *data, int pri)
   b[n].data = data;
   b[n].pri = pri;
 }
- 
+
 // remove top item. returns 0 if empty. *pri can be null. */
 void * priq_pop(pri_queue q, int *pri)
 {
@@ -277,12 +276,13 @@ void * priq_pop(pri_queue q, int *pri)
   return out;
 }
 
-int checkAndFill(frame_t *frame, frame_t *res, frame_t *visisted, int randWidth, int randHeight){
+int checkAndFill(frame_t *frame, frame_t *res, frame_t *visited, int randWidth, int randHeight, pri_queue p){
     int nextPixel;
     int frameWidth = frame->image->width;
     int frameHeight = frame->image->height;
     int widthNext;
     int heightNext;
+    int converted;
     unsigned char currentVal = -1;
 
     //Left Most
@@ -301,7 +301,7 @@ int checkAndFill(frame_t *frame, frame_t *res, frame_t *visisted, int randWidth,
             heightNext = randHeight + 1;
             nextPixel = heightNext * frameWidth + widthNext;
             if(visited->image->data[heightNext * frameWidth + widthNext].L == 1){
-                if ((currentVal == -1)
+                if (currentVal == -1)
                     currentVal = res->image->data[heightNext * frameWidth + widthNext].L;
                 else{
                     if(currentVal != res->image->data[heightNext * frameWidth + widthNext].L)
@@ -312,7 +312,7 @@ int checkAndFill(frame_t *frame, frame_t *res, frame_t *visisted, int randWidth,
         //Left Middle
         nextPixel = heightNext * frameWidth + widthNext;
         if(visited->image->data[heightNext * frameWidth + widthNext].L == 1){
-            if ((currentVal == -1)
+            if (currentVal == -1)
                 currentVal = res->image->data[heightNext * frameWidth + widthNext].L;
             else{
                 if(currentVal != res->image->data[heightNext * frameWidth + widthNext].L)
@@ -328,7 +328,7 @@ int checkAndFill(frame_t *frame, frame_t *res, frame_t *visisted, int randWidth,
             heightNext = randHeight - 1;
             nextPixel = heightNext * frameWidth + widthNext;
             if(visited->image->data[heightNext * frameWidth + widthNext].L == 1){
-                if ((currentVal == -1)
+                if (currentVal == -1)
                     currentVal = res->image->data[heightNext * frameWidth + widthNext].L;
                 else{
                     if(currentVal != res->image->data[heightNext * frameWidth + widthNext].L)
@@ -341,7 +341,7 @@ int checkAndFill(frame_t *frame, frame_t *res, frame_t *visisted, int randWidth,
             heightNext = randHeight + 1;
             nextPixel = heightNext * frameWidth + widthNext;
             if(visited->image->data[heightNext * frameWidth + widthNext].L == 1){
-                if ((currentVal == -1)
+                if (currentVal == -1)
                     currentVal = res->image->data[heightNext * frameWidth + widthNext].L;
                 else{
                     if(currentVal != res->image->data[heightNext * frameWidth + widthNext].L)
@@ -352,8 +352,8 @@ int checkAndFill(frame_t *frame, frame_t *res, frame_t *visisted, int randWidth,
         //Right Middle
         nextPixel = heightNext * frameWidth + widthNext;
         if(visited->image->data[heightNext * frameWidth + widthNext].L == 0){
-            visited->image->data[heightNext * frameWidth + widthNext].L == 1;
-            priq_push(p, nextPixel, 0);
+            visited->image->data[heightNext * frameWidth + widthNext].L = 1;
+            priq_push(p, &nextPixel, 0);
         }
     }
     //Middle Column
@@ -363,7 +363,7 @@ int checkAndFill(frame_t *frame, frame_t *res, frame_t *visisted, int randWidth,
         heightNext = randHeight - 1;
         nextPixel = heightNext * frameWidth + widthNext;
         if(visited->image->data[heightNext * frameWidth + widthNext].L == 1){
-            if ((currentVal == -1)
+            if (currentVal == -1)
                 currentVal = res->image->data[heightNext * frameWidth + widthNext].L;
             else{
                 if(currentVal != res->image->data[heightNext * frameWidth + widthNext].L)
@@ -376,7 +376,7 @@ int checkAndFill(frame_t *frame, frame_t *res, frame_t *visisted, int randWidth,
         heightNext = randHeight + 1;
         nextPixel = heightNext * frameWidth + widthNext;
         if(visited->image->data[heightNext * frameWidth + widthNext].L == 1){
-            if ((currentVal == -1)
+            if (currentVal == -1)
                 currentVal = res->image->data[heightNext * frameWidth + widthNext].L;
             else{
                 if(currentVal != res->image->data[heightNext * frameWidth + widthNext].L)
@@ -384,10 +384,12 @@ int checkAndFill(frame_t *frame, frame_t *res, frame_t *visisted, int randWidth,
             }
         }
     }
-    return int(currentVal); 
+
+    converted = (int)(currentVal);
+    return converted;
 }
 
-int checkSurrounding(frame_t *frame, frame_t *res, frame_t *visisted, int randWidth, int randHeight, pri_queue q){
+int checkSurrounding(frame_t *frame, frame_t *res, frame_t *visited, int randWidth, int randHeight, pri_queue p){
     int nextPixel;
     int frameWidth = frame->image->width;
     int frameHeight = frame->image->height;
@@ -402,8 +404,8 @@ int checkSurrounding(frame_t *frame, frame_t *res, frame_t *visisted, int randWi
             heightNext = randHeight - 1;
             nextPixel = heightNext * frameWidth + widthNext;
             if(visited->image->data[heightNext * frameWidth + widthNext].L == 0){
-                visited->image->data[heightNext * frameWidth + widthNext].L == 1;
-                priq_push(p, nextPixel, 0);
+                visited->image->data[heightNext * frameWidth + widthNext].L = 1;
+                priq_push(p, &nextPixel, 0);
             }
         }
         //Left Bottom Corner
@@ -411,15 +413,15 @@ int checkSurrounding(frame_t *frame, frame_t *res, frame_t *visisted, int randWi
             heightNext = randHeight + 1;
             nextPixel = heightNext * frameWidth + widthNext;
             if(visited->image->data[heightNext * frameWidth + widthNext].L == 0){
-                visited->image->data[heightNext * frameWidth + widthNext].L == 1;
-                priq_push(p, nextPixel, 0);
+                visited->image->data[heightNext * frameWidth + widthNext].L = 1;
+                priq_push(p, &nextPixel, 0);
             }
         }
         //Left Middle
         nextPixel = heightNext * frameWidth + widthNext;
         if(visited->image->data[heightNext * frameWidth + widthNext].L == 0){
-            visited->image->data[heightNext * frameWidth + widthNext].L == 1;
-            priq_push(p, nextPixel, 0);
+            visited->image->data[heightNext * frameWidth + widthNext].L = 1;
+            priq_push(p, &nextPixel, 0);
         }
     }
     //Right Most
@@ -430,8 +432,8 @@ int checkSurrounding(frame_t *frame, frame_t *res, frame_t *visisted, int randWi
             heightNext = randHeight - 1;
             nextPixel = heightNext * frameWidth + widthNext;
             if(visited->image->data[heightNext * frameWidth + widthNext].L == 0){
-                visited->image->data[heightNext * frameWidth + widthNext].L == 1;
-                priq_push(p, nextPixel, 0);
+                visited->image->data[heightNext * frameWidth + widthNext].L = 1;
+                priq_push(p, &nextPixel, 0);
             }
         }
         //Right Bottom Corner
@@ -439,15 +441,15 @@ int checkSurrounding(frame_t *frame, frame_t *res, frame_t *visisted, int randWi
             heightNext = randHeight + 1;
             nextPixel = heightNext * frameWidth + widthNext;
             if(visited->image->data[heightNext * frameWidth + widthNext].L == 0){
-                visited->image->data[heightNext * frameWidth + widthNext].L == 1;
-                priq_push(p, nextPixel, 0);
+                visited->image->data[heightNext * frameWidth + widthNext].L = 1;
+                priq_push(p, &nextPixel, 0);
             }
         }
         //Right Middle
         nextPixel = heightNext * frameWidth + widthNext;
         if(visited->image->data[heightNext * frameWidth + widthNext].L == 0){
-            visited->image->data[heightNext * frameWidth + widthNext].L == 1;
-            priq_push(p, nextPixel, 0);
+            visited->image->data[heightNext * frameWidth + widthNext].L = 1;
+            priq_push(p, &nextPixel, 0);
         }
     }
     //Middle Column
@@ -457,8 +459,8 @@ int checkSurrounding(frame_t *frame, frame_t *res, frame_t *visisted, int randWi
         heightNext = randHeight - 1;
         nextPixel = heightNext * frameWidth + widthNext;
         if(visited->image->data[heightNext * frameWidth + widthNext].L == 0){
-            visited->image->data[heightNext * frameWidth + widthNext].L == 1;
-            priq_push(p, nextPixel, 0);
+            visited->image->data[heightNext * frameWidth + widthNext].L = 1;
+            priq_push(p, &nextPixel, 0);
         }
     }
     //Middle Bottom
@@ -466,14 +468,13 @@ int checkSurrounding(frame_t *frame, frame_t *res, frame_t *visisted, int randWi
         heightNext = randHeight + 1;
         nextPixel = heightNext * frameWidth + widthNext;
         if(visited->image->data[heightNext * frameWidth + widthNext].L == 0){
-            visited->image->data[heightNext * frameWidth + widthNext].L == 1;
-            priq_push(p, nextPixel, 0);
+            visited->image->data[heightNext * frameWidth + widthNext].L = 1;
+            priq_push(p, &nextPixel, 0);
         }
     }
     return 0;
 }
 
-}
 int thresholdImage(frame_t *frame, frame_t *res, frame_t *visited) {
     //TODO: thresholdImage for use in segmentation - create a binary image
     int frameWidth = frame->image->width;
@@ -492,19 +493,19 @@ int thresholdImage(frame_t *frame, frame_t *res, frame_t *visited) {
         randHeight = randomNum(frameHeight);
         curPixel = frame->image->data[randHeight * frameWidth + randWidth].L;
         if(visited->image->data[randHeight * frameWidth + randWidth].L == 0){ 
-            visited->image->data[randHeight * frameWidth + randWidth].L == 1;    
+            visited->image->data[randHeight * frameWidth + randWidth].L = 1;    
             if(curPixel < sigDiff)
                 res->image->data[randHeight * frameWidth + randWidth].L = 0;
             else
                 res->image->data[randHeight * frameWidth + randWidth].L = 1;
-            checkSurrounding(frame, res, visisted, randWidth, randHeight, q)
+            checkSurrounding(frame, res, visited, randWidth, randHeight, q);
         }
     }
 
-    while(priq_size(p) != 0){
+    while(priq_size(q) != 0){
         popPixel = priq_pop(q, 0);
         curPixel = frame->image->data[popPixel].L;
-        pixelVal = checkAndFill(frame, res, visisted, randWidth, randHeight)
+        pixelVal = checkAndFill(frame, res, visited, randWidth, randHeight, q);
         if(pixelVal != -1)
             res->image->data[popPixel].L = pixelVal;
         else{
@@ -515,24 +516,24 @@ int thresholdImage(frame_t *frame, frame_t *res, frame_t *visited) {
         }
         randWidth = popPixel % frameHeight;
         randHeight = popPixel / frameHeight;
-        checkSurrounding(frame, res, visisted, randWidth, randHeight, q)
+        checkSurrounding(frame, res, visited, randWidth, randHeight, q);
     }
 
     return 0;
 }
-#endif
 
-int thresholdImage(frame_t *frame) {
-    return 0;
-}
 
-int segmentImage(frame_t *frame) {
+// int thresholdImage(frame_t *frame) {
+//     return 0;
+// }
+
+int segmentImage(frame_t *frame, frame_t *res, frame_t *visited)  {
     //segment the image (label each connected component a different label)
     if (blurImage(frame) != 0) {
         printf("segmentImage: blurImage failure code\n");
         return 1;
     }
-    if (thresholdImage(frame) != 0) {
+    if (thresholdImage(frame, res, visited) != 0) {
         printf("segmentImage: thresholdImage failure code\n");
         return 1;
     }
