@@ -231,6 +231,7 @@ int segmentImage(frame_t *frame, frame_t *res)  {
     }
 
     //TODO: add Segmentation code here - watershed
+    //      START LABELS AT 1 (non-labeled remains at 0)
 
     return 0;
 }
@@ -259,12 +260,12 @@ int maxBlob(int width, int height, int cx, int cy){
     int maxH = 800;
 
     if (height > maxH) {
-        LOG_ERR("blob at (%d, %d) with size [w,h] -> [%d,%d] < max dim of [%d, %d]\n", cx, cy, width, height, maxW, maxH);
+        LOG_ERR("blob at (%d, %d) with size [w,h] -> [%d,%d] > max dim of [%d, %d]\n", cx, cy, width, height, maxW, maxH);
         return 1;
     }
 
     if (width > maxW) {
-        LOG_ERR("blob at (%d, %d) with size [w,h] -> [%d,%d] < max dim of [%d, %d]\n", cx, cy, width, height, maxW, maxH);
+        LOG_ERR("blob at (%d, %d) with size [w,h] -> [%d,%d] > max dim of [%d, %d]\n", cx, cy, width, height, maxW, maxH);
         return 1;
     }
 
@@ -288,6 +289,10 @@ int blobDetection(frame_t *frame){
         return 1;
     }
 
+    int i, j;
+    int left, right, up, down; 
+    int tag=0;
+    pixel_t p;
     int w, h, cx, cy;
     int done = 0;
     //detect blobs based on size - mean of pixels connected together
@@ -295,15 +300,53 @@ int blobDetection(frame_t *frame){
     while(done == 0) {
         // Add blobs based on the segment - we're done when we've looked 
         //  through the whole list of segmentations
-        // TODO: Based on segmentation, decide what the centroid, width, height        
+        // Based on segmentation, decide what the centroid, width, height        
+        //      We're going to go through the image by each tag to find the 
+        //          corresponding left, right, up, and down of the box.
+        //      THIS IS COMPUTATIONALLY EXPENSIVE
+        // TODO: change this operation to look around the area instead of
+        //          the entire image.
 
+        left = frame->image->width;
+        right = 0;
+        up = frame->image->height;
+        down = 0;
+        tag++;       
+ 
+        for (i = 0; i < frame->image->height; i++){
+            for (j = 0; j < frame->image->width; j++){
+                p = frame->image->data[i*frame->image->width+j];
+                if (p.L != tag) {
+                    // The pixel has label we're looking for, so we include it
+                    //  Find the left, right, up, and down most values for the label
+                    if (j < left) {
+                        left = j;
+                    }
+                    if (j > right) {
+                        right = j;
+                    }
+                    if (i < up) {
+                        up = i;
+                    }
+                    if (i > down) {
+                        down = i;
+                    }
+                }
+            }
+        }
+
+        // update the corresponding values for the blob
+        cx = (right-left)/2 + left;
+        cy = (up - down)/2 - up;
+        w = abs(right - left);
+        h = abs(up - down);
 
         // Remove all blobs which do not fit within the constraints. 
         // Update the centroid and get min and max width and height of blob
         if (minBlob(w,h,cx,cy) != 0) {
-            LOG_ERR("Removing blob at (cx, cy) -> (%d, %d)\n", cx, cy);
+            LOG_ERR("Blob too small, Removing blob at (cx, cy) -> (%d, %d)\n", cx, cy);
         } else if (maxBlob(w,h,cx,cy) != 0) {
-            LOG_ERR("Splitting blob at (cx,cy) -> (%d, %d)\n", cx, cy);
+            LOG_ERR("Blob too large, Splitting blob at (cx,cy) -> (%d, %d)\n", cx, cy);
             // TODO: Check if we can split the blob into multiple boxes or not
             
         } else {
