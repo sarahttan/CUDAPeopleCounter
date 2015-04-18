@@ -85,6 +85,6 @@ frame_t *copyFrame(frame_t *frame);
 // print the frame to a jpg image
 // INPUT: frame - image frame
 // OUTPUT: 1 - if an error occurred, 0 - otherwise
-int frameToJPG(frame_t *frame);
+int frameToJPG(frame_t *frame, char *filename);
 
 #endif

@@ -3,6 +3,10 @@
 //
 // Adapted from http://stackoverflow.com/questions/694080/how-do-i-read-jpeg-and-png-pixels-in-c-on-linux
 //
+// added saving a JPG image
+// Adapted from http://stackoverflow.com/questions/16390783/how-to-save-yuyv-raw-data-to-jpeg-using-libjpeg
+// and http://stackoverflow.com/questions/16740165/saving-rgb-char-into-jpeg-image-using-libjpeg
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,9 +21,62 @@
 #define YCCK JCS_YCCK
 #define GRAYSCALE JCS_GRAYSCALE
 
+int saveJpg(const char *Name, Image_t *pImage)
+{
+    struct jpeg_compress_struct cinfo;
+    struct jpeg_error_mgr jerr;
+    
+    cinfo.err = jpeg_std_error( &jerr );
+    
+    cinfo.image_width = pImage->width;
+    cinfo.image_height = pImage->height;
+    cinfo.input_components = 3;
+    cinfo.in_color_space = COLOR_SPACE;
+    
+    jpeg_set_defaults(&cinfo);
+    jpeg_set_quality(&cinfo,100,TRUE);
+
+    FILE *outfile;
+    outfile = fopen(Name,"wb");
+    if (outfile == NULL) {
+        printf("Error: Cannot open %s file for writing!\n",Name);
+        return 0;
+    }
+        
+    unsigned char *pBuf;
+    pBuf = (unsigned char *) malloc(sizeof(char) * pImage->width * 3);
+    if (pBuf == NULL) {
+        printf("Error: Cannot allocate memory for buffer\n");
+        fclose(outfile);
+        return 0;
+    }
+    
+    jpeg_start_compress( &cinfo, TRUE );
+    
+    int i;
+    // now copy the info into the buffer
+    while (cinfo.next_scanline < pImage->height) {
+        for (i=0;i<cinfo.image_width; i++) {
+            pBuf[i*3]   = pImage->data[i].L;
+            pBuf[i*3+1] = pImage->data[i].A;
+            pBuf[i*3+2] = pImage->data[i].B;
+        }
+        JSAMPROW row_pointer;
+        row_pointer = (JSAMPROW) pBuf;
+        jpeg_write_scanlines( &cinfo, &row_pointer, 1);
+    }
+    jpeg_finish_compress( &cinfo );
+    jpeg_destroy_compress( &cinfo );
+    
+    fclose(outfile);
+    
+    return 1;    
+}
+
+
 int loadJpg(const char* Name, Image_t *pImage)
 {
-    unsigned char a,r,g,b;
+    unsigned char r,g,b;
     int width, height;
     struct jpeg_decompress_struct cinfo;
     struct jpeg_error_mgr jerr;
@@ -59,7 +116,7 @@ int loadJpg(const char* Name, Image_t *pImage)
     while (cinfo.output_scanline < cinfo.output_height) {
         (void) jpeg_read_scanlines(&cinfo, pJpegBuffer, 1);
         for (x=0;x<width;x++) {
-           a = 0; // alpha value is not supported on jpg
+//           a = 0; // alpha value is not supported on jpg
            r = pJpegBuffer[0][cinfo.output_components*x];
            if (cinfo.output_components>2) {
                g = pJpegBuffer[0][cinfo.output_components*x+1];
