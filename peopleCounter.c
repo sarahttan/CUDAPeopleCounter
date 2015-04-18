@@ -6,6 +6,7 @@
 
 #include <jpeglib.h>
 #define PI 3.14159265
+#define THRESHOLD_INIT_VALUE 10
 
 #define DEBUG
 #ifdef DEBUG
@@ -205,7 +206,7 @@ int blurImage(frame_t *frame) {
 int thresholdImage(frame_t *frame, frame_t *res) {
     int frameWidth = frame->image->width;
     int frameHeight = frame->image->height;
-    int sigDiff = 10;
+    int sigDiff = THRESHOLD_INIT_VALUE;
 
     for(int i = 0; i < frameHeight; i++){
         for(int j = 0; j < frameWidth; j++){
@@ -235,10 +236,80 @@ int segmentImage(frame_t *frame, frame_t *res)  {
 }
 
 
+int minBlob(int width, int height, int cx, int cy){
+    // for a given centroid position, check if bbox is within min size
+
+    int minW = 200;
+    int minH = 400;
+
+    if (width < minW) {
+        LOG_ERR("blob at (%d, %d) with size [w,h] -> [%d,%d] < min dim of [%d, %d]\n", cx, cy, width, height, minW, minH);
+        return 1;
+    }
+    if (height < minH) {
+        LOG_ERR("blob at (%d, %d) with size [w,h] -> [%d,%d] < min dime of [%d, %d]\n", cx, cy, width, height, minW, minH);
+        return 1; 
+    }
+    return 0;
+}
+
+int maxBlob(int width, int height, int cx, int cy){
+    // for a given centroid position, check if bbox is within max size
+    int maxW = 400;
+    int maxH = 800;
+
+    if (height > maxH) {
+        LOG_ERR("blob at (%d, %d) with size [w,h] -> [%d,%d] < max dim of [%d, %d]\n", cx, cy, width, height, maxW, maxH);
+        return 1;
+    }
+
+    if (width > maxW) {
+        LOG_ERR("blob at (%d, %d) with size [w,h] -> [%d,%d] < max dim of [%d, %d]\n", cx, cy, width, height, maxW, maxH);
+        return 1;
+    }
+
+    return 0;
+}
+
 int blobDetection(frame_t *frame){
     //TODO: detect blobs in the current frame and fill out the box struct
     //      --- look into segmentation of images (blur the image first then segment)
     // don't add a blob smaller than a certain size.
+    if (segmentImage(frame, frame) != 0) {
+        printf("blobDetection: segmentImage failed\n");
+        return 1;
+    }
+
+    box_t *box = frame->boxes;
+
+    if (box != NULL) {
+        printf("blobDetection: frame already has bounding boxes filled in!!\n");
+        printf("                free boxes before calling this function\n");
+        return 1;
+    }
+
+    int w, h, cx, cy;
+    int done = 0;
+    //detect blobs based on size - mean of pixels connected together
+    // Check the segmented pixels and create a bounding box for each segment
+    while(done == 0) {
+        // Add blobs based on the segment - we're done when we've looked 
+        //  through the whole list of segmentations
+        // TODO: Based on segmentation, decide what the centroid, width, height        
+
+
+        // Remove all blobs which do not fit within the constraints. 
+        // Update the centroid and get min and max width and height of blob
+        if (minBlob(w,h,cx,cy) != 0) {
+            LOG_ERR("Removing blob at (cx, cy) -> (%d, %d)\n", cx, cy);
+        } else if (maxBlob(w,h,cx,cy) != 0) {
+            LOG_ERR("Splitting blob at (cx,cy) -> (%d, %d)\n", cx, cy);
+            // TODO: Check if we can split the blob into multiple boxes or not
+            
+        } else {
+            createNewBox(frame, cx, cy, h, w);
+        }
+    }
 
     return 0;
 }
@@ -450,8 +521,7 @@ int drawBoxOnImage(frame_t *frame, frame_t *res) {
     return 0;
 }
 
+//TODO: testing
 int frameToJPG(frame_t *frame, char *filename){
-    //TODO: save the given frame as a jpg image. 
-    saveJpg(filename, frame->image);
-    return 0;
+    return saveJpg(filename, frame->image);
 }
