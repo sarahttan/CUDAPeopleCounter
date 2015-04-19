@@ -7,7 +7,7 @@
 
 #include <jpeglib.h>
 #define PI 3.14159265
-#define THRESHOLD_INIT_VALUE 10
+#define THRESHOLD_INIT_VALUE 200
 
 #define DEBUG
 #ifdef DEBUG
@@ -233,6 +233,8 @@ int thresholdImage(frame_t *frame, frame_t *res) {
                 res->image->data[i * frameWidth + j].L = 1;
             else
                 res->image->data[i * frameWidth + j].L = 0;          
+            res->image->data[i*frameWidth+j].A = 0;
+            res->image->data[i*frameWidth+j].B = 0;
         }
     }
     return 0;
@@ -329,6 +331,9 @@ int segmentImage(frame_t *frame, frame_t *res, int *largestLabel)  {
             }
         }
     }
+
+    //TODO: create a hash table of labels going through the image on one pass
+    //          then update the image using the hash table on the second pass
 
     *largestLabel = label;
     return 0;
@@ -461,9 +466,44 @@ int blobDetection(frame_t *frame){
     return 0;
 }
 
+//TODO: testing and writing
 int mergeBlobs(frame_t *frame){
-    //TODO: given the image and the bounding boxes, merge close by ones
+    // given the image and the bounding boxes, merge close by ones
     //      update bounding box structure in img.
+    if (frame == NULL) {
+        printf("mergeBlobs: frame does not exist\n");
+        return 1;
+    }
+    int tolX = 10;// tolerance is 10 pixels
+    int tolY = 10;// tolerance is 10 pixels
+    box_t *temp = frame->boxes;
+    box_t *temp2 = frame->boxes;
+    while(temp != NULL) {
+        // TODO: Algorithm in O(n^2) because each box looks at every other box
+        //   to see if should merge - should update this to become more efficient
+        while (temp2 != NULL) {
+            temp2 = temp2->next;
+            // if the current box is within some tolerance of another, merge boxes
+            // TODO: fix the data in which to merge blobs together
+            if (tolX <= abs(temp->centroid_x - temp2->centroid_x)){
+                if (tolY <= abs(temp->centroid_y - temp2->centroid_y)){
+                    LOG_ERR("mergeBlobs: merging blobs within tolerance\n");   
+                    // Create bounding box with new data
+                    temp->centroid_x = (temp->centroid_x + temp2->centroid_x)/2;
+                    temp->centroid_y = (temp->centroid_y + temp2->centroid_y)/2;
+                    
+                        //TODO: update the height and width of the box
+                    // Remove old bounding box
+                    if(deleteBox(frame, temp2)!= 0) {
+                        printf("mergeBlobs: Could not delete box from frame\n");
+                        return 1;
+                    }
+                }
+            }
+        }
+        temp = temp->next;
+        temp2 = frame->boxes;
+    }
     return 0;
 }
 
@@ -521,6 +561,7 @@ box_t *copyBoundingBoxes(frame_t *frame) {
     return head;
 }
 
+// TODO: frames are not the same size - TO BE FIXED?
 frame_t *copyFrame(frame_t *frame) {
     if (frame == NULL) {
         LOG_ERR("copyFrame: frame is NULL\n");
@@ -670,5 +711,9 @@ int drawBoxOnImage(frame_t *frame, frame_t *res) {
 
 //TODO: testing
 int frameToJPG(frame_t *frame, char *filename){
-    return saveJpg(filename, frame->image);
+    if (saveJpg(filename, frame->image) != 0) {
+        return 0;
+    } else {
+        return 1;
+    }
 }
