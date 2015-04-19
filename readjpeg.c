@@ -27,7 +27,19 @@ int saveJpg(const char *Name, Image_t *pImage)
     struct jpeg_error_mgr jerr;
     
     cinfo.err = jpeg_std_error( &jerr );
+
+    jpeg_create_compress(&cinfo);
+
+    FILE *outfile;
+    outfile = fopen(Name,"wb");
+    if (outfile == NULL) {
+        printf("Error: Cannot open %s file for writing!\n",Name);
+        return 0;
+    }
     
+    jpeg_stdio_dest(&cinfo, outfile);
+
+
     cinfo.image_width = pImage->width;
     cinfo.image_height = pImage->height;
     cinfo.input_components = 3;
@@ -36,12 +48,6 @@ int saveJpg(const char *Name, Image_t *pImage)
     jpeg_set_defaults(&cinfo);
     jpeg_set_quality(&cinfo,100,TRUE);
 
-    FILE *outfile;
-    outfile = fopen(Name,"wb");
-    if (outfile == NULL) {
-        printf("Error: Cannot open %s file for writing!\n",Name);
-        return 0;
-    }
         
     unsigned char *pBuf;
     pBuf = (unsigned char *) malloc(sizeof(char) * pImage->width * 3);
@@ -54,16 +60,20 @@ int saveJpg(const char *Name, Image_t *pImage)
     jpeg_start_compress( &cinfo, TRUE );
     
     int i;
+    int row_offset;
+    row_offset = 0;
     // now copy the info into the buffer
     while (cinfo.next_scanline < pImage->height) {
+     
         for (i=0;i<cinfo.image_width; i++) {
-            pBuf[i*3]   = pImage->data[i].L;
-            pBuf[i*3+1] = pImage->data[i].A;
-            pBuf[i*3+2] = pImage->data[i].B;
+            pBuf[i*3]   = pImage->data[i + row_offset].L;
+            pBuf[i*3+1] = pImage->data[i + row_offset].A;
+            pBuf[i*3+2] = pImage->data[i + row_offset].B;
         }
         JSAMPROW row_pointer;
         row_pointer = (JSAMPROW) pBuf;
         jpeg_write_scanlines( &cinfo, &row_pointer, 1);
+        row_offset += pImage->width;
     }
     jpeg_finish_compress( &cinfo );
     jpeg_destroy_compress( &cinfo );

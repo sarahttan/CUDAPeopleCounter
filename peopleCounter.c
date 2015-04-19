@@ -238,7 +238,6 @@ int thresholdImage(frame_t *frame, frame_t *res) {
     return 0;
 }
 
-//TODO: Testing in progress - ALSO ADD MORE PRINT STATEMENTS
 int segmentImage(frame_t *frame, frame_t *res, int *largestLabel)  {
     //segment the image (label each connected component a different label)
     if (thresholdImage(frame, res) != 0) {
@@ -372,7 +371,7 @@ int maxBlob(int width, int height, int cx, int cy){
 }
 
 int blobDetection(frame_t *frame){
-    //TODO: detect blobs in the current frame and fill out the box struct
+    //detect blobs in the current frame and fill out the box struct
     //      --- look into segmentation of images (blur the image first then segment)
     // don't add a blob smaller than a certain size.
     int largestLabel;
@@ -452,7 +451,8 @@ int blobDetection(frame_t *frame){
         } else if (maxBlob(w,h,cx,cy) != 0) {
             LOG_ERR("Blob too large, Splitting blob at (cx,cy) -> (%d, %d)\n", cx, cy);
             // TODO: Check if we can split the blob into multiple boxes or not
-            
+            //  for now, we'll just add the box to the list
+            createNewBox(frame, cx, cy, h, w);         
         } else {
             createNewBox(frame, cx, cy, h, w);
         }

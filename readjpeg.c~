@@ -61,7 +61,9 @@ int saveJpg(const char *Name, Image_t *pImage)
             pBuf[i*3+1] = pImage->data[i].A;
             pBuf[i*3+2] = pImage->data[i].B;
         }
-        jpeg_write_scanlines( &cinfo, (JSAMPROW) pBuf, 1);
+        JSAMPROW row_pointer;
+        row_pointer = (JSAMPROW) pBuf;
+        jpeg_write_scanlines( &cinfo, &row_pointer, 1);
     }
     jpeg_finish_compress( &cinfo );
     jpeg_destroy_compress( &cinfo );

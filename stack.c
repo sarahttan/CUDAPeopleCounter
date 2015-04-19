@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include "stack.h" 
 
-#define DEBUG_STACK
+//#define DEBUG_STACK
 #ifdef DEBUG_STACK
 #define LOG_ERR_STACK(...) fprintf(stdout, __VA_ARGS__)
 #else
