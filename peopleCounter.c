@@ -3,6 +3,7 @@
 #include <string.h>
 #include <math.h>
 #include "peopleCounter.h"
+#include <time.h>
 
 #include <jpeglib.h>
 #define PI 3.14159265
@@ -199,14 +200,32 @@ int deleteBox(frame_t *frame, box_t *b){
 }
 
 int blurImage(frame_t *frame) {
-    //TODO: blurImage before use in segmentation
+    //blurImage before thresholding
     return 0;
 }
 
+//TODO: testing in progress
 int thresholdImage(frame_t *frame, frame_t *res) {
     int frameWidth = frame->image->width;
     int frameHeight = frame->image->height;
     int sigDiff = THRESHOLD_INIT_VALUE;
+
+    // Add blurring before thresholding 
+    //      --- equivalent to imfill in Matlab
+
+    if ((frame == NULL) || (res == NULL)) {
+        printf("thresholdImage: failure because frame not initialized\n");
+        return 1;
+    }
+    if ((frame->image == NULL) || (res->image == NULL)) {
+        printf("thresholdImage: failure because frame->image not initialized\n");
+        return 1;
+    }
+    if ((res->image->width != frame->image->width) || (res->image->height != frame->image->height)) {
+        printf("thresholdImage: failure because res and frame image sizes are not the same\n");
+        return 1;
+    } 
+
 
     for(int i = 0; i < frameHeight; i++){
         for(int j = 0; j < frameWidth; j++){
@@ -219,20 +238,65 @@ int thresholdImage(frame_t *frame, frame_t *res) {
     return 0;
 }
 
-int segmentImage(frame_t *frame, frame_t *res)  {
+//TODO: Testing in progress
+int segmentImage(frame_t *frame, frame_t *res, int *largestLabel)  {
     //segment the image (label each connected component a different label)
-    if (blurImage(frame) != 0) {
-        printf("segmentImage: blurImage failure code\n");
-        return 1;
-    }
     if (thresholdImage(frame, res) != 0) {
         printf("segmentImage: thresholdImage failure code\n");
         return 1;
     }
 
-    //TODO: add Segmentation code here - watershed
-    //      START LABELS AT 1 (non-labeled remains at 0)
+    // Segmentation code here - watershed
+    //      START LABELS AT 2 (non-labeled remains at 0)
+    int numSeeds = 10; // number of seeds to begin at random locations
+    int i, j, pVal, label = 2;
+    int rWidth = res->image->width;
+    int rHeight = res->image->height;
+    for (i = 0; i < numSeeds; i++) {
+        srand(time(NULL));
+        pVal = rand() % (rWidth*rHeight);
+        // TODO: Using pVal, we'll segment surrounding pixels with the same label.
+        if (res->image->data[pVal].L == 0) {
+            // Pixel did not have a value
+            LOG_ERR("segmentImage: Continuing with seeds, pixel off at %d\n", pVal);
+            continue;
+        }
+        if (res->image->data[pVal].L != 1) {
+            LOG_ERR("segmentImage: Continuing with seeds, pixel already labeled at %d\n", pVal);
+            continue;
+        }
 
+        
+
+        label++;
+    }
+
+    // segment remaining pixels by looking for neighbor nearby or creating new label
+    int val1, val2, val3, val4; 
+    for (i = 0; i <rHeight; i++){
+        for (j = 0; j < rWidth; j++) {
+            if (res->image->data[i*rWidth+j].L == 1) {
+                val1 = res->image->data[(i-1)*rWidth+j].L;
+                val2 = res->image->data[(i+1)*rWidth+j].L;
+                val3 = res->image->data[i*rWidth+(j-1)].L;
+                val4 = res->image->data[i*rWidth+(j+1)].L;
+                if (val1 > 1){
+                    res->image->data[i*rWidth+j].L = val1;
+                } else if (val2 > 1) {
+                    res->image->data[i*rWidth+j].L = val2;
+                } else if (val3 > 1) {
+                    res->image->data[i*rWidth+j].L = val3;
+                } else if (val4 > 1) {
+                    res->image->data[i*rWidth+j].L = val4;
+                } else {
+                    res->image->data[i*rWidth+j].L = label;
+                    label++;
+                }
+            }
+        }
+    }
+
+    *largestLabel = label;
     return 0;
 }
 
@@ -276,7 +340,8 @@ int blobDetection(frame_t *frame){
     //TODO: detect blobs in the current frame and fill out the box struct
     //      --- look into segmentation of images (blur the image first then segment)
     // don't add a blob smaller than a certain size.
-    if (segmentImage(frame, frame) != 0) {
+    int largestLabel;
+    if (segmentImage(frame, frame, &largestLabel) != 0) {
         printf("blobDetection: segmentImage failed\n");
         return 1;
     }
@@ -291,7 +356,7 @@ int blobDetection(frame_t *frame){
 
     int i, j;
     int left, right, up, down; 
-    int tag=0;
+    int tag=1;
     pixel_t p;
     int w, h, cx, cy;
     int done = 0;
@@ -316,7 +381,7 @@ int blobDetection(frame_t *frame){
         for (i = 0; i < frame->image->height; i++){
             for (j = 0; j < frame->image->width; j++){
                 p = frame->image->data[i*frame->image->width+j];
-                if (p.L != tag) {
+                if (p.L == tag) {
                     // The pixel has label we're looking for, so we include it
                     //  Find the left, right, up, and down most values for the label
                     if (j < left) {
@@ -331,6 +396,10 @@ int blobDetection(frame_t *frame){
                     if (i > down) {
                         down = i;
                     }
+                }
+                if (tag > largestLabel) {
+                    // If we looked through the largest tag value, then we're done
+                    done = 1;
                 }
             }
         }
