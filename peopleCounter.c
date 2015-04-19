@@ -238,7 +238,7 @@ int thresholdImage(frame_t *frame, frame_t *res) {
     return 0;
 }
 
-//TODO: Testing in progress
+//TODO: Testing in progress - ALSO ADD MORE PRINT STATEMENTS
 int segmentImage(frame_t *frame, frame_t *res, int *largestLabel)  {
     //segment the image (label each connected component a different label)
     if (thresholdImage(frame, res) != 0) {
@@ -249,26 +249,43 @@ int segmentImage(frame_t *frame, frame_t *res, int *largestLabel)  {
     // Segmentation code here - watershed
     //      START LABELS AT 2 (non-labeled remains at 0)
     int numSeeds = 10; // number of seeds to begin at random locations
-    int i, j, pVal, label = 2;
+    int i, j, pValW, pValH, label = 2;
     int rWidth = res->image->width;
     int rHeight = res->image->height;
-
+    
+    pixel_t *P;
+    int x, y;
+    createStack();
     for (i = 0; i < numSeeds; i++) {
         srand(time(NULL));
-        pVal = rand() % (rWidth*rHeight);
+        pValW = rand() % rWidth;
+        pValH = rand() % rHeight;
         // TODO: Using pVal, we'll segment surrounding pixels with the same label.
-        if (res->image->data[pVal].L == 0) {
+        if (res->image->data[pValH*rWidth + pValW].L == 0) {
             // Pixel did not have a value
-            LOG_ERR("segmentImage: Continuing with seeds, pixel off at %d\n", pVal);
+            LOG_ERR("segmentImage: Continuing with seeds, pixel off at (w,h) -> (%d, %d)\n", pValW, pValH);
             continue;
         }
-        if (res->image->data[pVal].L != 1) {
-            LOG_ERR("segmentImage: Continuing with seeds, pixel already labeled at %d\n", pVal);
+        if (res->image->data[pValH*rWidth + pValW].L != 1) {
+            LOG_ERR("segmentImage: Continuing with seeds, pixel already labeled at (w,h) -> (%d, %d)\n", pValW, pValH);
             continue;
         }
 
-        // Add work to stack  
-         
+        // Add pixels to stack  
+        push(&res->image->data[(pValH - 1)*rWidth + pValW], pValW, pValH-1);
+        push(&res->image->data[(pValH + 1)*rWidth + pValW], pValW, pValH+1);
+        push(&res->image->data[pValH*rWidth + (pValW-1)], pValW-1, pValH);
+        push(&res->image->data[pValH*rWidth + (pValW+1)], pValW+1, pValH);
+        while(isEmpty() != 0) {
+            P = pop(&x, &y);
+            if (P->L != 0) {
+                P->L = label;
+                push(&res->image->data[(y-1)*rWidth+x], x, y-1);
+                push(&res->image->data[(y+1)*rWidth+x], x, y+1);
+                push(&res->image->data[y*rWidth+(x-1)], x-1, y);
+                push(&res->image->data[y*rWidth+(x+1)], x+1, y);
+            }
+        }
 
         label++;
     }

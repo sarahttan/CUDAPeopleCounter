@@ -77,10 +77,9 @@ void main()
 #endif 
 
 /* Create empty stack */
-stack_t *create()
+void createStack()
 {
     top = NULL;
-    return top;
 }
  
 /* Count stack elements */
@@ -90,26 +89,30 @@ void stack_count()
 }
  
 /* Push data into stack */
-void push(pixel_t *data)
+void push(pixel_t *data, int x, int y)
 {
     if (top == NULL)
     {
         top =(stack_t *)malloc(sizeof(struct stack_s));
         top->ptr = NULL;
         top->P = data;
+        top->x = x;
+        top->y = y;
     }
     else
     {
         stack_t *temp =(stack_t *)malloc(sizeof(struct stack_s));
         temp->ptr = top;
         temp->P = data;
+        temp->x = x;
+        temp->y = y;
         top = temp;
     }
     nStackCount++;
 }
  
 /* Display stack elements */
-void display()
+void displayStack()
 {
     stack_t *top1 = top;
  
@@ -127,7 +130,7 @@ void display()
  }
  
 /* Pop Operation on stack */
-pixel_t* pop()
+pixel_t* pop(int *x, int *y)
 {
     pixel_t *P;
     stack_t *top1 = top;
@@ -140,6 +143,8 @@ pixel_t* pop()
     else
         top1 = top1->ptr;
     P = top->P;
+    *x = top->x;
+    *y = top->y;
     free(top);
     LOG_ERR_STACK("\n Popped value : pixel with vals (L,A,B) -> (%d, %d, %d)", P->L, P->A, P->B);
     top = top1;
@@ -166,7 +171,7 @@ int isEmpty()
 }
  
 /* Destroy entire stack */
-void destroy()
+void destroyStack()
 {
     stack_t *top1 = top;
  

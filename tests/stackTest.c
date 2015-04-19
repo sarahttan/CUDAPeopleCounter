@@ -7,6 +7,7 @@ int main()
 {
     int no, ch;
     pixel_t *e;
+    int temp, temp1;
 
     printf("\n 1 - Push");
     printf("\n 2 - Pop");
@@ -18,7 +19,7 @@ int main()
     printf("\n 8 - Destroy stack");
     printf("\n 9 - Create stack");
 
-    create();
+    createStack();
 
     while (1)
     {
@@ -34,10 +35,10 @@ int main()
             p->L = no;
             p->A = 0;
             p->B = 0;
-            push(p);
+            push(p,1,1);
             break;
         case 2:
-            pop();
+            pop(&temp, &temp1);
             break;
         case 3:
             if (isEmpty() == 0)
@@ -54,16 +55,16 @@ int main()
         case 5:
             exit(0);
         case 6:
-            display();
+            displayStack();
             break;
         case 7:
             stack_count();
             break;
         case 8:
-            destroy();
+            destroyStack();
             break;
         case 9:
-            create();
+            createStack();
             break;
         default :
             printf(" Wrong choice, Please enter correct choice  ");
