@@ -11,7 +11,7 @@
 
 #define DEBUG
 #ifdef DEBUG
-#define LOG_ERR(...) fprintf(stderr, __VA_ARGS__)
+#define LOG_ERR(...) fprintf(stdout, __VA_ARGS__)
 #else
 #define LOG_ERR(...)
 #endif
@@ -252,6 +252,7 @@ int segmentImage(frame_t *frame, frame_t *res, int *largestLabel)  {
     int i, j, pVal, label = 2;
     int rWidth = res->image->width;
     int rHeight = res->image->height;
+
     for (i = 0; i < numSeeds; i++) {
         srand(time(NULL));
         pVal = rand() % (rWidth*rHeight);
@@ -266,7 +267,8 @@ int segmentImage(frame_t *frame, frame_t *res, int *largestLabel)  {
             continue;
         }
 
-        
+        // Add work to stack  
+         
 
         label++;
     }

@@ -1,6 +1,7 @@
 #ifndef PPL_COUNTER
 #define PPL_COUNTER
 #include "image.h"
+#include "stack.h"
 
 typedef struct box_s {
     int centroid_x; //center x of bounding box (pixels)
