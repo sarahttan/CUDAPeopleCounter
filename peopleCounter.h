@@ -41,6 +41,8 @@ int readImageFrame(frame_t *frame, char *fileName);
 // OUTPUT: 1 - if an error occurred, 0 - otherwise
 int frameSubtraction(frame_t *frame, frame_t *frame2, frame_t *res);
 
+int segmentImage(frame_t *frame, frame_t *res, int *largestLabel);
+
 // detect blobs in the image
 // INPUT: frame - image to detect blobs
 // OUTPUT: 1 - if an error occurred, 0 - otherwise

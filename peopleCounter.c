@@ -256,11 +256,11 @@ int segmentImage(frame_t *frame, frame_t *res, int *largestLabel)  {
     pixel_t *P;
     int x, y;
     createStack();
+    srand(time(NULL));
     for (i = 0; i < numSeeds; i++) {
-        srand(time(NULL));
         pValW = rand() % rWidth;
         pValH = rand() % rHeight;
-        // TODO: Using pVal, we'll segment surrounding pixels with the same label.
+        // Using pVal, we'll segment surrounding pixels with the same label.
         if (res->image->data[pValH*rWidth + pValW].L == 0) {
             // Pixel did not have a value
             LOG_ERR("segmentImage: Continuing with seeds, pixel off at (w,h) -> (%d, %d)\n", pValW, pValH);
@@ -271,19 +271,25 @@ int segmentImage(frame_t *frame, frame_t *res, int *largestLabel)  {
             continue;
         }
 
-        // Add pixels to stack  
-        push(&res->image->data[(pValH - 1)*rWidth + pValW], pValW, pValH-1);
-        push(&res->image->data[(pValH + 1)*rWidth + pValW], pValW, pValH+1);
-        push(&res->image->data[pValH*rWidth + (pValW-1)], pValW-1, pValH);
-        push(&res->image->data[pValH*rWidth + (pValW+1)], pValW+1, pValH);
+        // Add pixels to stack 
+        push(&res->image->data[pValH * rWidth + pValW], pValW, pValH); 
         while(isEmpty() != 0) {
             P = pop(&x, &y);
-            if (P->L != 0) {
+            if (P->L == 1) {
                 P->L = label;
-                push(&res->image->data[(y-1)*rWidth+x], x, y-1);
-                push(&res->image->data[(y+1)*rWidth+x], x, y+1);
-                push(&res->image->data[y*rWidth+(x-1)], x-1, y);
-                push(&res->image->data[y*rWidth+(x+1)], x+1, y);
+                // Add neighboring pixels within the bounds to the stack
+                if (y-1 >= 0) {
+                    push(&res->image->data[(y-1)*rWidth+x], x, y-1);
+                }
+                if (y+1 < rHeight) {
+                    push(&res->image->data[(y+1)*rWidth+x], x, y+1);
+                }
+                if (x-1 >= 0) {
+                    push(&res->image->data[y*rWidth+(x-1)], x-1, y);
+                }
+                if (x+1 < rWidth) {
+                    push(&res->image->data[y*rWidth+(x+1)], x+1, y);
+                }
             }
         }
 
@@ -294,11 +300,21 @@ int segmentImage(frame_t *frame, frame_t *res, int *largestLabel)  {
     int val1, val2, val3, val4; 
     for (i = 0; i <rHeight; i++){
         for (j = 0; j < rWidth; j++) {
+            val1 = 0;
+            val2 = 0;
+            val3 = 0;
+            val4 = 0;
+            // pixel has not been labelled yet
             if (res->image->data[i*rWidth+j].L == 1) {
-                val1 = res->image->data[(i-1)*rWidth+j].L;
-                val2 = res->image->data[(i+1)*rWidth+j].L;
-                val3 = res->image->data[i*rWidth+(j-1)].L;
-                val4 = res->image->data[i*rWidth+(j+1)].L;
+                // give the current pixel the label of its neighbor or new label
+                if (i-1 >= 0) 
+                    val1 = res->image->data[(i-1)*rWidth+j].L;
+                if (i+1 < rHeight)
+                    val2 = res->image->data[(i+1)*rWidth+j].L;
+                if (j-1 >= 0)
+                    val3 = res->image->data[i*rWidth+(j-1)].L;
+                if (j+1 < rWidth)
+                    val4 = res->image->data[i*rWidth+(j+1)].L;
                 if (val1 > 1){
                     res->image->data[i*rWidth+j].L = val1;
                 } else if (val2 > 1) {

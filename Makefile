@@ -1,4 +1,4 @@
-all: readjpeg readImage blobDir boxCreDel frameSub copyFrame writeImage stack
+all: readjpeg readImage blobDir boxCreDel frameSub copyFrame writeImage stack segmentImage
 
 readjpeg: readjpeg.c tests/loadjpeg.c
 	gcc -ljpeg -Wall -o readjpeg readjpeg.c tests/loadjpeg.c
@@ -24,5 +24,8 @@ writeImage: tests/writeImageTest.c readjpeg.c stack.c peopleCounter.c
 stack: tests/stackTest.c readjpeg.c stack.c peopleCounter.c
 	gcc -ljpeg -Wall -std=c99 -lm -o stackTest readjpeg.c stack.c peopleCounter.c tests/stackTest.c
 
+segmentImage: tests/segmentImageTest.c readjpeg.c stack.c peopleCounter.c
+	gcc -ljpeg -Wall -std=c99 -lm -o segmentImageTest readjpeg.c stack.c peopleCounter.c tests/segmentImageTest.c
+
 clean:
-	rm readjpeg readImageTest blobDirTest boxCreateDelete frameSubTest copyFrame writeImageTest stackTest
+	rm readjpeg readImageTest blobDirTest boxCreateDelete frameSubTest copyFrame writeImageTest stackTest segmentImageTest
