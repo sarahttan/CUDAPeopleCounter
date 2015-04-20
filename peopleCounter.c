@@ -249,7 +249,6 @@ int segmentImage(frame_t *frame, frame_t *res, int *largestLabel)  {
 
     // Segmentation code here - watershed
     //      START LABELS AT 2 (non-labeled remains at 0)
-    int numSeeds = 10; // number of seeds to begin at random locations
     int i, j, pValW, pValH, label = 2;
     int rWidth = res->image->width;
     int rHeight = res->image->height;
@@ -257,21 +256,20 @@ int segmentImage(frame_t *frame, frame_t *res, int *largestLabel)  {
     pixel_t *P;
     int x, y;
     createStack();
-    srand(time(NULL));
-    for (i = 0; i < numSeeds; i++) {
-        pValW = rand() % rWidth;
-        pValH = rand() % rHeight;
+    for (i = 0; i < rHeight; i++) {
+        for (j = 0; j < rWidth; j++) {
+        pValH = i;
+        pValW = j;
         // Using pVal, we'll segment surrounding pixels with the same label.
         if (res->image->data[pValH*rWidth + pValW].L == 0) {
             // Pixel did not have a value
-            LOG_ERR("segmentImage: Continuing with seeds, pixel off at (w,h) -> (%d, %d)\n", pValW, pValH);
-            continue;
+            //LOG_ERR("segmentImage: Continuing with seeds, pixel off at (w,h) -> (%d, %d)\n", pValW, pValH);
         }
         if (res->image->data[pValH*rWidth + pValW].L != 1) {
-            LOG_ERR("segmentImage: Continuing with seeds, pixel already labeled at (w,h) -> (%d, %d)\n", pValW, pValH);
-            continue;
+            //LOG_ERR("segmentImage: Continuing with seeds, pixel already labeled at (w,h) -> (%d, %d)\n", pValW, pValH);
         }
 
+        if (res->image->data[pValH*rWidth + pValW].L == 1) {
         // Add pixels to stack 
         push(&res->image->data[pValH * rWidth + pValW], pValW, pValH); 
         while(isEmpty() != 0) {
@@ -293,10 +291,13 @@ int segmentImage(frame_t *frame, frame_t *res, int *largestLabel)  {
                 }
             }
         }
+        }
 
         label++;
+        }
     }
 
+#if 0
     // segment remaining pixels by looking for neighbor nearby or creating new label
     int val1, val2, val3, val4; 
     for (i = 0; i <rHeight; i++){
@@ -331,6 +332,7 @@ int segmentImage(frame_t *frame, frame_t *res, int *largestLabel)  {
             }
         }
     }
+#endif
 
     //TODO: create a hash table of labels going through the image on one pass
     //          then update the image using the hash table on the second pass
