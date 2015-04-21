@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include "stack.h" 
 
-//#define DEBUG_STACK
+#define DEBUG_STACK
 #ifdef DEBUG_STACK
 #define LOG_ERR_STACK(...) fprintf(stdout, __VA_ARGS__)
 #else
@@ -146,7 +146,7 @@ pixel_t* pop(int *x, int *y)
     *x = top->x;
     *y = top->y;
     free(top);
-    LOG_ERR_STACK("\n Popped pixel at [y,x] -> [%d, %d]: (L,A,B,S,label) -> (%d, %d, %d, %d, %lu)", *y, *x, P->L, P->A, P->B, P->S, P->label);
+    LOG_ERR_STACK("\n Popped value : pixel with vals (L,A,B) -> (%d, %d, %d)", P->L, P->A, P->B);
     top = top1;
     nStackCount--;
     return P;

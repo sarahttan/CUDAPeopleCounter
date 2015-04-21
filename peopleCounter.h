@@ -43,7 +43,7 @@ int frameSubtraction(frame_t *frame, frame_t *frame2, frame_t *res);
 
 int thresholdImage(frame_t *frame, frame_t *res);
 
-int segmentImage(frame_t *frame, frame_t *res, int *largestLabel);
+int segmentImage(frame_t *frame, frame_t *res, unsigned long *largestLabel);
 
 // detect blobs in the image
 // INPUT: frame - image to detect blobs

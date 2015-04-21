@@ -44,7 +44,8 @@ int saveJpg(const char *Name, Image_t *pImage)
     cinfo.image_height = pImage->height;
     cinfo.input_components = 3;
     cinfo.in_color_space = COLOR_SPACE;
-    
+    cinfo.jpeg_color_space = COLOR_SPACE;
+ 
     jpeg_set_defaults(&cinfo);
     jpeg_set_quality(&cinfo,100,TRUE);
 

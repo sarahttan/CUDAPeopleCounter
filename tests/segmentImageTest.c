@@ -28,44 +28,45 @@ int main(int argc, char *argv[]){
     }
     
     
-    int largestLabel;
+    unsigned long largestLabel;
     segmentImage(frame, frame, &largestLabel);    
 
     pixel_t p;
     int i,j;
     int fH = frame->image->height;
     int fW = frame->image->width;
-#if 0
+
     for (i = 0; i < fH; i++) {
         for (j = 0; j < fW; j++) {
             p = frame->image->data[i*fW+j];
-            if (p.L == 1) {
-                printf("Missed a pixel during segmentation at (%d,%d)\n", i,j);
-                return 1;
+            if ((p.label == 0) && (p.L != 0)) {
+                printf("Missed a pixel during segmentation at (y,x) -> (%d,%d):(%d,%d,%d,%d,%lu)\n", i,j,p.L,p.A,p.B,p.S,p.label);
             }
-            if (p.L > 1) {
+            if (p.label >= 1) {
                 if (i - 1 >= 0) 
-                    if (frame->image->data[(i-1)*fW+j].L != p.L)
+                    if (frame->image->data[(i-1)*fW+j].label != p.label)
                         if (frame->image->data[(i-1)*fW+j].L > 0)
-                            printf("Pixel (%d, %d) with val %d not same as neighbor (%d, %d)->%d\n", i,j,p.L,i-1, j, frame->image->data[(i-1)*fW+j].L);
+                            printf("Pixel (%d, %d) with val %lu not same as neighbor (y,x): (%d, %d)->%lu\n", i,j,p.label,i-1, j, frame->image->data[(i-1)*fW+j].label);
                 if (i + 1 < fH) 
-                    if (frame->image->data[(i+1)*fW+j].L != p.L) 
+                    if (frame->image->data[(i+1)*fW+j].label != p.label) 
                         if (frame->image->data[(i+1)*fW+j].L > 0) 
-                            printf("Pixel (%d, %d) with val %d not same as neighbor (%d, %d)->%d\n", i,j,p.L,i+1, j, frame->image->data[(i+1)*fW+j].L);
+                            printf("Pixel (%d, %d) with val %lu not same as neighbor (y,x): (%d, %d)->%lu\n", i,j,p.label,i+1, j, frame->image->data[(i+1)*fW+j].label);
                 if (j-1 >= 0)
-                    if (frame->image->data[i*fW+(j-1)].L != p.L) 
+                    if (frame->image->data[i*fW+(j-1)].label != p.label) 
                         if (frame->image->data[i*fW+(j-1)].L > 0) 
-                            printf("Pixel (%d, %d) with val %d not same as neighbor (%d,%d)->%d\n", i,j,p.L,i, j-1, frame->image->data[i*fW+(j-1)].L);
+                            printf("Pixel (%d, %d) with val %lu not same as neighbor (y,x): (%d,%d)->%lu\n", i,j,p.label,i, j-1, frame->image->data[i*fW+(j-1)].label);
                 if (j+1 < fW)
-                    if (frame->image->data[i*fW+(j+1)].L != p.L)
+                    if (frame->image->data[i*fW+(j+1)].label != p.label)
                         if (frame->image->data[i*fW+(j+1)].L > 0)
-                            printf("Pixel (%d, %d) with val %d not same as neighbor (%d,%d)->%d\n", i,j,p.L,i, j+1, frame->image->data[i*fW+(j+1)].L);
+                            printf("Pixel (%d, %d) with val %lu not same as neighbor (y,x): (%d,%d)->%lu\n", i,j,p.label,i, j+1, frame->image->data[i*fW+(j+1)].label);
             }
         } 
     }
     printf("Segment Image Success!!\n");
-    printf("Largest label number is %d\n", largestLabel);
-#endif
+    printf("Largest label number is %lu\n", largestLabel);
+    
+
+#if 0
     pixel_t *P;
     srand(time(NULL));
     for (i = 0; i < fH; i++) {
@@ -88,7 +89,7 @@ int main(int argc, char *argv[]){
     } else {
         printf("Segmented Image can be found at [segOut.jpg]\n");
     } 
- 
+ #endif
     printf("Freeing frame\n");
     if (freeFrame(frame) == 1) {
         printf("Unable to free frame\n");
