@@ -134,7 +134,6 @@ int frameSubtraction(frame_t *frame, frame_t *frame2, frame_t *res){
     return 0;
 }
 
-//TODO: Retest with added values of center_x and center_y
 // Create a new box with centroid (c_x, c_y), and center (center_x, center_y) height and width
 int createNewBox(frame_t *frame, int c_x, int c_y, int center_x, int center_y, int height, int width) {
     //create a new bounding box in the frame
@@ -681,6 +680,8 @@ int drawBoxOnImage(frame_t *frame, frame_t *res) {
     // initialize
     box_t *head = frame->boxes;
     box_t *tmp = head;
+    int fWidth = frame->image->width;
+    int fHeight = frame->image->height;
     int width;
     int height;
     int cx;
@@ -698,7 +699,23 @@ int drawBoxOnImage(frame_t *frame, frame_t *res) {
         height = tmp->height;
         cx = tmp->centroid_x;
         cy = tmp->centroid_y;
-    
+  
+        // draw centroid into the result frame 
+        //  box should be at least a 5 square pixels in order to view
+        int pCX, pCY;
+        for (pCY = 0; pCY < 5; pCY++) {
+            for (pCX = 0; pCX < 5; pCX++) {
+                if ((cx+3-pCX > 0) && (cx+3-pCX < fWidth)){
+                    if ((cy+3-pCY) && (cy+3-pCY < fHeight)){
+                        frame->image->data[(cy+3-pCY)*fWidth+(cx+3-pCX)].L = 142;
+                        frame->image->data[(cy+3-pCY)*fWidth+(cx+3-pCX)].A = 105;
+                        frame->image->data[(cy+3-pCY)*fWidth+(cx+3-pCX)].L = 196;
+                    }   
+                }
+            }
+        }
+         
+
         //draw box onto the result frame
         int i,j,cr1,cr2;
         cr1 = cx-width/2;
@@ -717,10 +734,11 @@ int drawBoxOnImage(frame_t *frame, frame_t *res) {
                 if (width < linelen) {
                     linelen = width-1;
                 }
+                // draw the column so that it is at least a 5 pixel width line
                 for (x = 0; (x < linelen || x == 0); x++) {
-                    res->image->data[(j+x)*width+cr1].L = 117;
-                    res->image->data[(j+x)*width+cr1].A = 196;
-                    res->image->data[(j+x)*width+cr1].B = 117;
+                    res->image->data[(j+x)*fWidth+cr1].L = 117;
+                    res->image->data[(j+x)*fWidth+cr1].A = 196;
+                    res->image->data[(j+x)*fWidth+cr1].B = 117;
                 }
             }
             
@@ -736,9 +754,9 @@ int drawBoxOnImage(frame_t *frame, frame_t *res) {
                     linelen = width-1;
                 }
                 for (x = 0; (x < linelen || x == 0); x++) {
-                    res->image->data[(j-x)*width+cr2].L = 117;
-                    res->image->data[(j-x)*width+cr2].A = 196;
-                    res->image->data[(j-x)*width+cr2].B = 117;   
+                    res->image->data[(j-x)*fWidth+cr2].L = 117;
+                    res->image->data[(j-x)*fWidth+cr2].A = 196;
+                    res->image->data[(j-x)*fWidth+cr2].B = 117;   
                 }
             }
             if (done >= 2) {
