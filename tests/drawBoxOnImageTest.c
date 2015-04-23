@@ -3,7 +3,6 @@
 #include <string.h>
 #include <math.h>
 #include "../peopleCounter.h"
-#include "../image.h"
 
 int main(int argc, char *argv[]){
 

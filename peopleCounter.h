@@ -91,11 +91,11 @@ box_t *copyBoundingBoxes(frame_t *frame);
 // OUTPUT: new malloced frame
 frame_t *copyFrame(frame_t *frame);
 
+int drawBoxOnImage(frame_t *frame, frame_t *res);
+
 // print the frame to a jpg image
 // INPUT: frame - image frame
 // OUTPUT: 1 - if an error occurred, 0 - otherwise
-
-int drawBoxOnImage(frame_t *frame, frame_t *res;
 int frameToJPG(frame_t *frame, char *filename);
 
 #endif
