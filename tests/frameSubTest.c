@@ -14,7 +14,8 @@ int main(int argc, char *argv[]){
     frame_t *res = malloc(sizeof(struct frame_s));
 
     readImageFrame(frame, "./frames/frame01.jpg");
-    readImageFrame(frame2, "./frames/frame04.jpg");
+    frame2 = copyFrame(frame);
+    //readImageFrame(frame2, "./frames/frame04.jpg");
     readImageFrame(res, "./frames/frame01.jpg");
 
     if (frameSubtraction(frame, frame2, res) != 0) {

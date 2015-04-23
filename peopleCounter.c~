@@ -235,29 +235,38 @@ int thresholdImage(frame_t *frame, frame_t *res) {
                 res->image->data[i * frameWidth + j].L = 0;          
             res->image->data[i*frameWidth+j].A = 0;
             res->image->data[i*frameWidth+j].B = 0;
+            res->image->data[i*frameWidth+j].S = 0;
+            res->image->data[i*frameWidth+j].label = 0;
         }
     }
     return 0;
 }
 
-int segmentImage(frame_t *frame, frame_t *res, int *largestLabel)  {
+int segmentImage(frame_t *frame, frame_t *res, unsigned long *largestLabel)  {
     //segment the image (label each connected component a different label)
     if (thresholdImage(frame, res) != 0) {
         printf("segmentImage: thresholdImage failure code\n");
         return 1;
     }
 
+    // DISCLAIMERS: L channel - binary map after thresholding image
+    //                        - contains segmented image following this func
+    //              A channel - must be 0s after threshold
+    //                        - "in stack" binary map use in this func only
+    //              B channel - must be 0s after threshold
+
     // Segmentation code here - watershed
-    //      START LABELS AT 2 (non-labeled remains at 0)
-    int i, j, pValW, pValH, label = 2;
+    //      START LABELS AT 1 (non-labeled remains at 0)
+    int i, j, pValW, pValH;
+    unsigned long label = 1;
     int rWidth = res->image->width;
     int rHeight = res->image->height;
     
     pixel_t *P;
+    pixel_t *nP;
     int x, y;
     createStack();
     for (i = 0; i < rHeight; i++) {
-        printf("i=%d\n",i);
         for (j = 0; j < rWidth; j++) {
         pValH = i;
         pValW = j;
@@ -265,44 +274,66 @@ int segmentImage(frame_t *frame, frame_t *res, int *largestLabel)  {
         if (res->image->data[pValH*rWidth + pValW].L == 0) {
             // Pixel did not have a value
             //LOG_ERR("segmentImage: Continuing with seeds, pixel off at (w,h) -> (%d, %d)\n", pValW, pValH);
-        } else if (res->image->data[pValH*rWidth + pValW].L > 1) {
-            //LOG_ERR("segmentImage: Continuing with seeds, pixel already labeled at (w,h) -> (%d, %d)\n", pValW, pValH);
         } else {
+            if (res->image->data[pValH*rWidth + pValW].label >= 1) {
+            //LOG_ERR("segmentImage: Continuing with seeds, pixel already labeled at (w,h) -> (%d, %d)\n", pValW, pValH);
+            } else {
             //LOG_ERR("segmentImage: Labeling connected pixels starting at (w,h) -> (%d, %d)\n", pValW, pValH);
-            // Add pixels to stack 
-            push(&res->image->data[pValH * rWidth + pValW], pValW, pValH); 
-            while(isEmpty() != 0) {
-                P = pop(&x, &y);
-                if (P->L == 1) {
-                    P->L = label;
+                // Add pixels to stack 
+                push(&res->image->data[pValH * rWidth + pValW], pValW, pValH);
+                res->image->data[pValH*rWidth+pValW].S = 1; 
+                while(isEmpty() != 0) {
+                    P = pop(&x, &y);
+                    if (((P->label != label) && (P->L != 0))) {
+                        P->label = label;
+                        //printf("\nAdding label to (%d, %d) to get (%d, %d, %d, %d, %lu)\n", y, x, P->L,P->A,P->B,P->S, P->label);
                     // Add neighboring pixels within the bounds to the stack
-                    if (y-1 >= 0) {
-                        if(res->image->data[(y-1)*rWidth+x].L == 1){
-                            push(&res->image->data[(y-1)*rWidth+x], x, y-1);
+                        if (y-1 >= 0) {
+                            nP = &res->image->data[(y-1)*rWidth+x];
+                            // Check if the pixel has been in the stack
+                            if (nP->S != 1) {
+                                // Check if the pixel has a value
+                                if(nP->L != 0 && nP->label != label){
+                                    push(nP, x, y-1);
+                                    nP->S = 1;
+                                }
+                            }
                         }
-                    }
-                    if (y+1 < rHeight) {
-                        if (res->image->data[(y+1)*rWidth+x].L == 1) {
-                            push(&res->image->data[(y+1)*rWidth+x], x, y+1);
+                        if (y+1 < rHeight) {
+                            nP = &res->image->data[(y+1)*rWidth+x];
+                            if (nP->S != 1) {
+                                if(nP->L != 0 && nP->label != label){
+                                    push(nP, x, y+1);
+                                    nP->S = 1;
+                                }
+                            } 
                         }   
-                    }   
-                    if (x-1 >= 0) {
-                        if(res->image->data[y*rWidth+(x-1)].L == 1) {
-                            push(&res->image->data[y*rWidth+(x-1)], x-1, y);
+                        if (x-1 >= 0) {
+                            nP = &res->image->data[y*rWidth+(x-1)];
+                            if (nP->S != 1) {
+                                if(nP->L != 0 && nP->label != label){
+                                    push(nP, x-1, y);
+                                    nP->S = 1;
+                                }
+                            }    
                         }
-                    }
-                    if (x+1 < rWidth) {
-                        if(res->image->data[y*rWidth+(x+1)].L == 1) {
-                            push(&res->image->data[y*rWidth+(x+1)], x+1, y);
+                        if (x+1 < rWidth) {
+                            nP = &res->image->data[y*rWidth+(x+1)];
+                            if (nP->S != 1) {
+                                if(nP->L != 0 && nP->label != label){
+                                    push(nP, x+1, y);
+                                    nP->S = 1;
+                                }
+                            }
                         }
                     }
                 }
             }
-        }
 
         label++;
         }
     }
+}
 
 // Other method of labelling pixels - sequential algo
 #if 0
@@ -386,7 +417,7 @@ int blobDetection(frame_t *frame){
     //detect blobs in the current frame and fill out the box struct
     //      --- look into segmentation of images (blur the image first then segment)
     // don't add a blob smaller than a certain size.
-    int largestLabel;
+    unsigned long largestLabel;
     if (segmentImage(frame, frame, &largestLabel) != 0) {
         printf("blobDetection: segmentImage failed\n");
         return 1;
@@ -427,7 +458,7 @@ int blobDetection(frame_t *frame){
         for (i = 0; i < frame->image->height; i++){
             for (j = 0; j < frame->image->width; j++){
                 p = frame->image->data[i*frame->image->width+j];
-                if (p.L == tag) {
+                if (p.label == tag) {
                     // The pixel has label we're looking for, so we include it
                     //  Find the left, right, up, and down most values for the label
                     if (j < left) {

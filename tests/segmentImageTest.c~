@@ -153,6 +153,7 @@ int main(int argc, char *argv[]){
         
     printf("Largest label number is %lu (should be 2)\n", largestLabel);
         
+    pixel_t *P;
     srand(time(NULL));
     for (i = 0; i < fH; i++) {
         for (j = 0; j < fW; j++) {

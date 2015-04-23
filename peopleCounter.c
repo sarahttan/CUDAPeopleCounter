@@ -286,7 +286,7 @@ int segmentImage(frame_t *frame, frame_t *res, unsigned long *largestLabel)  {
                     P = pop(&x, &y);
                     if (((P->label != label) && (P->L != 0))) {
                         P->label = label;
-                        printf("\nAdding label to (%d, %d) to get (%d, %d, %d, %d, %lu)\n", y, x, P->L,P->A,P->B,P->S, P->label);
+                        //printf("\nAdding label to (%d, %d) to get (%d, %d, %d, %d, %lu)\n", y, x, P->L,P->A,P->B,P->S, P->label);
                     // Add neighboring pixels within the bounds to the stack
                         if (y-1 >= 0) {
                             nP = &res->image->data[(y-1)*rWidth+x];
@@ -389,7 +389,7 @@ int minBlob(int width, int height, int cx, int cy){
         return 1;
     }
     if (height < minH) {
-        LOG_ERR("blob at (%d, %d) with size [w,h] -> [%d,%d] < min dime of [%d, %d]\n", cx, cy, width, height, minW, minH);
+        LOG_ERR("blob at (%d, %d) with size [w,h] -> [%d,%d] < min dim of [%d, %d]\n", cx, cy, width, height, minW, minH);
         return 1; 
     }
     return 0;
@@ -413,6 +413,7 @@ int maxBlob(int width, int height, int cx, int cy){
     return 0;
 }
 
+//TODO: testing in progress
 int blobDetection(frame_t *frame){
     //detect blobs in the current frame and fill out the box struct
     //      --- look into segmentation of images (blur the image first then segment)
@@ -433,6 +434,7 @@ int blobDetection(frame_t *frame){
 
     int i, j;
     int left, right, up, down; 
+    int x=0,y=0,count=0;
     int tag=1;
     pixel_t p;
     int w, h, cx, cy;
@@ -473,6 +475,9 @@ int blobDetection(frame_t *frame){
                     if (i > down) {
                         down = i;
                     }
+                    x+=j;
+                    y+=i;
+                    count++;
                 }
                 if (tag > largestLabel) {
                     // If we looked through the largest tag value, then we're done
@@ -482,8 +487,8 @@ int blobDetection(frame_t *frame){
         }
 
         // update the corresponding values for the blob
-        cx = (right-left)/2 + left;
-        cy = (up - down)/2 - up;
+        cx = x/count;
+        cy = y/count;
         w = abs(right - left);
         h = abs(up - down);
 
@@ -599,7 +604,6 @@ box_t *copyBoundingBoxes(frame_t *frame) {
     return head;
 }
 
-// TODO: frames are not the same size - TO BE FIXED?
 frame_t *copyFrame(frame_t *frame) {
     if (frame == NULL) {
         LOG_ERR("copyFrame: frame is NULL\n");
@@ -619,20 +623,30 @@ frame_t *copyFrame(frame_t *frame) {
     } else {
         newF->image = (Image_t *)malloc(sizeof(struct Image_s));
         newF->image->width = frame->image->width;
-        newF->image->height = newF->image->height;
+        newF->image->height = frame->image->height;
         if (frame->image->data == NULL) {
             newF->image->data = NULL;
         } else {
             LOG_ERR("copyFrame: Copying over all image data\n");
             // copy over all of the image data in single for loop
             //  - will be really slow
-            newF->image->data = (pixel_t *)(malloc(sizeof(struct pixel_s) *frame->image->width*frame->image->height));
+            // **fixed using memcpy
+            
+            int imageSizeInPixels;
+            imageSizeInPixels = (frame->image->width)*(frame->image->height);
+            int imageSizeInBytes;
+            imageSizeInBytes = imageSizeInPixels * sizeof(pixel_t);
+            
+            newF->image->data = (pixel_t *)(malloc(imageSizeInBytes));
+            /*
             int i;
             for (i = 0; i < frame->image->width*frame->image->height; i++){
                 newF->image->data[i].L = frame->image->data[i].L;
                 newF->image->data[i].A = frame->image->data[i].A;
                 newF->image->data[i].B = frame->image->data[i].B;
             }
+            */
+            memcpy(newF->image->data, frame->image->data, imageSizeInBytes);
         }
     }
     return newF; 
@@ -690,9 +704,16 @@ int drawBoxOnImage(frame_t *frame, frame_t *res) {
                 done++;
             } else {
                 // draw in the values
-                res->image->data[j*width+cr1].L = 1;
-                res->image->data[j*width+cr1].A = 0;
-                res->image->data[j*width+cr1].B = 0;
+                int x;
+                int linelen = 5;
+                if (width < linelen) {
+                    linelen = width-1;
+                }
+                for (x = 0; (x < linelen || x == 0); x++) {
+                    res->image->data[(j+x)*width+cr1].L = 117;
+                    res->image->data[(j+x)*width+cr1].A = 196;
+                    res->image->data[(j+x)*width+cr1].B = 117;
+                }
             }
             
             // Draw right column
@@ -701,9 +722,16 @@ int drawBoxOnImage(frame_t *frame, frame_t *res) {
                 done++;
             } else {
                 // draw in the values
-                res->image->data[j*width+cr2].L = 1;
-                res->image->data[j*width+cr2].A = 0;
-                res->image->data[j*width+cr2].B = 0;   
+                int x;
+                int linelen = 5;
+                if (width < linelen) {
+                    linelen = width-1;
+                }
+                for (x = 0; (x < linelen || x == 0); x++) {
+                    res->image->data[(j-x)*width+cr2].L = 117;
+                    res->image->data[(j-x)*width+cr2].A = 196;
+                    res->image->data[(j-x)*width+cr2].B = 117;   
+                }
             }
             if (done >= 2) {
                 break;
@@ -717,25 +745,40 @@ int drawBoxOnImage(frame_t *frame, frame_t *res) {
         // draw in the top and bottom rows in the result image
             //Draw top row
             if ((cr1 < 0) || (cr1 >= frame->image->height)){
-                // column 1 is out of bounds
+                // row 1 is out of bounds
                 LOG_ERR("drawBoxOnImage: top row %d is out of bounds\n", cr1);
                 done++;
             } else {
                 // draw in the values
-                res->image->data[i*width+cr1].L = 1;
-                res->image->data[i*width+cr1].A = 0;
-                res->image->data[i*width+cr1].B = 0;
+                int x;
+                int linelen = 5;
+                if (height < linelen) {
+                    linelen = height-1;
+                }
+                for (x = 0; (x < linelen || x == 0); x++) {
+                    res->image->data[cr1*width+(i+x)].L = 117;
+                    res->image->data[cr1*width+(i+x)].A = 196;
+                    res->image->data[cr1*width+(i+x)].B = 117;
+                }
             }
 
-            // Draw right column
+            // Draw bottom row
             if ((cr2 < 0) || (cr2 >= frame->image->height)) {
+                // row 2 is out of bounds
                 LOG_ERR("drawBoxOnImage: bottom row %d is out of bounds\n",cr2);
                 done++;
             } else {
                 // draw in the values
-                res->image->data[i*width+cr2].L = 1;
-                res->image->data[i*width+cr2].A = 0;
-                res->image->data[i*width+cr2].B = 0;
+                int x;
+                int linelen = 5;
+                if (height < linelen) {
+                    linelen = height-1;
+                }
+                for (x = 0; (x < linelen || x == 0); x++) {
+                    res->image->data[cr2*width+(i-x)].L = 117;
+                    res->image->data[cr2*width+(i-x)].A = 196;
+                    res->image->data[cr2*width+(i-x)].B = 117;
+                }
             }
             if (done >= 2) {
                 break;

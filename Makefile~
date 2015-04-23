@@ -31,4 +31,4 @@ segmentImageTest: tests/segmentImageTest.c readjpeg.c stack.c peopleCounter.c
 	gcc -ljpeg -Wall -std=c99 -lm -o segmentImageTest readjpeg.c stack.c peopleCounter.c tests/segmentImageTest.c
 
 clean:
-	rm readjpeg readImageTest blobDirTest boxCreateDelete frameSubTest copyFrameTest writeImageTest stackTest segmentImageTest
+	rm readjpeg readImageTest blobDirTest boxCreateDelete frameSubTest copyFrame writeImageTest stackTest segmentImageTest

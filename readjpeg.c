@@ -13,13 +13,15 @@
 #include <jpeglib.h>
 #include "image.h"
 
-#define COLOR_SPACE LAB
 
 #define LAB JCS_YCbCr
 #define RGB JCS_RGB
 #define CMYK JCS_CMYK
 #define YCCK JCS_YCCK
 #define GRAYSCALE JCS_GRAYSCALE
+
+#define COLOR_SPACE LAB
+
 
 int saveJpg(const char *Name, Image_t *pImage)
 {
@@ -39,7 +41,6 @@ int saveJpg(const char *Name, Image_t *pImage)
     
     jpeg_stdio_dest(&cinfo, outfile);
 
-
     cinfo.image_width = pImage->width;
     cinfo.image_height = pImage->height;
     cinfo.input_components = 3;
@@ -49,7 +50,6 @@ int saveJpg(const char *Name, Image_t *pImage)
     jpeg_set_defaults(&cinfo);
     jpeg_set_quality(&cinfo,100,TRUE);
 
-        
     unsigned char *pBuf;
     pBuf = (unsigned char *) malloc(sizeof(char) * pImage->width * 3);
     if (pBuf == NULL) {
