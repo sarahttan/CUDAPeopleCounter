@@ -134,8 +134,9 @@ int frameSubtraction(frame_t *frame, frame_t *frame2, frame_t *res){
     return 0;
 }
 
-// Create a new box with centroid (c_x, c_y), height and width
-int createNewBox(frame_t *frame, int c_x, int c_y, int height, int width) {
+//TODO: Retest with added values of center_x and center_y
+// Create a new box with centroid (c_x, c_y), and center (center_x, center_y) height and width
+int createNewBox(frame_t *frame, int c_x, int c_y, int center_x, int center_y, int height, int width) {
     //create a new bounding box in the frame
 
     if (height > frame->image->height) {
@@ -156,6 +157,8 @@ int createNewBox(frame_t *frame, int c_x, int c_y, int height, int width) {
     box_t *newB = (box_t *)malloc(sizeof(box_t));
     newB->centroid_x = c_x;
     newB->centroid_y = c_y;
+    newB->center_x = center_x;
+    newB->center_y = center_y;
     newB->height = height;
     newB->width = width;
     newB->dir = 0; 
@@ -438,6 +441,7 @@ int blobDetection(frame_t *frame){
     int tag=1;
     pixel_t p;
     int w, h, cx, cy;
+    int centerx,centery;
     int done = 0;
     //detect blobs based on size - mean of pixels connected together
     // Check the segmented pixels and create a bounding box for each segment
@@ -489,20 +493,22 @@ int blobDetection(frame_t *frame){
         // update the corresponding values for the blob
         cx = x/count;
         cy = y/count;
+        centerx = (right-left)/2 + left;
+        centery = (up - down)/2 + down;
         w = abs(right - left);
         h = abs(up - down);
 
         // Remove all blobs which do not fit within the constraints. 
         // Update the centroid and get min and max width and height of blob
-        if (minBlob(w,h,cx,cy) != 0) {
-            LOG_ERR("Blob too small, Removing blob at (cx, cy) -> (%d, %d)\n", cx, cy);
-        } else if (maxBlob(w,h,cx,cy) != 0) {
-            LOG_ERR("Blob too large, Splitting blob at (cx,cy) -> (%d, %d)\n", cx, cy);
+        if (minBlob(w,h,centerx,centery) != 0) {
+            LOG_ERR("Blob too small, Removing blob at (cx, cy) -> (%d, %d)\n", centerx, centery);
+        } else if (maxBlob(w,h,centerx,centery) != 0) {
+            LOG_ERR("Blob too large, Splitting blob at (cx,cy) -> (%d, %d)\n", centerx, centery);
             // TODO: Check if we can split the blob into multiple boxes or not
             //  for now, we'll just add the box to the list
-            createNewBox(frame, cx, cy, h, w);         
+            createNewBox(frame, cx, cy, centerx, centery, h, w);         
         } else {
-            createNewBox(frame, cx, cy, h, w);
+            createNewBox(frame, cx, cy, centerx, centery, h, w);
         }
     }
 
@@ -589,6 +595,8 @@ box_t *copyBoundingBoxes(frame_t *frame) {
         newB = (box_t *)(malloc(sizeof(struct box_s)));
         newB->centroid_x = tmp->centroid_x;
         newB->centroid_y = tmp->centroid_y;
+        newB->center_x = tmp->center_x;
+        newB->center_y = tmp->center_y;
         newB->height = tmp->height;
         newB->width = tmp->width;
         newB->dir = tmp->dir;

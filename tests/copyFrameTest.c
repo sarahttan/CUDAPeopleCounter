@@ -17,17 +17,17 @@ int main(int argc, char *argv[]){
     }
   
 // Comment number of boxes we want out
-    if (createNewBox(frame, 100, 200, 10, 20) != 0) {
+    if (createNewBox(frame, 100, 200, 100, 200,10, 20) != 0) {
         printf("Unable to create box\n");
         return 1;
     }
 
-    if (createNewBox(frame, 100, 500, 80, 20) != 0) {
+    if (createNewBox(frame, 100, 500, 100,500,80, 20) != 0) {
         printf("Unable to create box\n");
         return 1;
     }
 
-    if (createNewBox(frame, 100, 800, 10, 500) != 0) {
+    if (createNewBox(frame, 100, 800, 100, 800, 10, 500) != 0) {
         printf("Unable to create box\n");
         return 1;
     }

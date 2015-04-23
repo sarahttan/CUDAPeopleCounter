@@ -24,22 +24,24 @@ int main(int argc, char *argv[]){
 
     int option = 0;
     int i, randDel;
-    int cx, cy, w, h;
+    int cx, cy, w, h, center_x, center_y;
     int nc = num_boxes_c;
     box_t *temp;   
+    srand (time(NULL));
  
     while ((num_boxes_c > 0) || num_boxes_d >0) {
         switch(option) {
         // create boxes case
         case 0:
             //printf("In creating box case\n");
-            srand (time(NULL));
             cx = (rand() % 1000);
             cy = (rand() % 1000);
+            center_x = rand()%1000;
+            center_y = rand()%1000;
             h = (rand() % 1000);
             w = (rand() % 500);
-            printf("Creating box with centroid (%d, %d), width = %d, height = %d",cx, cy, h, w);
-            createNewBox(frame, cx, cy, h, w);
+            printf("Creating box with centroid (%d, %d), center (%d, %d), width = %d, height = %d",cx,cy,center_x,center_y,h, w);
+            createNewBox(frame, cx, cy, center_x, center_y, h, w);
             printf(": tag = %d\n", frame->boxes->tag);
             //printf("Subtracting from num_boxes_c\n");
             num_boxes_c--;

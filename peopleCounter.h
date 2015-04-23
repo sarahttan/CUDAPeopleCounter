@@ -4,8 +4,10 @@
 #include "stack.h"
 
 typedef struct box_s {
-    int centroid_x; //center x of bounding box (pixels)
-    int centroid_y; //center y of bounding box (pixels)
+    int centroid_x; //center of mass x-component of bounding box (pixels)
+    int centroid_y; //center of mass y-component of bounding box (pixels)
+    int center_x;   //center x of bounding box (pixels)
+    int center_y;   //center y of bounding box (pixels)
     int height;     //height of bounding box (pixels)
     int width;      //width of bounding box (pixels)
     int dir;        //direction of box travel (degrees)
@@ -66,10 +68,12 @@ int findBlobDirection(frame_t *frame, frame_t *frame2, frame_t *res);
 // INPUT: frame - frame to add image to
 //        cx - x component of centroid
 //        cy - y component of centroid
+//        center_x - x component of center
+//        center_y - y component of center
 //        height - height of bounding box
 //        width - width of bounding box
 // OUTPUT: 1 - if an error occurred, 0 - otherwise
-int createNewBox(frame_t *frame, int cx, int cy, int height, int width);
+int createNewBox(frame_t *frame, int cx, int cy, int center_x, int center_y, int height, int width);
 
 // delete a given box from the frame
 // INPUT: frame - frame to delete box from
