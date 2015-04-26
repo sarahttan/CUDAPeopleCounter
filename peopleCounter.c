@@ -838,9 +838,6 @@ void drawBox(frame_t *frame, int startx, int starty, int width, int height,
              
 
 
-
-
-
 //
 // Draw the boxes from frame into res (frame is not touched)
 // 
@@ -905,117 +902,7 @@ int drawBoxOnImage(frame_t *frame, frame_t *res) {
         
         drawBox(res, tmp->startx, tmp->starty, tmp->width, tmp->height, 4,
                     117, 196, 117);
-/*
-        drawVLine(res, tmp->startx, tmp->starty, tmp->height, 
-                    117, 196, 117);
-
-        drawVLine(res, tmp->startx+tmp->width, tmp->starty, tmp->height, 
-                    117, 196, 117);
-                    
-        drawHLine(res, tmp->startx, tmp->starty, tmp->width, 
-                    117, 196, 117);
-
-        drawHLine(res, tmp->startx, tmp->starty + tmp->height, tmp->width, 
-                    117, 196, 117);
-                    
-*/                    
-         
-/*
-        //draw box onto the result frame
-        int i,j,cr1,cr2;
-        cr1 = cx-width/2;
-        cr2 = cx+width/2;
-        for (j=cy-height/2; j < cy+height/2; j++){
-        // draw in the left and right cols in the result image
-            //Draw left column
-            if ((cr1 < 0) || (cr1 >= frame->image->width)){
-                // column 1 is out of bounds
-                LOG_ERR("drawBoxOnImage: left column %d is out of bounds\n", cr1);
-                done++;
-            } else {
-                // draw in the values
-                int x;
-                int linelen = 5;
-                if (width < linelen) {
-                    linelen = width-1;
-                }
-                // draw the column so that it is at least a 5 pixel width line
-                for (x = 0; (x < linelen || x == 0); x++) {
-                    res->image->data[(j+x)*fWidth+cr1].L = 117;
-                    res->image->data[(j+x)*fWidth+cr1].A = 196;
-                    res->image->data[(j+x)*fWidth+cr1].B = 117;
-                }
-            }
-            
-            // Draw right column
-            if ((cr2 < 0) || (cr2 >= frame->image->width)) {
-                LOG_ERR("drawBoxOnImage: right column %d is out of bounds\n",cr2);
-                done++;
-            } else {
-                // draw in the values
-                int x;
-                int linelen = 5;
-                if (width < linelen) {
-                    linelen = width-1;
-                }
-                for (x = 0; (x < linelen || x == 0); x++) {
-                    res->image->data[(j-x)*fWidth+cr2].L = 117;
-                    res->image->data[(j-x)*fWidth+cr2].A = 196;
-                    res->image->data[(j-x)*fWidth+cr2].B = 117;   
-                }
-            }
-            if (done >= 2) {
-                break;
-            }
-        }
-
-
-        cr1 = cy-height/2;
-        cr2 = cy+height/2;
-        for (i=cx-width/2; i < cx+width/2; j++){
-        // draw in the top and bottom rows in the result image
-            //Draw top row
-            if ((cr1 < 0) || (cr1 >= frame->image->height)){
-                // row 1 is out of bounds
-                LOG_ERR("drawBoxOnImage: top row %d is out of bounds\n", cr1);
-                done++;
-            } else {
-                // draw in the values
-                int x;
-                int linelen = 5;
-                if (height < linelen) {
-                    linelen = height-1;
-                }
-                for (x = 0; (x < linelen || x == 0); x++) {
-                    res->image->data[cr1*width+(i+x)].L = 117;
-                    res->image->data[cr1*width+(i+x)].A = 196;
-                    res->image->data[cr1*width+(i+x)].B = 117;
-                }
-            }
-
-            // Draw bottom row
-            if ((cr2 < 0) || (cr2 >= frame->image->height)) {
-                // row 2 is out of bounds
-                LOG_ERR("drawBoxOnImage: bottom row %d is out of bounds\n",cr2);
-                done++;
-            } else {
-                // draw in the values
-                int x;
-                int linelen = 5;
-                if (height < linelen) {
-                    linelen = height-1;
-                }
-                for (x = 0; (x < linelen || x == 0); x++) {
-                    res->image->data[cr2*width+(i-x)].L = 117;
-                    res->image->data[cr2*width+(i-x)].A = 196;
-                    res->image->data[cr2*width+(i-x)].B = 117;
-                }
-            }
-            if (done >= 2) {
-                break;
-            }
-        }
-*/
+        // process the next box in the list
         tmp = tmp->next;
     }
     return 0;

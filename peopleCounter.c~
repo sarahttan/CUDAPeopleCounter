@@ -830,9 +830,9 @@ void drawBox(frame_t *frame, int startx, int starty, int width, int height,
     int i;
     for (i=0;i<thickness;i++) {
         drawVLine(frame, startx+i, starty, height, L, A, B);
-        drawVLine(frame, startx+width-1-i, starty, height, L, A, B);
+        drawVLine(frame, startx+width-i, starty, height, L, A, B);
         drawHLine(frame, startx, starty+i, width, L, A, B);
-        drawHLine(frame, startx, starty+height-1-i, height, L, A, B);
+        drawHLine(frame, startx, starty+height-i, width, L, A, B);
     }
 }
              
