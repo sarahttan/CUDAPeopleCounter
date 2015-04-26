@@ -421,10 +421,13 @@ int blobDetection(frame_t *frame){
     //      --- look into segmentation of images (blur the image first then segment)
     // don't add a blob smaller than a certain size.
     unsigned long largestLabel;
+    
+    printf("at blobDetection, about to segment Image\n");
     if (segmentImage(frame, frame, &largestLabel) != 0) {
         printf("blobDetection: segmentImage failed\n");
         return 1;
     }
+    printf("at blobDetection, segmentImage finished\n");
 
     box_t *box = frame->boxes;
 
@@ -459,10 +462,17 @@ int blobDetection(frame_t *frame){
         up = frame->image->height;
         down = 0;
         tag++;       
- 
+        count = 0;
+
+        if (frame->image->data == NULL) {
+            printf("ERROR: data is null\n");
+        }
+
         for (i = 0; i < frame->image->height; i++){
             for (j = 0; j < frame->image->width; j++){
+                
                 p = frame->image->data[i*frame->image->width+j];
+
                 if (p.label == tag) {
                     // The pixel has label we're looking for, so we include it
                     //  Find the left, right, up, and down most values for the label
@@ -488,6 +498,12 @@ int blobDetection(frame_t *frame){
                 }
             }
         }
+        
+
+        if (count == 0) {
+            continue;
+        }        
+        printf("loop done, tag = %d, count = %d\n",tag, count);
 
         // update the corresponding values for the blob
         cx = x/count;
@@ -496,6 +512,8 @@ int blobDetection(frame_t *frame){
         centery = (up - down)/2 + down;
         w = abs(right - left);
         h = abs(up - down);
+
+        printf("at blobDetection, finished loop\n");
 
         // Remove all blobs which do not fit within the constraints. 
         // Update the centroid and get min and max width and height of blob
