@@ -688,6 +688,59 @@ frame_t *copyFrame(frame_t *frame) {
 }
 
 
+//
+// Draw a horizontal line in the image inside frame starting
+// at (startx, starty) and going right by width
+//
+void drawHLine(frame_t *frame, int startx, int starty, int width, 
+                unsigned char L, unsigned char A, unsigned char B)
+{
+    // Sanity checks
+    if (frame == NULL) {
+        printf("ERROR: drawVLine called with frame == NULL\n");
+        return;
+    }
+    if (frame->image == NULL) {
+        printf("ERROR: drawVLine called with frame->image == NULL\n");
+        return;
+    }
+    if (frame->image->data == NULL) {
+        printf("ERROR: drawVLine called with frame->image->data == NULL\n");
+        return;
+    }
+    if ((frame->image->width == 0) || (frame->image->height == 0)) {
+        printf("ERROR: drawVLine called with invalid image width/height\n");
+        return;
+    }
+    // do some clipping
+    if (startx >= frame->image->width) {
+        printf("Warning: drawVline called with startx (%d) >= image width (%d)\n",
+            startx, frame->image->width);
+        return;
+    }
+    if (starty >= frame->image->height) {
+        printf("Warning: drawVline called with starty (%d) >= image height (%d)\n",
+            startx, frame->image->height);
+        return;
+    }
+    int endx;
+    endx = startx + width;
+    if (endx >= frame->image->width) {
+        endx = frame->image->width - 1;
+    }
+    int idx;
+    pixel_t *P;
+    int x;
+    for (x=startx; x<=endx; x++) {
+        idx = starty*frame->image->width + x;
+        P = &frame->image->data[idx];
+        P->L = L;
+        P->A = A;
+        P->B = B;
+    }
+}
+
+
 
 //
 // Draw a vertical line in the image inside frame starting
@@ -805,10 +858,10 @@ int drawBoxOnImage(frame_t *frame, frame_t *res) {
                 }
             }
         }
-        drawVLine(frame, tmp->startx, tmp->starty, tmp->height, 
+        drawVLine(res, tmp->startx, tmp->starty, tmp->height, 
                     117, 196, 117);
 
-        drawVLine(frame, tmp->startx+tmp->width, tmp->starty, tmp->height, 
+        drawVLine(res, tmp->startx+tmp->width, tmp->starty, tmp->height, 
                     117, 196, 117);
                     
                     
