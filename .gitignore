@@ -1,2 +1,13 @@
 *~
 *.log
+blobDirTest
+boxCreateDelete
+copyFrameTest
+drawBoxOnImageTest
+drawTest
+frameSubTest
+readImageTest
+readjpeg
+segmentImageTest
+stackTest
+writeImageTest
