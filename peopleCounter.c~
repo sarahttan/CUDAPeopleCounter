@@ -697,32 +697,45 @@ void drawHLine(frame_t *frame, int startx, int starty, int width,
 {
     // Sanity checks
     if (frame == NULL) {
-        printf("ERROR: drawVLine called with frame == NULL\n");
+        printf("ERROR: drawHLine called with frame == NULL\n");
         return;
     }
     if (frame->image == NULL) {
-        printf("ERROR: drawVLine called with frame->image == NULL\n");
+        printf("ERROR: drawHLine called with frame->image == NULL\n");
         return;
     }
     if (frame->image->data == NULL) {
-        printf("ERROR: drawVLine called with frame->image->data == NULL\n");
+        printf("ERROR: drawHLine called with frame->image->data == NULL\n");
         return;
     }
     if ((frame->image->width == 0) || (frame->image->height == 0)) {
-        printf("ERROR: drawVLine called with invalid image width/height\n");
+        printf("ERROR: drawHLine called with invalid image width/height\n");
         return;
     }
     // do some clipping
     if (startx >= frame->image->width) {
-        printf("Warning: drawVline called with startx (%d) >= image width (%d)\n",
+        printf("Warning: drawHline called with startx (%d) >= image width (%d)\n",
             startx, frame->image->width);
         return;
     }
     if (starty >= frame->image->height) {
-        printf("Warning: drawVline called with starty (%d) >= image height (%d)\n",
+        printf("Warning: drawHline called with starty (%d) >= image height (%d)\n",
             startx, frame->image->height);
         return;
     }
+    if (startx < 0) {
+        startx = 0;
+    }
+    if (starty < 0) {
+        starty = 0;
+    }
+    if (width < 0) {
+        printf("Warning: drawHLine called with invalid width (%d)\n",
+                width);
+        return;                
+    }
+
+
     int endx;
     endx = startx + width;
     if (endx >= frame->image->width) {
@@ -749,7 +762,6 @@ void drawHLine(frame_t *frame, int startx, int starty, int width,
 void drawVLine(frame_t *frame, int startx, int starty, int height, 
                 unsigned char L, unsigned char A, unsigned char B)
 {
-    int y;
     // Sanity checks
     if (frame == NULL) {
         printf("ERROR: drawVLine called with frame == NULL\n");
@@ -778,6 +790,18 @@ void drawVLine(frame_t *frame, int startx, int starty, int height,
             startx, frame->image->height);
         return;
     }
+    if (startx < 0) {
+        startx = 0;
+    }
+    if (starty < 0) {
+        starty = 0;
+    }
+    if (height < 0) {
+        printf("Warning: drawVLine called with invalid height (%d)\n",
+                height);
+        return;                
+    }
+    
     int endy;
     endy = starty + height;
     if (endy >= frame->image->height) {
@@ -785,6 +809,7 @@ void drawVLine(frame_t *frame, int startx, int starty, int height,
     }
     int idx;
     pixel_t *P;
+    int y;
     for (y=starty; y<=endy; y++) {
         idx = y*frame->image->width + startx;
         P = &frame->image->data[idx];
@@ -793,6 +818,25 @@ void drawVLine(frame_t *frame, int startx, int starty, int height,
         P->B = B;
     }
 }
+
+
+//
+// Draw a box in the image in the frame of width, height
+// starting at startx, starty, and of thickness pixels 
+//
+void drawBox(frame_t *frame, int startx, int starty, int width, int height,
+             int thickness, unsigned char L, unsigned char A, unsigned char B)
+{
+    int i;
+    for (i=0;i<thickness;i++) {
+        drawVLine(frame, startx+i, starty, height, L, A, B);
+        drawVLine(frame, startx+width-1-i, starty, height, L, A, B);
+        drawHLine(frame, startx, starty+i, width, L, A, B);
+        drawHLine(frame, startx, starty+height-1-i, height, L, A, B);
+    }
+}
+             
+
 
 
 
@@ -858,13 +902,23 @@ int drawBoxOnImage(frame_t *frame, frame_t *res) {
                 }
             }
         }
+        
+        drawBox(res, tmp->startx, tmp->starty, tmp->width, tmp->height, 4,
+                    117, 196, 117);
+/*
         drawVLine(res, tmp->startx, tmp->starty, tmp->height, 
                     117, 196, 117);
 
         drawVLine(res, tmp->startx+tmp->width, tmp->starty, tmp->height, 
                     117, 196, 117);
                     
+        drawHLine(res, tmp->startx, tmp->starty, tmp->width, 
+                    117, 196, 117);
+
+        drawHLine(res, tmp->startx, tmp->starty + tmp->height, tmp->width, 
+                    117, 196, 117);
                     
+*/                    
          
 /*
         //draw box onto the result frame

@@ -827,8 +827,13 @@ void drawVLine(frame_t *frame, int startx, int starty, int height,
 void drawBox(frame_t *frame, int startx, int starty, int width, int height,
              int thickness, unsigned char L, unsigned char A, unsigned char B)
 {
-
-
+    int i;
+    for (i=0;i<thickness;i++) {
+        drawVLine(frame, startx+i, starty, height, L, A, B);
+        drawVLine(frame, startx+width-i, starty, height, L, A, B);
+        drawHLine(frame, startx, starty+i, width, L, A, B);
+        drawHLine(frame, startx, starty+height-i, width, L, A, B);
+    }
 }
              
 
@@ -897,6 +902,10 @@ int drawBoxOnImage(frame_t *frame, frame_t *res) {
                 }
             }
         }
+        
+        drawBox(res, tmp->startx, tmp->starty, tmp->width, tmp->height, 4,
+                    117, 196, 117);
+/*
         drawVLine(res, tmp->startx, tmp->starty, tmp->height, 
                     117, 196, 117);
 
@@ -909,7 +918,7 @@ int drawBoxOnImage(frame_t *frame, frame_t *res) {
         drawHLine(res, tmp->startx, tmp->starty + tmp->height, tmp->width, 
                     117, 196, 117);
                     
-                    
+*/                    
          
 /*
         //draw box onto the result frame
