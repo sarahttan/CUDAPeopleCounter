@@ -4,16 +4,14 @@
 #include "stack.h"
 
 typedef struct box_s {
-    int startx;	    // left most coordinate of the box
-    int starty;     // top most coordinate of the box 
-    int centroid_x; // center of mass x-component of bounding box (pixels)
-    int centroid_y; // center of mass y-component of bounding box (pixels)
-    int center_x;   // center x of bounding box (pixels)
-    int center_y;   // center y of bounding box (pixels)
-    int height;     // height of bounding box (pixels)
-    int width;      // width of bounding box (pixels)
-    int dir;        // direction of box travel (degrees)
-    int tag;        // tag of the bounding box
+    int centroid_x; //center of mass x-component of bounding box (pixels)
+    int centroid_y; //center of mass y-component of bounding box (pixels)
+    int center_x;   //center x of bounding box (pixels)
+    int center_y;   //center y of bounding box (pixels)
+    int height;     //height of bounding box (pixels)
+    int width;      //width of bounding box (pixels)
+    int dir;        //direction of box travel (degrees)
+    int tag;        //tag of the bounding box
     struct box_s *next;
 } box_t;
 

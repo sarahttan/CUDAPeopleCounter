@@ -135,7 +135,7 @@ int frameSubtraction(frame_t *frame, frame_t *frame2, frame_t *res){
 }
 
 // Create a new box with centroid (c_x, c_y), and center (center_x, center_y) height and width
-int createNewBox(frame_t *frame, int c_x, int c_y, int center_x, int center_y, int height, int width) {
+int createNewBox(frame_t *frame, int c_x, int c_y, int start_x, int start_y, int height, int width) {
     //create a new bounding box in the frame
 
     if (height > frame->image->height) {
@@ -147,17 +147,20 @@ int createNewBox(frame_t *frame, int c_x, int c_y, int center_x, int center_y, i
         return 1;
     }
 
-    if ((width == 0) || (height == 0)) {
-        LOG_ERR("createNewBox: unable to create box of width/height of 0\n");
+    if ((width <= 5) || (height <= 5)) {
+        LOG_ERR("createNewBox: unable to create box of width/height less than 5\n");
         return 1;
     }
+    
 
     // initialize values
     box_t *newB = (box_t *)malloc(sizeof(box_t));
     newB->centroid_x = c_x;
     newB->centroid_y = c_y;
-    newB->center_x = center_x;
-    newB->center_y = center_y;
+    newB->startx = start_x;
+    newB->starty = start_y;
+    newB->center_x = start_x + width / 2;
+    newB->center_y = start_y + height / 2;
     newB->height = height;
     newB->width = width;
     newB->dir = 0; 
@@ -463,6 +466,8 @@ int blobDetection(frame_t *frame){
         down = 0;
         tag++;       
         count = 0;
+        x = 0;
+        y = 0;
 
         if (frame->image->data == NULL) {
             printf("ERROR: data is null\n");
@@ -513,8 +518,7 @@ int blobDetection(frame_t *frame){
         w = abs(right - left);
         h = abs(up - down);
 
-        printf("at blobDetection, finished loop\n");
-
+/*
         // Remove all blobs which do not fit within the constraints. 
         // Update the centroid and get min and max width and height of blob
         if (minBlob(w,h,centerx,centery) != 0) {
@@ -526,6 +530,12 @@ int blobDetection(frame_t *frame){
             createNewBox(frame, cx, cy, centerx, centery, h, w);         
         } else {
             createNewBox(frame, cx, cy, centerx, centery, h, w);
+        }
+*/        
+        if (count > 30) {
+            printf("adding new box at (%d,%d) centroid = (%d,%d) (w,h) = (%d,%d)\n",
+                left,up, centerx,centery, w, h);
+            createNewBox(frame, cx, cy, left, up, w, h);
         }
     }
 
@@ -677,7 +687,67 @@ frame_t *copyFrame(frame_t *frame) {
     return newF; 
 }
 
-//TODO: Testing in progress
+
+
+//
+// Draw a vertical line in the image inside frame starting
+// at (startx, starty) and going down by height
+//
+void drawVLine(frame_t *frame, int startx, int starty, int height, 
+                unsigned char L, unsigned char A, unsigned char B)
+{
+    int y;
+    // Sanity checks
+    if (frame == NULL) {
+        printf("ERROR: drawVLine called with frame == NULL\n");
+        return;
+    }
+    if (frame->image == NULL) {
+        printf("ERROR: drawVLine called with frame->image == NULL\n");
+        return;
+    }
+    if (frame->image->data == NULL) {
+        printf("ERROR: drawVLine called with frame->image->data == NULL\n");
+        return;
+    }
+    if ((frame->image->width == 0) || (frame->image->height == 0)) {
+        printf("ERROR: drawVLine called with invalid image width/height\n");
+        return;
+    }
+    // do some clipping
+    if (startx >= frame->image->width) {
+        printf("Warning: drawVline called with startx (%d) >= image width (%d)\n",
+            startx, frame->image->width);
+        return;
+    }
+    if (starty >= frame->image->height) {
+        printf("Warning: drawVline called with starty (%d) >= image height (%d)\n",
+            startx, frame->image->height);
+        return;
+    }
+    int endy;
+    endy = starty + height;
+    if (endy >= frame->image->height) {
+        endy = frame->image->height - 1;
+    }
+    int idx;
+    pixel_t *P;
+    for (y=starty; y<=endy; y++) {
+        idx = y*frame->image->width + startx;
+        P = &frame->image->data[idx];
+        P->L = L;
+        P->A = A;
+        P->B = B;
+    }
+}
+
+
+
+
+//
+// Draw the boxes from frame into res (frame is not touched)
+// 
+//
 int drawBoxOnImage(frame_t *frame, frame_t *res) {
     // draws a white box for every bounding box given the values of frame
     if ((frame == NULL) || (res == NULL)) {
@@ -717,6 +787,9 @@ int drawBoxOnImage(frame_t *frame, frame_t *res) {
         height = tmp->height;
         cx = tmp->centroid_x;
         cy = tmp->centroid_y;
+        
+        printf("drawing box at (%d,%d) (w,h)=(%d,%d)\n",
+            tmp->startx, tmp->starty, tmp->width, tmp->height);
   
         // draw centroid into the result frame 
         //  box should be at least a 5 square pixels in order to view
@@ -725,15 +798,22 @@ int drawBoxOnImage(frame_t *frame, frame_t *res) {
             for (pCX = 0; pCX < 5; pCX++) {
                 if ((cx+3-pCX > 0) && (cx+3-pCX < fWidth)){
                     if ((cy+3-pCY) && (cy+3-pCY < fHeight)){
-                        frame->image->data[(cy+3-pCY)*fWidth+(cx+3-pCX)].L = 142;
-                        frame->image->data[(cy+3-pCY)*fWidth+(cx+3-pCX)].A = 105;
-                        frame->image->data[(cy+3-pCY)*fWidth+(cx+3-pCX)].L = 196;
+                        res->image->data[(cy+3-pCY)*fWidth+(cx+3-pCX)].L = 142;
+                        res->image->data[(cy+3-pCY)*fWidth+(cx+3-pCX)].A = 105;
+                        res->image->data[(cy+3-pCY)*fWidth+(cx+3-pCX)].L = 196;
                     }   
                 }
             }
         }
-         
+        drawVLine(res, tmp->startx, tmp->starty, tmp->height, 
+                    117, 196, 117);
 
+        drawVLine(res, tmp->startx+tmp->width, tmp->starty, tmp->height, 
+                    117, 196, 117);
+                    
+                    
+         
+/*
         //draw box onto the result frame
         int i,j,cr1,cr2;
         cr1 = cx-width/2;
@@ -828,7 +908,7 @@ int drawBoxOnImage(frame_t *frame, frame_t *res) {
                 break;
             }
         }
-
+*/
         tmp = tmp->next;
     }
     return 0;

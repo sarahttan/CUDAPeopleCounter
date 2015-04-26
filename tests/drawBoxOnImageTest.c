@@ -21,6 +21,7 @@ int main(int argc, char *argv[]){
     readImageFrame(frame, "./frames/frame13.jpg");
     readImageFrame(frame2, "./frames/frame16.jpg");
     res1 = copyFrame(frame);
+    res2 = copyFrame(frame);
     
     printf("CopyFrame finished\n");
 
@@ -36,12 +37,15 @@ int main(int argc, char *argv[]){
 
     printf("BlobDetection Finished\n");
 
+//    res2 = copyFrame(res1);
+
+
     if (drawBoxOnImage(res1, res2) != 0) {
         printf("Error in draw box on image\n");
         exit(1);
     }
 
-    if (res2->image->data == NULL) {
+/*    if (res2->image->data == NULL) {
         printf("res2 data is null!\n");
         exit(1);
     }
@@ -56,9 +60,9 @@ int main(int argc, char *argv[]){
             return 1;
         }
     }
-
+*/
     printf("Writing frame\n");    
-    // frameToJPG(res2, filename);
+    frameToJPG(res2, filename);
     printf("Write to frame complete, please check file = %s\n", filename);
 
     printf("Freeing frames\n");
