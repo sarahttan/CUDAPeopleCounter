@@ -23,7 +23,7 @@ int main(int argc, char *argv[]){
     printf("Checking all values in frame are initialized\n");
     printf("Data array is size %ld\n", sizeof(frame->image->data)/sizeof(frame->image->data[0]));
     
-    int i,j;
+    int i;
     for (i = 0; i < frame->image->width*frame->image->height; i++) {
         p = frame->image->data[i];
         if ((p.L < 0) || (p.A < 0) || (p.B < 0)){

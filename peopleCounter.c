@@ -235,7 +235,7 @@ int thresholdImage(frame_t *frame, frame_t *res) {
     for(int i = 0; i < frameHeight; i++){
         for(int j = 0; j < frameWidth; j++){
             if(frame->image->data[i * frameWidth + j].L > sigDiff)
-                res->image->data[i * frameWidth + j].L = 1;
+                res->image->data[i * frameWidth + j].L = 255;
             else
                 res->image->data[i * frameWidth + j].L = 0;          
             res->image->data[i*frameWidth+j].A = 0;
@@ -864,11 +864,8 @@ int drawBoxOnImage(frame_t *frame, frame_t *res) {
     box_t *tmp = head;
     int fWidth = frame->image->width;
     int fHeight = frame->image->height;
-    int width;
-    int height;
     int cx;
     int cy;
-    char done = 0;
 
     // Check if there are boxes available
     if (head == NULL){
@@ -877,8 +874,6 @@ int drawBoxOnImage(frame_t *frame, frame_t *res) {
     }
     while (tmp != NULL){
         //get width, height, and centroid of each box
-        width = tmp->width;
-        height = tmp->height;
         cx = tmp->centroid_x;
         cy = tmp->centroid_y;
         

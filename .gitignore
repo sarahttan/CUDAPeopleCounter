@@ -1,5 +1,6 @@
 *~
 *.log
+*.jpg
 blobDirTest
 boxCreateDelete
 copyFrameTest
@@ -11,3 +12,5 @@ readjpeg
 segmentImageTest
 stackTest
 writeImageTest
+fullTest
+DEADJOE

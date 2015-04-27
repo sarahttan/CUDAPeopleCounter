@@ -47,22 +47,6 @@ int main(int argc, char *argv[]){
         exit(1);
     }
 
-/*    if (res2->image->data == NULL) {
-        printf("res2 data is null!\n");
-        exit(1);
-    }
-
-    printf("Checking all values in frame are initialized\n");
-    int i;
-    pixel_t p;
-    for (i = 0; i < res2->image->width*res2->image->height; i++) {
-        p = res2->image->data[i];
-        if ((p.L < 0) || (p.A < 0) || (p.B < 0)){
-            printf("Pixel[%d] not initialized\n", i);
-            return 1;
-        }
-    }
-*/
     printf("Writing frame\n");    
     frameToJPG(res2, filename);
     printf("Write to frame complete, please check file = %s\n", filename);

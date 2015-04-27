@@ -20,7 +20,7 @@
 #define YCCK JCS_YCCK
 #define GRAYSCALE JCS_GRAYSCALE
 
-#define COLOR_SPACE LAB
+#define COLOR_SPACE RGB
 
 
 int saveJpg(const char *Name, Image_t *pImage)

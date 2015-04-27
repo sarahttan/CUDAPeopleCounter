@@ -23,7 +23,7 @@ int main(int argc, char *argv[]){
     frame->image->width = 499;
 
     int option = 0;
-    int i, randDel;
+    int randDel;
     int cx, cy, w, h, center_x, center_y;
     int nc = num_boxes_c;
     box_t *temp;   

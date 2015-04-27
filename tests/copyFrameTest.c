@@ -41,7 +41,7 @@ int main(int argc, char *argv[]){
 
     printf("Checking all values in frame are initialized\n");
     
-    int i,j;
+    int i;
     pixel_t p;
     for (i = 0; i < res->image->width*res->image->height; i++) {
         p = res->image->data[i];

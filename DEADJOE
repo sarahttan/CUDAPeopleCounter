@@ -1,6 +1,6 @@
 
-*** These modified files were found in JOE when it aborted on Mon Apr 13 03:38:04 2015
-*** JOE was aborted by UNIX signal 1
+*** These modified files were found in JOE when it aborted on Mon Apr 27 06:21:05 2015
+*** JOE was aborted because the terminal closed
 
 *** File '(Unnamed)'
 Nary.Bud
@@ -15,32 +15,28 @@ start
 imagPtr->
 
 *** File '(Unnamed)'
-lastrequest
-backlog
-killed
-cleanup
-cleanup
-cle
-cleanup
-backlog
-delta
-cleanup
-rgb
-pDummy
+blobkDetection
+detect
+Error:
+rror
+adding
+createNewBox
+createNewBox
+drawBox
+createNew
+drawB
+blob
+Blob
 
 *** File '(Unnamed)'
-readjpeg.c
-readjpeg.c
-readjpeg.c
-readjpeg.c
-readjpeg.c
-readjpeg.c
-readjpeg.c
-readjpeg.c
-readjpeg.c
-readjpeg.c
-readjpeg.c
-readjpeg.c
-readjpeg.c
-readjpeg.c
-readjpeg.c
+TODO
+peopleCounter.c
+peopleCounter.c
+peopleCounter.c
+peopleCounter.c
+peopleCounter.c
+peopleCounter.c
+TODO
+tests/drawBoxOnImageTest.c
+tests/drawBoxOnImageTest.c
+peopleCounter.c
