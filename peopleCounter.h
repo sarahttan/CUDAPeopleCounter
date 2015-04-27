@@ -100,4 +100,10 @@ int drawBoxOnImage(frame_t *frame, frame_t *res);
 // OUTPUT: 1 - if an error occurred, 0 - otherwise
 int frameToJPG(frame_t *frame, char *filename);
 
+
+// merge intersecting boxes
+// INPUT: frame - image frame
+// OUTPUT: 1 - if error, 0 - success
+int mergeBoxes(frame_t *frame);
+
 #endif

@@ -16,6 +16,10 @@
 #define LOG_ERR(...)
 #endif
 
+#define MAX(x,y) ((x) > (y) ? (x) : (y))
+#define MIN(x,y) ((x) < (y) ? (x) : (y))
+
+
 // PRIORITY COMPLETION ORDER
 //  (1) FrameToJPG
 //  (4) Test print boxes
@@ -134,6 +138,40 @@ int frameSubtraction(frame_t *frame, frame_t *frame2, frame_t *res){
     return 0;
 }
 
+//
+// Return 1 if boxes intersect, 0 if they do not
+// code is based on http://gamemath.com/2011/09/detecting-whether-two-boxes-overlap/
+// tolerance is the number of pixels to expand the boxes so that boxes close to each
+// other are still considered overlapping
+//
+int boxesIntersect(box_t *box1, box_t *box2, int tolerance)
+{
+    if (box1->startx + box1->width + tolerance < box2->startx) {
+        // box1 is left of box2
+        return 0;
+    }
+    if (box1->startx > box2->startx + box2->width + tolerance) {
+        // box1 is right of box2
+        return 0;
+    }
+    if (box1->starty + box1->height + tolerance < box2->starty) {
+        // box1 is above box2
+        return 0;
+    }
+    if (box1->starty > box2->starty + box2->height + tolerance) {
+        // box1 is below box2
+        return 0;
+    }
+    // yup, they overlap
+    return 1;
+
+}
+
+
+
+
+
+
 // Create a new box with centroid (c_x, c_y), and center (center_x, center_y) height and width
 int createNewBox(frame_t *frame, int c_x, int c_y, int start_x, int start_y, int width, int height) {
     //create a new bounding box in the frame
@@ -203,6 +241,71 @@ int deleteBox(frame_t *frame, box_t *b){
     printf("deleteBox: Unable to find box to delete\n");
     return 1;
 }
+
+//
+// mergeBoxes - merge overlapping boxes
+//
+// return 0 on success
+//
+int mergeBoxes(frame_t *frame)
+{
+    if (frame == NULL) {
+        printf("ERROR: mergeBoxes called with frame == NULL\n");
+        return 1;
+    }
+    
+    box_t *temp1 = frame->boxes;
+    box_t *temp2;
+    box_t *temp3;
+    
+    while (temp1 != NULL) {
+        temp2 = temp1->next;
+        while (temp2 != NULL) {
+            if (boxesIntersect(temp1, temp2, 10)) {
+                // boxes intersect, merge them
+                int endy, endy1, endy2;
+                int endx, endx1, endx2;
+                endx1 = temp1->startx + temp1->width;
+                endx2 = temp2->startx + temp2->width;
+                endy1 = temp1->starty + temp1->height;
+                endy2 = temp2->starty + temp2->height;
+                
+                endx = MAX(endx1, endx2);
+                endy = MAX(endy1, endy2);
+                
+                int startx, starty;
+                startx = MIN(temp1->startx, temp2->startx);
+                starty = MIN(temp1->starty, temp2->starty);
+                
+                // expand the first box
+                temp1->startx = startx;
+                temp1->starty = starty;
+                temp1->width = endx - startx;
+                temp1->height = endy - starty;
+
+                // get the next pointer first before we delete it
+                temp3 = temp2->next;
+                
+                // delete the 2nd box
+                if (deleteBox(frame, temp2) != 0) {
+                    printf("mergeBoxes: ERROR - could not delete box from frame\n");
+                    return 1;
+                }
+                // update the temp2
+                temp2 = temp3;
+            } else {
+                temp2 = temp2->next;
+            }
+        }
+        temp1 = temp1->next;
+    }
+    return 0;
+}
+
+
+
+
+
 
 int blurImage(frame_t *frame) {
     //blurImage before thresholding
@@ -547,6 +650,10 @@ int blobDetection(frame_t *frame){
 
     return 0;
 }
+
+
+
+
 
 //TODO: testing and writing
 int mergeBlobs(frame_t *frame){

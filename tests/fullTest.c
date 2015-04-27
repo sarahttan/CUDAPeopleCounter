@@ -27,12 +27,14 @@ int main(int argc, char *argv[]){
     frame_t *res1 = malloc(sizeof(struct frame_s));
     frame_t *res2 = malloc(sizeof(struct frame_s));
     frame_t *res3 = malloc(sizeof(struct frame_s));
+    frame_t *res4 = malloc(sizeof(struct frame_s));
 
     readImageFrame(frame1, filename1);
     readImageFrame(frame2, filename2);
     res1 = copyFrame(frame1);
     res2 = copyFrame(frame1);
-    res3 = copyFrame(frame1);
+    res3 = copyFrame(frame2);
+    res4 = copyFrame(frame2);
     
     printf("CopyFrame finished\n");
 
@@ -62,15 +64,29 @@ int main(int argc, char *argv[]){
 
 //    res2 = copyFrame(res1);
 
-
     if (drawBoxOnImage(res2, res3) != 0) {
         printf("Error in draw box on image\n");
         exit(1);
     }
-
     printf("Writing frame\n");    
     frameToJPG(res3, "full5.jpg");
     printf("Write to frame complete, please check file = full5.jpg\n");
+
+    // merge boxes
+    if (mergeBoxes(res2) != 0) {
+        printf("Error in mergeBoxes\n");
+        exit(1);
+    }
+    
+    if (drawBoxOnImage(res2, res4) != 0) {
+        printf("Error in draw box on image\n");
+        exit(1);
+    }
+    printf("Writing frame\n");    
+    frameToJPG(res4, "full6.jpg");
+    printf("Write to frame complete, please check file = full6.jpg\n");
+    
+
 
     printf("Freeing frames\n");
     int err = freeFrame(frame1);
@@ -78,6 +94,7 @@ int main(int argc, char *argv[]){
     err += freeFrame(res1);
     err += freeFrame(res2);
     err += freeFrame(res3);
+    err += freeFrame(res4);
     if (err != 0) {
         printf("Unable to free frame\n");
         return 1;

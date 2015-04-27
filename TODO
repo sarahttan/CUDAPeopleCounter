@@ -1,7 +1,25 @@
 
+
 (3) Go into the program final.c and see code priorities there
-(4) Be sure to write test code to test your functions.
 (5) Get statistics/graphs based on areas the boxes are in/direction of travel
+
+- write script to save all frames after fullTest
+- fix mergeBoxes to loop until no more boxes need to be merged
+
+############################# 
+COMPLETED ITEMS BELOW
+=============================
+
+(1) Write a test program (under test files) to test the function
+drawBoxOnImage.  You can use another of the test programs (in the tests
+folder) as your template.  You can also copy the Makefile call to compile
+your program within the Makefile of a previous test.  Use the header file as
+a guide for which functions to call in order to load images and save them.  
+
+
+(2) Fix bugs in drawBoxOnImage
+
+
 
 (3) Subtract the frames and perform an appropriate threshold using the
 subtracted frames.  Create a script which will save all the frames into a
@@ -17,17 +35,4 @@ can see the blobs and save the image for viewing.
 (5) Fix bugs in blobDetection
 
 
-
-
-############################# 
-COMPLETED ITEMS BELOW
-=============================
-
-(1) Write a test program (under test files) to test the function
-drawBoxOnImage.  You can use another of the test programs (in the tests
-folder) as your template.  You can also copy the Makefile call to compile
-your program within the Makefile of a previous test.  Use the header file as
-a guide for which functions to call in order to load images and save them.  
-
-
-(2) Fix bugs in drawBoxOnImage
+(4) Be sure to write test code to test your functions.
