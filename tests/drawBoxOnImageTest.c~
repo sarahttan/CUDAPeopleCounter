@@ -21,7 +21,7 @@ int main(int argc, char *argv[]){
     readImageFrame(frame, "./frames/frame13.jpg");
     readImageFrame(frame2, "./frames/frame16.jpg");
     res1 = copyFrame(frame);
-//    res2 = copyFrame(frame);
+    res2 = copyFrame(frame);
     
     printf("CopyFrame finished\n");
 
@@ -37,7 +37,7 @@ int main(int argc, char *argv[]){
 
     printf("BlobDetection Finished\n");
 
-    res2 = copyFrame(res1);
+//    res2 = copyFrame(res1);
 
 
     if (drawBoxOnImage(res1, res2) != 0) {

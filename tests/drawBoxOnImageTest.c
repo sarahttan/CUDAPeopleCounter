@@ -31,6 +31,8 @@ int main(int argc, char *argv[]){
     
     printf("FrameSubtraction finished\n");
     
+    frameToJPG(res1, "drawBox1.jpg");
+    
     if (blobDetection(res1) != 0) {
         printf("Error in blob detection\n");
     }

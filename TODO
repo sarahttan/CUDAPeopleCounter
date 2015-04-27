@@ -3,8 +3,6 @@
 (4) Be sure to write test code to test your functions.
 (5) Get statistics/graphs based on areas the boxes are in/direction of travel
 
-(2) Fix bugs in drawBoxOnImage
-
 (3) Subtract the frames and perform an appropriate threshold using the
 subtracted frames.  Create a script which will save all the frames into a
 jpg (be sure that the jpg name includes both the filename and a tag to say
@@ -31,3 +29,5 @@ folder) as your template.  You can also copy the Makefile call to compile
 your program within the Makefile of a previous test.  Use the header file as
 a guide for which functions to call in order to load images and save them.  
 
+
+(2) Fix bugs in drawBoxOnImage
