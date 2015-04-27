@@ -232,10 +232,16 @@ int thresholdImage(frame_t *frame, frame_t *res) {
     } 
 
 
+    int value;
+    pixel_t *P; 
     for(int i = 0; i < frameHeight; i++){
         for(int j = 0; j < frameWidth; j++){
-            if(frame->image->data[i * frameWidth + j].L > sigDiff)
-                res->image->data[i * frameWidth + j].L = 1;
+            // for now we work in RGB, 
+            P = &frame->image->data[i * frameWidth + j];
+            value = P->L + P->A + P->B;
+        
+            if(value > sigDiff)
+                res->image->data[i * frameWidth + j].L = 255;
             else
                 res->image->data[i * frameWidth + j].L = 0;          
             res->image->data[i*frameWidth+j].A = 0;

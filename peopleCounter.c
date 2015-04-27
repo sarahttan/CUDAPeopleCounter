@@ -135,7 +135,7 @@ int frameSubtraction(frame_t *frame, frame_t *frame2, frame_t *res){
 }
 
 // Create a new box with centroid (c_x, c_y), and center (center_x, center_y) height and width
-int createNewBox(frame_t *frame, int c_x, int c_y, int start_x, int start_y, int height, int width) {
+int createNewBox(frame_t *frame, int c_x, int c_y, int start_x, int start_y, int width, int height) {
     //create a new bounding box in the frame
 
     if (height > frame->image->height) {
@@ -232,9 +232,15 @@ int thresholdImage(frame_t *frame, frame_t *res) {
     } 
 
 
+    int value;
+    pixel_t *P; 
     for(int i = 0; i < frameHeight; i++){
         for(int j = 0; j < frameWidth; j++){
-            if(frame->image->data[i * frameWidth + j].L > sigDiff)
+            // for now we work in RGB, 
+            P = &frame->image->data[i * frameWidth + j];
+            value = P->L + P->A + P->B;
+        
+            if(value > sigDiff)
                 res->image->data[i * frameWidth + j].L = 255;
             else
                 res->image->data[i * frameWidth + j].L = 0;          
