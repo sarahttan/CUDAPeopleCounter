@@ -299,7 +299,7 @@ int mergeBoxes(frame_t *frame)
         }
         temp1 = temp1->next;
     }
-
+    return 0;
 }
 
 

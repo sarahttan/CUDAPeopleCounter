@@ -257,47 +257,55 @@ int mergeBoxes(frame_t *frame)
     box_t *temp1 = frame->boxes;
     box_t *temp2;
     box_t *temp3;
-    
-    while (temp1 != NULL) {
-        temp2 = temp1->next;
-        while (temp2 != NULL) {
-            if (boxesIntersect(temp1, temp2, 10)) {
-                // boxes intersect, merge them
-                int endy, endy1, endy2;
-                int endx, endx1, endx2;
-                endx1 = temp1->startx + temp1->width;
-                endx2 = temp2->startx + temp2->width;
-                endy1 = temp1->starty + temp1->height;
-                endy2 = temp2->starty + temp2->height;
-                
-                endx = MAX(endx1, endx2);
-                endy = MAX(endy1, endy2);
-                
-                int startx, starty;
-                startx = MIN(temp1->startx, temp2->startx);
-                starty = MIN(temp1->starty, temp2->starty);
-                
-                // expand the first box
-                temp1->startx = startx;
-                temp1->starty = starty;
-                temp1->width = endx - startx;
-                temp1->height = endy - starty;
+    int boxUpdated;
+    boxUpdated = 1;
 
-                // get the next pointer first before we delete it
-                temp3 = temp2->next;
-                
-                // delete the 2nd box
-                if (deleteBox(frame, temp2) != 0) {
-                    printf("mergeBoxes: ERROR - could not delete box from frame\n");
-                    return 1;
+    while (boxUpdated) {    
+        temp1 = frame->boxes;
+        boxUpdated = 0;
+        while (temp1 != NULL) {
+            temp2 = temp1->next;
+            while (temp2 != NULL) {
+                if (boxesIntersect(temp1, temp2, 10)) {
+                    // boxes intersect, merge them
+                    int endy, endy1, endy2;
+                    int endx, endx1, endx2;
+                    endx1 = temp1->startx + temp1->width;
+                    endx2 = temp2->startx + temp2->width;
+                    endy1 = temp1->starty + temp1->height;
+                    endy2 = temp2->starty + temp2->height;
+                    
+                    endx = MAX(endx1, endx2);
+                    endy = MAX(endy1, endy2);
+                    
+                    int startx, starty;
+                    startx = MIN(temp1->startx, temp2->startx);
+                    starty = MIN(temp1->starty, temp2->starty);
+                    
+                    // expand the first box
+                    temp1->startx = startx;
+                    temp1->starty = starty;
+                    temp1->width = endx - startx;
+                    temp1->height = endy - starty;
+
+                    // get the next pointer first before we delete it
+                    temp3 = temp2->next;
+                    
+                    // delete the 2nd box
+                    if (deleteBox(frame, temp2) != 0) {
+                        printf("mergeBoxes: ERROR - could not delete box from frame\n");
+                        return 1;
+                    }
+                    // update the temp2
+                    temp2 = temp3;
+                    // set the update flag so we rescan the boxes
+                    boxUpdated = 1;
+                } else {
+                    temp2 = temp2->next;
                 }
-                // update the temp2
-                temp2 = temp3;
-            } else {
-                temp2 = temp2->next;
             }
+            temp1 = temp1->next;
         }
-        temp1 = temp1->next;
     }
     return 0;
 }

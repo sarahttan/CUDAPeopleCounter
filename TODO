@@ -4,11 +4,15 @@
 (5) Get statistics/graphs based on areas the boxes are in/direction of travel
 
 - write script to save all frames after fullTest
-- fix mergeBoxes to loop until no more boxes need to be merged
 
 ############################# 
 COMPLETED ITEMS BELOW
 =============================
+
+
+- fix mergeBoxes to loop until no more boxes need to be merged
+
+
 
 (1) Write a test program (under test files) to test the function
 drawBoxOnImage.  You can use another of the test programs (in the tests
