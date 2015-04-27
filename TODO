@@ -5,6 +5,12 @@
 
 - write script to save all frames after fullTest
 
+- add weights (number of pixels in a box) as an additional attribute
+- use weights to properly calculate the centroids when we are merging boxes
+
+- tweak threshold values a little bit to capture similar colored pants
+
+
 ############################# 
 COMPLETED ITEMS BELOW
 =============================
