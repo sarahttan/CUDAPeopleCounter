@@ -160,18 +160,11 @@ int frameSubtractionOmp(frame_t *frame, frame_t *frame2, frame_t *res){
 
     int frameWidth = frame->image->width;
     int frameHeight = frame->image->height;
-    unsigned char frameL= 0;
-    unsigned char frame2L = 0;
-    unsigned char frameA = 0;
-    unsigned char frame2A = 0;
-    unsigned char frameB = 0;
-    unsigned char frame2B = 0;
 
     //printf("Frame->image->data length = %lx\n", sizeof(frame->image->data)/(sizeof(struct pixel_s)));
 
-    
+    #pragma omp parallel for num_threads(4)
     for(int i = 0; i < frameHeight; i++){
-        #pragma omp parallel for
         for(int j = 0; j < frameWidth; j++){
             if ((&frame->image->data[i*frameWidth+j] == NULL) || (&frame2->image->data[i*frameWidth+j] == NULL) || (&res->image->data[i*frameWidth+j] == NULL)) {
                 printf("frameSubtraction: pixel is null (%d, %d)\n", i, j);
