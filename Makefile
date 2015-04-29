@@ -1,4 +1,4 @@
-all: readjpeg readImageTest blobDirTest boxCreateDelete frameSubTest copyFrameTest writeImageTest stackTest segmentImageTest drawTest drawBoxOnImageTest fullTest
+all: readjpeg readImageTest blobDirTest boxCreateDelete frameSubTest frameSubTestOmp copyFrameTest writeImageTest stackTest segmentImageTest drawTest drawBoxOnImageTest fullTest
 
 drawTest: readjpeg.c tests/drawTest.c peopleCounter.c stack.c
 	gcc -ljpeg -Wall -std=c99 -lm -o drawTest stack.c peopleCounter.c readjpeg.c tests/drawTest.c
@@ -17,6 +17,9 @@ boxCreateDelete: tests/boxCreateDelete.c readjpeg.c stack.c peopleCounter.c
 
 frameSubTest: tests/frameSubTest.c readjpeg.c stack.c peopleCounter.c
 	gcc -ljpeg -Wall -std=c99 -lm -o frameSubTest readjpeg.c stack.c peopleCounter.c tests/frameSubTest.c
+
+frameSubTestOmp: tests/frameSubTestOmp.c readjpeg.c stack.c peopleCounter.c
+	gcc -ljpeg -Wall -std=c99 -lm -o frameSubTestOmp -fopenmp readjpeg.c stack.c peopleCounter.c tests/frameSubTestOmp.c
 
 copyFrameTest: tests/copyFrameTest.c readjpeg.c stack.c peopleCounter.c
 	gcc -ljpeg -Wall -std=c99 -lm -o copyFrameTest readjpeg.c stack.c peopleCounter.c tests/copyFrameTest.c
@@ -37,4 +40,4 @@ fullTest: tests/fullTest.c readjpeg.c stack.c peopleCounter.c
 	gcc -ljpeg -Wall -std=c99 -lm -o fullTest readjpeg.c stack.c peopleCounter.c tests/fullTest.c
 
 clean:
-	rm readjpeg readImageTest blobDirTest boxCreateDelete frameSubTest copyFrameTest writeImageTest stackTest segmentImageTest drawBoxOnImageTest fullTest
+	rm readjpeg readImageTest blobDirTest boxCreateDelete frameSubTest frameSubTestOmp copyFrameTest writeImageTest stackTest segmentImageTest drawBoxOnImageTest fullTest

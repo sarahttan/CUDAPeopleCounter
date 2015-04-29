@@ -22,7 +22,7 @@ int main(int argc, char *argv[]){
     readImageFrame(res, "./frames/frame01.jpg");
 
     begin = clock();
-    if (frameSubtraction(frame, frame2, res) != 0) {
+    if (frameSubtractionOmp(frame, frame2, res) != 0) {
         printf("Error in frame subtraction\n");
     }
     end = clock();
