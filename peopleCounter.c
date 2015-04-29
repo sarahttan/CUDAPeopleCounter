@@ -178,21 +178,20 @@ int frameSubtractionOmp(frame_t *frame, frame_t *frame2, frame_t *res){
                 // return 1;
             }
             //Get L values
-            frameL = frame->image->data[i * frameWidth + j].L;
-            frame2L = frame2->image->data[i * frameWidth + j].L;
-            //Get A values
-            frameA = frame->image->data[i * frameWidth + j].A;
-            frame2A = frame2->image->data[i * frameWidth + j].A;
-            //Get B values
-            frameB = frame->image->data[i * frameWidth + j].B;
-            frame2B = frame2->image->data[i * frameWidth + j].B;
+            // frameL = frame->image->data[i * frameWidth + j].L;
+            // frame2L = frame2->image->data[i * frameWidth + j].L;
+            // //Get A values
+            // frameA = frame->image->data[i * frameWidth + j].A;
+            // frame2A = frame2->image->data[i * frameWidth + j].A;
+            // //Get B values
+            // frameB = frame->image->data[i * frameWidth + j].B;
+            // frame2B = frame2->image->data[i * frameWidth + j].B;
             //Set pixel values in res
-            res->image->data[i * frameWidth + j].L = abs(frame2L - frameL);
-            res->image->data[i * frameWidth + j].A = abs(frame2A - frameA);
-            res->image->data[i * frameWidth + j].B = abs(frame2B - frameB);
-            //printf("(i,j) = (%d, %d)\n", i,j);
+            res->image->data[i * frameWidth + j].L = abs(frame2->image->data[i * frameWidth + j].L - frame->image->data[i * frameWidth + j].L);
+            res->image->data[i * frameWidth + j].A = abs(frame2->image->data[i * frameWidth + j].A - frame->image->data[i * frameWidth + j].A);
+            res->image->data[i * frameWidth + j].B = abs(frame2->image->data[i * frameWidth + j].B - frame->image->data[i * frameWidth + j].B);
+            // printf("(i,j) = (%d, %d)\n", i,j);
         }
-        #pragma omp barrier
     }
     return 0;
 }
