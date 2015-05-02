@@ -8,14 +8,15 @@ copyFrame: Creating new frame
 copyFrame: Copying over all image data
 copyFrame: Creating new frame
 copyFrame: Copying over all image data
-CopyFrame finished, elapsed time = 0.018931 seconds
-FrameSubtraction finished, time = 0.008967 seconds
-thresholdImage finished, time = 0.005788 seconds
+CopyFrame finished, elapsed time = 0.020035 seconds
+FrameSubtraction finished, time = 0.008999 seconds
+thresholdImage finished, time = 0.005832 seconds
 at blobDetection, about to segment Image
-at blobDetection, segmentImage finished, time = 0.007887
+at blobDetection, segmentImage finished, time = 0.007913
+at blobDetection, map finished, time = 0.001776
 createNewBox: unable to create box of width/height less than 5
 createNewBox: unable to create box of width/height less than 5
-BlobDetection Finished, time = 24.304682 seconds
+BlobDetection Finished, time = 0.542143 seconds
 drawing box at (584,312) (w,h)=(12,9)
 drawing box at (579,279) (w,h)=(12,6)
 drawing box at (635,267) (w,h)=(21,12)

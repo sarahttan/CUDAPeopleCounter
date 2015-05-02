@@ -588,7 +588,7 @@ int maxBlob(int width, int height, int cx, int cy){
 }
 
 //TODO: testing in progress
-int blobDetection(frame_t *frame){
+int blobDetectionOriginal(frame_t *frame){
     //detect blobs in the current frame and fill out the box struct
     //      --- look into segmentation of images (blur the image first then segment)
     // don't add a blob smaller than a certain size.
@@ -617,7 +617,7 @@ int blobDetection(frame_t *frame){
     unsigned int tag=1;
     pixel_t p;
     int w, h, cx, cy;
-    int centerx,centery;
+//    int centerx,centery;
     int done = 0;
     //detect blobs based on size - mean of pixels connected together
     // Check the segmented pixels and create a bounding box for each segment
@@ -684,8 +684,157 @@ int blobDetection(frame_t *frame){
         // update the corresponding values for the blob
         cx = x/count;
         cy = y/count;
-        centerx = (right-left)/2 + left;
-        centery = (up - down)/2 + down;
+//        centerx = (right-left)/2 + left;
+//        centery = (up - down)/2 + down;
+        w = abs(right - left);
+        h = abs(up - down);
+
+        // very simple noise remover, just count blobs with more
+        // than 30 pixels
+        if (count > 30) {
+//            printf("adding new box at (%d,%d) centroid = (%d,%d) (w,h) = (%d,%d)\n",
+//                left,up, centerx,centery, w, h);
+            createNewBox(frame, cx, cy, left, up, w, h);
+        }
+    }
+
+    return 0;
+}
+
+//TODO: testing in progress
+int blobDetection(frame_t *frame){
+    //detect blobs in the current frame and fill out the box struct
+    //      --- look into segmentation of images (blur the image first then segment)
+    // don't add a blob smaller than a certain size.
+    unsigned long largestLabel;
+    
+    printf("at blobDetection, about to segment Image\n");
+    double sTime = CycleTimer::currentSeconds(); 
+    if (segmentImage(frame, frame, &largestLabel) != 0) {
+        printf("blobDetection: segmentImage failed\n");
+        return 1;
+    }
+    double dTime = CycleTimer::currentSeconds() - sTime;
+    printf("at blobDetection, segmentImage finished, time = %f\n", dTime);
+
+    box_t *box = frame->boxes;
+
+    if (box != NULL) {
+        printf("blobDetection: frame already has bounding boxes filled in!!\n");
+        printf("                free boxes before calling this function\n");
+        return 1;
+    }
+    
+    // first build a list of labels found in the image
+    // we build it in a character array bitmap instead of a 
+    // linked list so that we can implemenet parallel algorithms on it
+    // e.g. prefix sum
+    
+    // get the current time to time the algorithm
+    sTime = CycleTimer::currentSeconds(); 
+    
+    unsigned char *map;
+    // allocate memory for it
+    // we already have the maximum number of elements in 
+    // largest label
+    map = (unsigned char *) malloc( sizeof(char) * largestLabel );
+    // zero it
+    memset(map, 0, largestLabel);
+    
+    // loop through the image
+    int label;
+    int i, j;
+
+    for (i = 0; i < frame->image->height; i++){
+        for (j = 0; j < frame->image->width; j++){
+            label = frame->image->data[i*frame->image->width+j].label;
+            map[label] = 1;
+        }
+    }
+    
+    dTime = CycleTimer::currentSeconds() - sTime;
+    printf("at blobDetection, map finished, time = %f\n",dTime);    
+    
+    
+    int left, right, up, down; 
+    int x=0,y=0,count=0;
+    unsigned int tag=1;
+    pixel_t p;
+    int w, h, cx, cy;
+//    int centerx,centery;
+    int done = 0;
+    //detect blobs based on size - mean of pixels connected together
+    // Check the segmented pixels and create a bounding box for each segment
+    while(done == 0) {
+        // Add blobs based on the segment - we're done when we've looked 
+        //  through the whole list of segmentations
+        // Based on segmentation, decide what the centroid, width, height        
+        //      We're going to go through the image by each tag to find the 
+        //          corresponding left, right, up, and down of the box.
+        //      THIS IS COMPUTATIONALLY EXPENSIVE
+        // TODO: change this operation to look around the area instead of
+        //          the entire image.
+
+        left = frame->image->width;
+        right = 0;
+        up = frame->image->height;
+        down = 0;
+        tag++;   
+        // check if we need to check this tag
+        if (map[tag] == 0) {
+            continue;
+        }
+            
+        count = 0;
+        x = 0;
+        y = 0;
+
+        if (frame->image->data == NULL) {
+            printf("ERROR: data is null\n");
+        }
+
+        for (i = 0; i < frame->image->height; i++){
+            for (j = 0; j < frame->image->width; j++){
+                
+                p = frame->image->data[i*frame->image->width+j];
+
+                if (p.label == tag) {
+                    // The pixel has label we're looking for, so we include it
+                    //  Find the left, right, up, and down most values for the label
+                    if (j < left) {
+                        left = j;
+                    }
+                    if (j > right) {
+                        right = j;
+                    }
+                    if (i < up) {
+                        up = i;
+                    }
+                    if (i > down) {
+                        down = i;
+                    }
+                    x+=j;
+                    y+=i;
+                    count++;
+                }
+                if (tag > largestLabel) {
+                    // If we looked through the largest tag value, then we're done
+                    done = 1;
+                }
+            }
+        }
+        
+
+        if (count == 0) {
+            continue;
+        }        
+//        printf("loop done, tag = %d, count = %d\n",tag, count);
+
+        // update the corresponding values for the blob
+        cx = x/count;
+        cy = y/count;
+//        centerx = (right-left)/2 + left;
+//        centery = (up - down)/2 + down;
         w = abs(right - left);
         h = abs(up - down);
 
