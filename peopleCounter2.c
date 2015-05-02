@@ -595,11 +595,13 @@ int blobDetection(frame_t *frame){
     unsigned long largestLabel;
     
     printf("at blobDetection, about to segment Image\n");
+    double sTime = CycleTimer::currentSeconds(); 
     if (segmentImage(frame, frame, &largestLabel) != 0) {
         printf("blobDetection: segmentImage failed\n");
         return 1;
     }
-    printf("at blobDetection, segmentImage finished\n");
+    double dTime = CycleTimer::currentSeconds() - sTime;
+    printf("at blobDetection, segmentImage finished, time = %f\n", dTime);
 
     box_t *box = frame->boxes;
 
@@ -687,20 +689,8 @@ int blobDetection(frame_t *frame){
         w = abs(right - left);
         h = abs(up - down);
 
-/*
-        // Remove all blobs which do not fit within the constraints. 
-        // Update the centroid and get min and max width and height of blob
-        if (minBlob(w,h,centerx,centery) != 0) {
-            LOG_ERR("Blob too small, Removing blob at (cx, cy) -> (%d, %d)\n", centerx, centery);
-        } else if (maxBlob(w,h,centerx,centery) != 0) {
-            LOG_ERR("Blob too large, Splitting blob at (cx,cy) -> (%d, %d)\n", centerx, centery);
-            // TODO: Check if we can split the blob into multiple boxes or not
-            //  for now, we'll just add the box to the list
-            createNewBox(frame, cx, cy, centerx, centery, h, w);         
-        } else {
-            createNewBox(frame, cx, cy, centerx, centery, h, w);
-        }
-*/        
+        // very simple noise remover, just count blobs with more
+        // than 30 pixels
         if (count > 30) {
 //            printf("adding new box at (%d,%d) centroid = (%d,%d) (w,h) = (%d,%d)\n",
 //                left,up, centerx,centery, w, h);

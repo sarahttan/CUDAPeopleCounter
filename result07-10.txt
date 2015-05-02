@@ -1,0 +1,67 @@
+readImageFrame: Image height = 480, width = 704
+readImageFrame: Image height = 480, width = 704
+copyFrame: Creating new frame
+copyFrame: Copying over all image data
+copyFrame: Creating new frame
+copyFrame: Copying over all image data
+copyFrame: Creating new frame
+copyFrame: Copying over all image data
+copyFrame: Creating new frame
+copyFrame: Copying over all image data
+CopyFrame finished, elapsed time = 0.020535 seconds
+FrameSubtraction finished, time = 0.008964 seconds
+thresholdImage finished, time = 0.005802 seconds
+at blobDetection, about to segment Image
+at blobDetection, segmentImage finished, time = 0.007762
+createNewBox: unable to create box of width/height less than 5
+createNewBox: unable to create box of width/height less than 5
+createNewBox: unable to create box of width/height less than 5
+createNewBox: unable to create box of width/height less than 5
+createNewBox: unable to create box of width/height less than 5
+createNewBox: unable to create box of width/height less than 5
+createNewBox: unable to create box of width/height less than 5
+createNewBox: unable to create box of width/height less than 5
+createNewBox: unable to create box of width/height less than 5
+createNewBox: unable to create box of width/height less than 5
+createNewBox: unable to create box of width/height less than 5
+createNewBox: unable to create box of width/height less than 5
+createNewBox: unable to create box of width/height less than 5
+createNewBox: unable to create box of width/height less than 5
+createNewBox: unable to create box of width/height less than 5
+createNewBox: unable to create box of width/height less than 5
+createNewBox: unable to create box of width/height less than 5
+createNewBox: unable to create box of width/height less than 5
+BlobDetection Finished, time = 19.554835 seconds
+drawing box at (581,259) (w,h)=(14,13)
+drawing box at (597,247) (w,h)=(22,11)
+drawing box at (94,193) (w,h)=(24,9)
+drawing box at (526,187) (w,h)=(11,17)
+drawing box at (133,172) (w,h)=(14,29)
+drawing box at (81,166) (w,h)=(71,50)
+drawing box at (142,159) (w,h)=(10,24)
+drawing box at (354,135) (w,h)=(30,8)
+drawing box at (375,104) (w,h)=(21,19)
+drawing box at (156,98) (w,h)=(19,63)
+drawing box at (363,80) (w,h)=(6,11)
+drawing box at (108,75) (w,h)=(15,20)
+drawing box at (77,60) (w,h)=(77,133)
+drawing box at (368,57) (w,h)=(31,21)
+drawing box at (384,52) (w,h)=(8,6)
+drawing box at (127,51) (w,h)=(18,50)
+drawing box at (95,51) (w,h)=(30,33)
+drawing box at (160,49) (w,h)=(19,56)
+drawing box at (136,45) (w,h)=(20,30)
+drawing box at (243,35) (w,h)=(63,150)
+Writing frame
+Write to frame complete, please check file = full5.jpg
+mergeBoxes Finished, time = 0.000004 seconds
+drawing box at (581,247) (w,h)=(38,25)
+drawing box at (77,45) (w,h)=(102,171)
+drawing box at (526,187) (w,h)=(11,17)
+drawing box at (354,135) (w,h)=(30,8)
+drawing box at (375,104) (w,h)=(21,19)
+drawing box at (363,52) (w,h)=(36,39)
+drawing box at (243,35) (w,h)=(63,150)
+Writing frame
+Write to frame complete, please check file = full6.jpg
+Freeing frames
