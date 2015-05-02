@@ -2,10 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <omp.h>
 #include "peopleCounter.h"
 #include <time.h>
-//#include "CycleTimer.h"
+#include "CycleTimer.h"
 
 #include <jpeglib.h>
 #define PI 3.14159265
@@ -135,56 +134,6 @@ int frameSubtraction(frame_t *frame, frame_t *frame2, frame_t *res){
             res->image->data[i * frameWidth + j].A = abs(frame2A - frameA);
             res->image->data[i * frameWidth + j].B = abs(frame2B - frameB);
             //printf("(i,j) = (%d, %d)\n", i,j);
-        }
-    }
-    return 0;
-}
-
-int frameSubtractionOmp(frame_t *frame, frame_t *frame2, frame_t *res){
-    //subtract two frames and give back the resulting frame
-    //Frames are not the same size and we're screwed
-    if ((frame == NULL) || (frame2 == NULL) || (res == NULL)) {
-        printf("frameSubtraction: frames are not initialized\n");
-        return 1;
-    }
-
-    if ((frame->image == NULL) || (frame2->image == NULL) || (res->image == NULL)) {
-        printf("frameSubtraction: frame->image not initialized\n");
-        return 1;
-    }
-
-    if((frame->image->width != frame2->image->width) || 
-        (frame->image->height != frame2->image->height)){
-        printf("frameSutraction: The frame sizes are not the same!");
-        return 1;
-    }
-
-    int frameWidth = frame->image->width;
-    int frameHeight = frame->image->height;
-
-    //printf("Frame->image->data length = %lx\n", sizeof(frame->image->data)/(sizeof(struct pixel_s)));
-
-    #pragma omp parallel for num_threads(4)
-    for(int i = 0; i < frameHeight; i++){
-        for(int j = 0; j < frameWidth; j++){
-            if ((&frame->image->data[i*frameWidth+j] == NULL) || (&frame2->image->data[i*frameWidth+j] == NULL) || (&res->image->data[i*frameWidth+j] == NULL)) {
-                printf("frameSubtraction: pixel is null (%d, %d)\n", i, j);
-                // return 1;
-            }
-            //Get L values
-            // frameL = frame->image->data[i * frameWidth + j].L;
-            // frame2L = frame2->image->data[i * frameWidth + j].L;
-            // //Get A values
-            // frameA = frame->image->data[i * frameWidth + j].A;
-            // frame2A = frame2->image->data[i * frameWidth + j].A;
-            // //Get B values
-            // frameB = frame->image->data[i * frameWidth + j].B;
-            // frame2B = frame2->image->data[i * frameWidth + j].B;
-            //Set pixel values in res
-            res->image->data[i * frameWidth + j].L = abs(frame2->image->data[i * frameWidth + j].L - frame->image->data[i * frameWidth + j].L);
-            res->image->data[i * frameWidth + j].A = abs(frame2->image->data[i * frameWidth + j].A - frame->image->data[i * frameWidth + j].A);
-            res->image->data[i * frameWidth + j].B = abs(frame2->image->data[i * frameWidth + j].B - frame->image->data[i * frameWidth + j].B);
-            // printf("(i,j) = (%d, %d)\n", i,j);
         }
     }
     return 0;

@@ -3,9 +3,9 @@
 #include <string.h>
 #include <math.h>
 #include <omp.h>
-#include "peopleCounter.h"
+#include "peopleCounter2.h"
 #include <time.h>
-//#include "CycleTimer.h"
+#include "CycleTimer.h"
 
 #include <jpeglib.h>
 #define PI 3.14159265
@@ -612,7 +612,7 @@ int blobDetection(frame_t *frame){
     int i, j;
     int left, right, up, down; 
     int x=0,y=0,count=0;
-    int tag=1;
+    unsigned int tag=1;
     pixel_t p;
     int w, h, cx, cy;
     int centerx,centery;
@@ -677,7 +677,7 @@ int blobDetection(frame_t *frame){
         if (count == 0) {
             continue;
         }        
-        printf("loop done, tag = %d, count = %d\n",tag, count);
+//        printf("loop done, tag = %d, count = %d\n",tag, count);
 
         // update the corresponding values for the blob
         cx = x/count;
@@ -702,8 +702,8 @@ int blobDetection(frame_t *frame){
         }
 */        
         if (count > 30) {
-            printf("adding new box at (%d,%d) centroid = (%d,%d) (w,h) = (%d,%d)\n",
-                left,up, centerx,centery, w, h);
+//            printf("adding new box at (%d,%d) centroid = (%d,%d) (w,h) = (%d,%d)\n",
+//                left,up, centerx,centery, w, h);
             createNewBox(frame, cx, cy, left, up, w, h);
         }
     }
@@ -1077,7 +1077,7 @@ int drawBoxOnImage(frame_t *frame, frame_t *res) {
 }
 
 //TODO: testing
-int frameToJPG(frame_t *frame, char *filename){
+int frameToJPG(frame_t *frame, const char *filename){
     if (saveJpg(filename, frame->image) != 0) {
         return 0;
     } else {

@@ -20,6 +20,9 @@ int main(int argc, char *argv[]){
         return 1;
     }
 
+    double startTime = CycleTimer::currentSeconds();
+    double deltaTime;
+
     char *filename1 = argv[1];
     char *filename2 = argv[2];
 
@@ -37,31 +40,47 @@ int main(int argc, char *argv[]){
     res3 = copyFrame(frame2);
     res4 = copyFrame(frame2);
     
-    printf("CopyFrame finished\n");
+    deltaTime = CycleTimer::currentSeconds() - startTime;
+    
+    printf("CopyFrame finished, elapsed time = %f seconds\n", deltaTime);
+
 
     frameToJPG(frame1, "full1.jpg");
     frameToJPG(frame2, "full2.jpg");
+
+    startTime = CycleTimer::currentSeconds();
 
     if (frameSubtraction(frame1, frame2, res1) != 0) {
         printf("Error in frame subtraction\n");
     }
     
-    printf("FrameSubtraction finished\n");
+    deltaTime = CycleTimer::currentSeconds() - startTime;
+
+    printf("FrameSubtraction finished, time = %f seconds\n", deltaTime);
     
     frameToJPG(res1, "full3.jpg");
+
+    startTime = CycleTimer::currentSeconds();
     
     if (thresholdImage(res1, res2) != 0) {
         printf("Error in thresholdImage\n");
     }
-    printf("thresholdImage finished\n");
+
+    deltaTime = CycleTimer::currentSeconds() - startTime;
+
+    printf("thresholdImage finished, time = %f seconds\n", deltaTime);
     
     frameToJPG(res2, "full4.jpg");
+
+    startTime = CycleTimer::currentSeconds();
     
     if (blobDetection(res2) != 0) {
         printf("Error in blob detection\n");
     }
 
-    printf("BlobDetection Finished\n");
+    deltaTime = CycleTimer::currentSeconds() - startTime;
+
+    printf("BlobDetection Finished, time = %f seconds\n", deltaTime);
 
 //    res2 = copyFrame(res1);
 
@@ -73,11 +92,16 @@ int main(int argc, char *argv[]){
     frameToJPG(res3, "full5.jpg");
     printf("Write to frame complete, please check file = full5.jpg\n");
 
+    startTime = CycleTimer::currentSeconds();
+
     // merge boxes
     if (mergeBoxes(res2) != 0) {
         printf("Error in mergeBoxes\n");
         exit(1);
     }
+    deltaTime = CycleTimer::currentSeconds() - startTime;
+    printf("mergeBoxes Finished, time = %f seconds\n", deltaTime);
+
     
     if (drawBoxOnImage(res2, res4) != 0) {
         printf("Error in draw box on image\n");

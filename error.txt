@@ -14,24 +14,6 @@ peopleCounter2.c:669:27: warning: comparison between signed and unsigned integer
                  if (tag > largestLabel) {
                            ^
 tests/fullTest.c: In function ‘int main(int, char**)’:
-tests/fullTest.c:25:52: error: invalid conversion from ‘void*’ to ‘frame_t* {aka frame_s*}’ [-fpermissive]
-     frame_t *frame1 = malloc(sizeof(struct frame_s));
-                                                    ^
-tests/fullTest.c:26:52: error: invalid conversion from ‘void*’ to ‘frame_t* {aka frame_s*}’ [-fpermissive]
-     frame_t *frame2 = malloc(sizeof(struct frame_s));    
-                                                    ^
-tests/fullTest.c:27:50: error: invalid conversion from ‘void*’ to ‘frame_t* {aka frame_s*}’ [-fpermissive]
-     frame_t *res1 = malloc(sizeof(struct frame_s));
-                                                  ^
-tests/fullTest.c:28:50: error: invalid conversion from ‘void*’ to ‘frame_t* {aka frame_s*}’ [-fpermissive]
-     frame_t *res2 = malloc(sizeof(struct frame_s));
-                                                  ^
-tests/fullTest.c:29:50: error: invalid conversion from ‘void*’ to ‘frame_t* {aka frame_s*}’ [-fpermissive]
-     frame_t *res3 = malloc(sizeof(struct frame_s));
-                                                  ^
-tests/fullTest.c:30:50: error: invalid conversion from ‘void*’ to ‘frame_t* {aka frame_s*}’ [-fpermissive]
-     frame_t *res4 = malloc(sizeof(struct frame_s));
-                                                  ^
 tests/fullTest.c:41:35: warning: deprecated conversion from string constant to ‘char*’ [-Wwrite-strings]
      frameToJPG(frame1, "full1.jpg");
                                    ^
@@ -50,4 +32,3 @@ tests/fullTest.c:72:33: warning: deprecated conversion from string constant to �
 tests/fullTest.c:86:33: warning: deprecated conversion from string constant to ‘char*’ [-Wwrite-strings]
      frameToJPG(res4, "full6.jpg");
                                  ^
-make: *** [fullTest] Error 1

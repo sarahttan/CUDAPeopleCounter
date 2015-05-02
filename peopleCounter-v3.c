@@ -5,7 +5,6 @@
 #include <omp.h>
 #include "peopleCounter.h"
 #include <time.h>
-//#include "CycleTimer.h"
 
 #include <jpeglib.h>
 #define PI 3.14159265

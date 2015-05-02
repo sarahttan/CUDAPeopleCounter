@@ -1,317 +1,143 @@
-readImageFrame: Image height = 480, width = 704
-readImageFrame: Image height = 480, width = 704
-copyFrame: Creating new frame
-copyFrame: Copying over all image data
-CopyFrame finished
-FrameSubtraction finished
-at blobDetection, about to segment Image
-at blobDetection, segmentImage finished
-loop done, tag = 45, count = 34
-at blobDetection, finished loop
-blob at (286, 1) with size [w,h] -> [16,1] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (286, 1)
-loop done, tag = 122, count = 22
-at blobDetection, finished loop
-blob at (327, 3) with size [w,h] -> [21,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (327, 3)
-loop done, tag = 144, count = 1
-at blobDetection, finished loop
-blob at (99, 7) with size [w,h] -> [0,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (99, 7)
-loop done, tag = 145, count = 3
-at blobDetection, finished loop
-blob at (124, 8) with size [w,h] -> [2,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (124, 8)
-loop done, tag = 148, count = 1
-at blobDetection, finished loop
-blob at (83, 9) with size [w,h] -> [0,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (83, 9)
-loop done, tag = 149, count = 1
-at blobDetection, finished loop
-blob at (127, 10) with size [w,h] -> [0,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (127, 10)
-loop done, tag = 150, count = 1
-at blobDetection, finished loop
-blob at (127, 12) with size [w,h] -> [0,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (127, 12)
-loop done, tag = 151, count = 2
-at blobDetection, finished loop
-blob at (47, 13) with size [w,h] -> [1,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (47, 13)
-loop done, tag = 153, count = 4
-at blobDetection, finished loop
-blob at (123, 16) with size [w,h] -> [1,2] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (123, 16)
-loop done, tag = 154, count = 3
-at blobDetection, finished loop
-blob at (127, 16) with size [w,h] -> [0,2] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (127, 16)
-loop done, tag = 160, count = 1
-at blobDetection, finished loop
-blob at (123, 19) with size [w,h] -> [0,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (123, 19)
-loop done, tag = 161, count = 2
-at blobDetection, finished loop
-blob at (124, 20) with size [w,h] -> [1,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (124, 20)
-loop done, tag = 163, count = 3
-at blobDetection, finished loop
-blob at (116, 27) with size [w,h] -> [2,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (116, 27)
-loop done, tag = 166, count = 5
-at blobDetection, finished loop
-blob at (96, 29) with size [w,h] -> [4,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (96, 29)
-loop done, tag = 171, count = 3
-at blobDetection, finished loop
-blob at (21, 43) with size [w,h] -> [2,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (21, 43)
-loop done, tag = 174, count = 7
-at blobDetection, finished loop
-blob at (108, 51) with size [w,h] -> [6,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (108, 51)
-loop done, tag = 181, count = 6
-at blobDetection, finished loop
-blob at (52, 59) with size [w,h] -> [5,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (52, 59)
-loop done, tag = 187, count = 3
-at blobDetection, finished loop
-blob at (78, 61) with size [w,h] -> [0,2] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (78, 61)
-loop done, tag = 190, count = 1
-at blobDetection, finished loop
-blob at (40, 67) with size [w,h] -> [0,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (40, 67)
-loop done, tag = 191, count = 1
-at blobDetection, finished loop
-blob at (78, 75) with size [w,h] -> [0,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (78, 75)
-loop done, tag = 192, count = 2
-at blobDetection, finished loop
-blob at (402, 87) with size [w,h] -> [1,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (402, 87)
-loop done, tag = 194, count = 22
-at blobDetection, finished loop
-blob at (623, 91) with size [w,h] -> [14,3] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (623, 91)
-loop done, tag = 216, count = 146
-at blobDetection, finished loop
-blob at (125, 100) with size [w,h] -> [15,14] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (125, 100)
-loop done, tag = 237, count = 5
-at blobDetection, finished loop
-blob at (79, 98) with size [w,h] -> [0,4] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (79, 98)
-loop done, tag = 339, count = 6
-at blobDetection, finished loop
-blob at (618, 103) with size [w,h] -> [5,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (618, 103)
-loop done, tag = 355, count = 2
-at blobDetection, finished loop
-blob at (136, 105) with size [w,h] -> [0,1] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (136, 105)
-loop done, tag = 370, count = 5
-at blobDetection, finished loop
-blob at (103, 108) with size [w,h] -> [2,1] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (103, 108)
-loop done, tag = 378, count = 3
-at blobDetection, finished loop
-blob at (133, 107) with size [w,h] -> [2,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (133, 107)
-loop done, tag = 381, count = 3
-at blobDetection, finished loop
-blob at (647, 108) with size [w,h] -> [1,1] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (647, 108)
-loop done, tag = 385, count = 7
-at blobDetection, finished loop
-blob at (114, 109) with size [w,h] -> [5,1] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (114, 109)
-loop done, tag = 393, count = 503
-at blobDetection, finished loop
-blob at (142, 140) with size [w,h] -> [20,59] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (142, 140)
-loop done, tag = 394, count = 1
-at blobDetection, finished loop
-blob at (109, 111) with size [w,h] -> [0,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (109, 111)
-loop done, tag = 398, count = 1
-at blobDetection, finished loop
-blob at (80, 112) with size [w,h] -> [0,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (80, 112)
-loop done, tag = 404, count = 4
-at blobDetection, finished loop
-blob at (104, 114) with size [w,h] -> [1,2] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (104, 114)
-loop done, tag = 411, count = 2
-at blobDetection, finished loop
-blob at (80, 115) with size [w,h] -> [0,1] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (80, 115)
-loop done, tag = 412, count = 20
-at blobDetection, finished loop
-blob at (84, 117) with size [w,h] -> [5,5] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (84, 117)
-loop done, tag = 426, count = 16
-at blobDetection, finished loop
-blob at (99, 117) with size [w,h] -> [5,3] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (99, 117)
-loop done, tag = 451, count = 1
-at blobDetection, finished loop
-blob at (88, 117) with size [w,h] -> [0,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (88, 117)
-loop done, tag = 468, count = 1
-at blobDetection, finished loop
-blob at (93, 118) with size [w,h] -> [0,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (93, 118)
-loop done, tag = 472, count = 338
-at blobDetection, finished loop
-blob at (128, 137) with size [w,h] -> [24,37] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (128, 137)
-loop done, tag = 500, count = 6
-at blobDetection, finished loop
-blob at (392, 119) with size [w,h] -> [5,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (392, 119)
-loop done, tag = 506, count = 467
-at blobDetection, finished loop
-blob at (92, 145) with size [w,h] -> [19,50] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (92, 145)
-loop done, tag = 525, count = 1
-at blobDetection, finished loop
-blob at (80, 121) with size [w,h] -> [0,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (80, 121)
-loop done, tag = 565, count = 3
-at blobDetection, finished loop
-blob at (113, 123) with size [w,h] -> [2,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (113, 123)
-loop done, tag = 763, count = 1
-at blobDetection, finished loop
-blob at (88, 130) with size [w,h] -> [0,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (88, 130)
-loop done, tag = 795, count = 2
-at blobDetection, finished loop
-blob at (85, 131) with size [w,h] -> [1,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (85, 131)
-loop done, tag = 817, count = 5
-at blobDetection, finished loop
-blob at (136, 133) with size [w,h] -> [1,3] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (136, 133)
-loop done, tag = 826, count = 4
-at blobDetection, finished loop
-blob at (89, 133) with size [w,h] -> [2,1] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (89, 133)
-loop done, tag = 973, count = 2
-at blobDetection, finished loop
-blob at (116, 140) with size [w,h] -> [0,1] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (116, 140)
-loop done, tag = 1090, count = 1
-at blobDetection, finished loop
-blob at (96, 144) with size [w,h] -> [0,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (96, 144)
-loop done, tag = 1564, count = 96
-at blobDetection, finished loop
-blob at (129, 171) with size [w,h] -> [9,24] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (129, 171)
-loop done, tag = 1752, count = 1
-at blobDetection, finished loop
-blob at (319, 165) with size [w,h] -> [0,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (319, 165)
-loop done, tag = 1788, count = 1
-at blobDetection, finished loop
-blob at (319, 167) with size [w,h] -> [0,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (319, 167)
-loop done, tag = 1821, count = 224
-at blobDetection, finished loop
-blob at (96, 186) with size [w,h] -> [17,29] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (96, 186)
-loop done, tag = 1831, count = 25
-at blobDetection, finished loop
-blob at (86, 177) with size [w,h] -> [4,8] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (86, 177)
-loop done, tag = 1840, count = 5
-at blobDetection, finished loop
-blob at (144, 175) with size [w,h] -> [1,3] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (144, 175)
-loop done, tag = 1894, count = 1
-at blobDetection, finished loop
-blob at (146, 177) with size [w,h] -> [0,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (146, 177)
-loop done, tag = 1941, count = 7
-at blobDetection, finished loop
-blob at (147, 181) with size [w,h] -> [2,2] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (147, 181)
-loop done, tag = 2007, count = 29
-at blobDetection, finished loop
-blob at (163, 189) with size [w,h] -> [8,6] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (163, 189)
-loop done, tag = 2017, count = 1
-at blobDetection, finished loop
-blob at (86, 188) with size [w,h] -> [0,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (86, 188)
-loop done, tag = 2027, count = 3
-at blobDetection, finished loop
-blob at (149, 189) with size [w,h] -> [0,2] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (149, 189)
-loop done, tag = 2108, count = 44
-at blobDetection, finished loop
-blob at (145, 196) with size [w,h] -> [14,7] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (145, 196)
-loop done, tag = 2209, count = 48
-at blobDetection, finished loop
-blob at (145, 203) with size [w,h] -> [16,5] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (145, 203)
-loop done, tag = 2257, count = 25
-at blobDetection, finished loop
-blob at (99, 213) with size [w,h] -> [11,3] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (99, 213)
-loop done, tag = 2261, count = 2
-at blobDetection, finished loop
-blob at (112, 211) with size [w,h] -> [1,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (112, 211)
-loop done, tag = 2284, count = 31
-at blobDetection, finished loop
-blob at (609, 254) with size [w,h] -> [17,6] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (609, 254)
-loop done, tag = 2300, count = 25
-at blobDetection, finished loop
-blob at (617, 255) with size [w,h] -> [10,3] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (617, 255)
-loop done, tag = 2340, count = 3
-at blobDetection, finished loop
-blob at (599, 259) with size [w,h] -> [1,1] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (599, 259)
-loop done, tag = 2343, count = 2
-at blobDetection, finished loop
-blob at (679, 260) with size [w,h] -> [0,1] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (679, 260)
-loop done, tag = 2345, count = 30
-at blobDetection, finished loop
-blob at (589, 265) with size [w,h] -> [11,2] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (589, 265)
-loop done, tag = 2369, count = 3
-at blobDetection, finished loop
-blob at (581, 267) with size [w,h] -> [1,1] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (581, 267)
-loop done, tag = 2378, count = 8
-at blobDetection, finished loop
-blob at (619, 272) with size [w,h] -> [3,2] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (619, 272)
-loop done, tag = 2380, count = 3
-at blobDetection, finished loop
-blob at (636, 271) with size [w,h] -> [2,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (636, 271)
-loop done, tag = 2389, count = 2
-at blobDetection, finished loop
-blob at (702, 277) with size [w,h] -> [1,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (702, 277)
-loop done, tag = 2391, count = 2
-at blobDetection, finished loop
-blob at (605, 287) with size [w,h] -> [1,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (605, 287)
-loop done, tag = 2393, count = 1
-at blobDetection, finished loop
-blob at (582, 291) with size [w,h] -> [0,0] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (582, 291)
-loop done, tag = 2394, count = 7
-at blobDetection, finished loop
-blob at (596, 338) with size [w,h] -> [4,1] < min dim of [200, 400]
-Blob too small, Removing blob at (cx, cy) -> (596, 338)
-loop don
+gcc -ljpeg -Wall -std=c99 -lm -o -fopenmp drawTest stack.c peopleCounter.c readjpeg.c tests/drawTest.c
+peopleCounter.c: In function ‘frameSubtractionOmp’:
+peopleCounter.c:167:0: warning: ignoring #pragma omp parallel [-Wunknown-pragmas]
+     #pragma omp parallel for num_threads(4)
+ ^
+drawTest: In function `_start':
+(.text+0x0): multiple definition of `_start'
+/usr/lib/../lib64/crt1.o:(.text+0x0): first defined here
+drawTest: In function `_fini':
+(.fini+0x0): multiple definition of `_fini'
+/usr/lib/../lib64/crti.o:(.fini+0x0): first defined here
+drawTest:(.rodata+0x0): multiple definition of `_IO_stdin_used'
+/usr/lib/../lib64/crt1.o:(.rodata.cst4+0x0): first defined here
+drawTest: In function `__data_start':
+(.data+0x0): multiple definition of `__data_start'
+/usr/lib/../lib64/crt1.o:(.data+0x0): first defined here
+drawTest: In function `__data_start':
+(.data+0x8): multiple definition of `__dso_handle'
+/usr/local/lib/gcc/lib/gcc/x86_64-unknown-linux-gnu/4.8.1/crtbegin.o:(.data+0x0): first defined here
+drawTest: In function `_edata':
+(*ABS*+0x6054a0): multiple definition of `__bss_start'
+drawTest: In function `_end':
+(*ABS*+0x6054d8): multiple definition of `_end'
+drawTest: In function `_edata':
+(*ABS*+0x6054a0): multiple definition of `_edata'
+drawTest: In function `_init':
+(.init+0x0): multiple definition of `_init'
+/usr/lib/../lib64/crti.o:(.init+0x0): first defined here
+/tmp/ccaplhS5.o:(.bss+0x0): multiple definition of `nStackCount'
+drawTest:(.bss+0x28): first defined here
+/tmp/ccaplhS5.o: In function `createStack':
+stack.c:(.text+0x0): multiple definition of `createStack'
+drawTest:(.text+0x160): first defined here
+/tmp/ccaplhS5.o: In function `stack_count':
+stack.c:(.text+0x11): multiple definition of `stack_count'
+drawTest:(.text+0x171): first defined here
+/tmp/ccaplhS5.o: In function `push':
+stack.c:(.text+0x17): multiple definition of `push'
+drawTest:(.text+0x177): first defined here
+/tmp/ccaplhS5.o: In function `displayStack':
+stack.c:(.text+0xd7): multiple definition of `displayStack'
+drawTest:(.text+0x237): first defined here
+/tmp/ccaplhS5.o: In function `pop':
+stack.c:(.text+0x106): multiple definition of `pop'
+drawTest:(.text+0x266): first defined here
+/tmp/ccaplhS5.o: In function `topelement':
+stack.c:(.text+0x198): multiple definition of `topelement'
+drawTest:(.text+0x2f8): first defined here
+/tmp/ccaplhS5.o: In function `isEmpty':
+stack.c:(.text+0x1a8): multiple definition of `isEmpty'
+drawTest:(.text+0x308): first defined here
+/tmp/ccaplhS5.o: In function `destroyStack':
+stack.c:(.text+0x1c6): multiple definition of `destroyStack'
+drawTest:(.text+0x326): first defined here
+/tmp/ccKr8UvT.o: In function `extractFrames':
+peopleCounter.c:(.text+0x0): multiple definition of `extractFrames'
+drawTest:(.text+0x39c): first defined here
+/tmp/ccKr8UvT.o: In function `freeFrame':
+peopleCounter.c:(.text+0xf): multiple definition of `freeFrame'
+drawTest:(.text+0x3ab): first defined here
+/tmp/ccKr8UvT.o: In function `readImageFrame':
+peopleCounter.c:(.text+0xdd): multiple definition of `readImageFrame'
+drawTest:(.text+0x479): first defined here
+/tmp/ccKr8UvT.o: In function `frameSubtraction':
+peopleCounter.c:(.text+0x18b): multiple definition of `frameSubtraction'
+drawTest:(.text+0x527): first defined here
+/tmp/ccKr8UvT.o: In function `frameSubtractionOmp':
+peopleCounter.c:(.text+0x4e5): multiple definition of `frameSubtractionOmp'
+drawTest:(.text+0x881): first defined here
+/tmp/ccKr8UvT.o: In function `boxesIntersect':
+peopleCounter.c:(.text+0x805): multiple definition of `boxesIntersect'
+drawTest:(.text+0xba1): first defined here
+/tmp/ccKr8UvT.o: In function `createNewBox':
+peopleCounter.c:(.text+0x8b3): multiple definition of `createNewBox'
+drawTest:(.text+0xc4f): first defined here
+/tmp/ccKr8UvT.o: In function `deleteBox':
+peopleCounter.c:(.text+0xa4b): multiple definition of `deleteBox'
+drawTest:(.text+0xde7): first defined here
+/tmp/ccKr8UvT.o: In function `mergeBoxes':
+peopleCounter.c:(.text+0xaf9): multiple definition of `mergeBoxes'
+drawTest:(.text+0xe95): first defined here
+/tmp/ccKr8UvT.o: In function `blurImage':
+peopleCounter.c:(.text+0xcc4): multiple definition of `blurImage'
+drawTest:(.text+0x1060): first defined here
+/tmp/ccKr8UvT.o: In function `thresholdImage':
+peopleCounter.c:(.text+0xcd3): multiple definition of `thresholdImage'
+drawTest:(.text+0x106f): first defined here
+/tmp/ccKr8UvT.o: In function `segmentImage':
+peopleCounter.c:(.text+0xf0f): multiple definition of `segmentImage'
+drawTest:(.text+0x12ab): first defined here
+/tmp/ccKr8UvT.o: In function `minBlob':
+peopleCounter.c:(.text+0x12c0): multiple definition of `minBlob'
+drawTest:(.text+0x165c): first defined here
+/tmp/ccKr8UvT.o: In function `maxBlob':
+peopleCounter.c:(.text+0x1379): multiple definition of `maxBlob'
+drawTest:(.text+0x1715): first defined here
+/tmp/ccKr8UvT.o: In function `blobDetection':
+peopleCounter.c:(.text+0x1432): multiple definition of `blobDetection'
+drawTest:(.text+0x17ce): first defined here
+/tmp/ccKr8UvT.o: In function `mergeBlobs':
+peopleCounter.c:(.text+0x171d): multiple definition of `mergeBlobs'
+drawTest:(.text+0x1ab9): first defined here
+/tmp/ccKr8UvT.o: In function `findBlobDirection':
+peopleCounter.c:(.text+0x187f): multiple definition of `findBlobDirection'
+drawTest:(.text+0x1c1b): first defined here
+/tmp/ccKr8UvT.o: In function `copyBoundingBoxes':
+peopleCounter.c:(.text+0x197c): multiple definition of `copyBoundingBoxes'
+drawTest:(.text+0x1d18): first defined here
+/tmp/ccKr8UvT.o: In function `copyFrame':
+peopleCounter.c:(.text+0x1aaa): multiple definition of `copyFrame'
+drawTest:(.text+0x1e46): first defined here
+/tmp/ccKr8UvT.o: In function `drawHLine':
+peopleCounter.c:(.text+0x1c60): multiple definition of `drawHLine'
+drawTest:(.text+0x1ffc): first defined here
+/tmp/ccKr8UvT.o: In function `drawVLine':
+peopleCounter.c:(.text+0x1e2d): multiple definition of `drawVLine'
+drawTest:(.text+0x21c9): first defined here
+/tmp/ccKr8UvT.o: In function `drawBox':
+peopleCounter.c:(.text+0x1ffc): multiple definition of `drawBox'
+drawTest:(.text+0x2398): first defined here
+/tmp/ccKr8UvT.o: In function `drawBoxOnImage':
+peopleCounter.c:(.text+0x2107): multiple definition of `drawBoxOnImage'
+drawTest:(.text+0x24a3): first defined here
+/tmp/ccKr8UvT.o: In function `frameToJPG':
+peopleCounter.c:(.text+0x23ae): multiple definition of `frameToJPG'
+drawTest:(.text+0x274a): first defined here
+/tmp/cclY05eH.o: In function `saveJpg':
+readjpeg.c:(.text+0x0): multiple definition of `saveJpg'
+drawTest:(.text+0x2784): first defined here
+/tmp/cclY05eH.o: In function `loadJpg':
+readjpeg.c:(.text+0x2b3): multiple definition of `loadJpg'
+drawTest:(.text+0x2a37): first defined here
+/tmp/ccvrPi2u.o: In function `main':
+drawTest.c:(.text+0x0): multiple definition of `main'
+drawTest:(.text+0x2cd0): first defined here
+/usr/local/lib/gcc/lib/gcc/x86_64-unknown-linux-gnu/4.8.1/crtend.o:(.dtors+0x0): multiple definition of `__DTOR_END__'
+drawTest:(.dtors+0x8): first defined here
+/usr/local/lib/gcc/lib/gcc/x86_64-unknown-linux-gnu/4.8.1/crtend.o:(.tm_clone_table+0x0): multiple definition of `__TMC_END__'
+drawTest:(.data+0x10): first defined here
+/usr/bin/ld: warning: Cannot create .eh_frame_hdr section, --eh-frame-hdr ignored.
+/usr/bin/ld: error in drawTest(.eh_frame); no .eh_frame_hdr table will be created.
+collect2: error: ld returned 1 exit status
+make: *** [drawTest] Error 1

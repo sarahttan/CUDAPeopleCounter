@@ -2,8 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <omp.h>
 #include "peopleCounter.h"
 #include <time.h>
+#include "CycleTimer.h"
 
 #include <jpeglib.h>
 #define PI 3.14159265
@@ -138,6 +140,56 @@ int frameSubtraction(frame_t *frame, frame_t *frame2, frame_t *res){
     return 0;
 }
 
+int frameSubtractionOmp(frame_t *frame, frame_t *frame2, frame_t *res){
+    //subtract two frames and give back the resulting frame
+    //Frames are not the same size and we're screwed
+    if ((frame == NULL) || (frame2 == NULL) || (res == NULL)) {
+        printf("frameSubtraction: frames are not initialized\n");
+        return 1;
+    }
+
+    if ((frame->image == NULL) || (frame2->image == NULL) || (res->image == NULL)) {
+        printf("frameSubtraction: frame->image not initialized\n");
+        return 1;
+    }
+
+    if((frame->image->width != frame2->image->width) || 
+        (frame->image->height != frame2->image->height)){
+        printf("frameSutraction: The frame sizes are not the same!");
+        return 1;
+    }
+
+    int frameWidth = frame->image->width;
+    int frameHeight = frame->image->height;
+
+    //printf("Frame->image->data length = %lx\n", sizeof(frame->image->data)/(sizeof(struct pixel_s)));
+
+    #pragma omp parallel for num_threads(4)
+    for(int i = 0; i < frameHeight; i++){
+        for(int j = 0; j < frameWidth; j++){
+            if ((&frame->image->data[i*frameWidth+j] == NULL) || (&frame2->image->data[i*frameWidth+j] == NULL) || (&res->image->data[i*frameWidth+j] == NULL)) {
+                printf("frameSubtraction: pixel is null (%d, %d)\n", i, j);
+                // return 1;
+            }
+            //Get L values
+            // frameL = frame->image->data[i * frameWidth + j].L;
+            // frame2L = frame2->image->data[i * frameWidth + j].L;
+            // //Get A values
+            // frameA = frame->image->data[i * frameWidth + j].A;
+            // frame2A = frame2->image->data[i * frameWidth + j].A;
+            // //Get B values
+            // frameB = frame->image->data[i * frameWidth + j].B;
+            // frame2B = frame2->image->data[i * frameWidth + j].B;
+            //Set pixel values in res
+            res->image->data[i * frameWidth + j].L = abs(frame2->image->data[i * frameWidth + j].L - frame->image->data[i * frameWidth + j].L);
+            res->image->data[i * frameWidth + j].A = abs(frame2->image->data[i * frameWidth + j].A - frame->image->data[i * frameWidth + j].A);
+            res->image->data[i * frameWidth + j].B = abs(frame2->image->data[i * frameWidth + j].B - frame->image->data[i * frameWidth + j].B);
+            // printf("(i,j) = (%d, %d)\n", i,j);
+        }
+    }
+    return 0;
+}
+
 //
 // Return 1 if boxes intersect, 0 if they do not
 // code is based on http://gamemath.com/2011/09/detecting-whether-two-boxes-overlap/
@@ -257,47 +309,55 @@ int mergeBoxes(frame_t *frame)
     box_t *temp1 = frame->boxes;
     box_t *temp2;
     box_t *temp3;
-    
-    while (temp1 != NULL) {
-        temp2 = temp1->next;
-        while (temp2 != NULL) {
-            if (boxesIntersect(temp1, temp2, 10)) {
-                // boxes intersect, merge them
-                int endy, endy1, endy2;
-                int endx, endx1, endx2;
-                endx1 = temp1->startx + temp1->width;
-                endx2 = temp2->startx + temp2->width;
-                endy1 = temp1->starty + temp1->height;
-                endy2 = temp2->starty + temp2->height;
-                
-                endx = MAX(endx1, endx2);
-                endy = MAX(endy1, endy2);
-                
-                int startx, starty;
-                startx = MIN(temp1->startx, temp2->startx);
-                starty = MIN(temp1->starty, temp2->starty);
-                
-                // expand the first box
-                temp1->startx = startx;
-                temp1->starty = starty;
-                temp1->width = endx - startx;
-                temp1->height = endy - starty;
+    int boxUpdated;
+    boxUpdated = 1;
 
-                // get the next pointer first before we delete it
-                temp3 = temp2->next;
-                
-                // delete the 2nd box
-                if (deleteBox(frame, temp2) != 0) {
-                    printf("mergeBoxes: ERROR - could not delete box from frame\n");
-                    return 1;
+    while (boxUpdated) {    
+        temp1 = frame->boxes;
+        boxUpdated = 0;
+        while (temp1 != NULL) {
+            temp2 = temp1->next;
+            while (temp2 != NULL) {
+                if (boxesIntersect(temp1, temp2, 10)) {
+                    // boxes intersect, merge them
+                    int endy, endy1, endy2;
+                    int endx, endx1, endx2;
+                    endx1 = temp1->startx + temp1->width;
+                    endx2 = temp2->startx + temp2->width;
+                    endy1 = temp1->starty + temp1->height;
+                    endy2 = temp2->starty + temp2->height;
+                    
+                    endx = MAX(endx1, endx2);
+                    endy = MAX(endy1, endy2);
+                    
+                    int startx, starty;
+                    startx = MIN(temp1->startx, temp2->startx);
+                    starty = MIN(temp1->starty, temp2->starty);
+                    
+                    // expand the first box
+                    temp1->startx = startx;
+                    temp1->starty = starty;
+                    temp1->width = endx - startx;
+                    temp1->height = endy - starty;
+
+                    // get the next pointer first before we delete it
+                    temp3 = temp2->next;
+                    
+                    // delete the 2nd box
+                    if (deleteBox(frame, temp2) != 0) {
+                        printf("mergeBoxes: ERROR - could not delete box from frame\n");
+                        return 1;
+                    }
+                    // update the temp2
+                    temp2 = temp3;
+                    // set the update flag so we rescan the boxes
+                    boxUpdated = 1;
+                } else {
+                    temp2 = temp2->next;
                 }
-                // update the temp2
-                temp2 = temp3;
-            } else {
-                temp2 = temp2->next;
             }
+            temp1 = temp1->next;
         }
-        temp1 = temp1->next;
     }
     return 0;
 }

@@ -64,9 +64,9 @@ int saveJpg(const char *Name, Image_t *pImage)
     int row_offset;
     row_offset = 0;
     // now copy the info into the buffer
-    while (cinfo.next_scanline < pImage->height) {
+    while ((int) cinfo.next_scanline < pImage->height) {
      
-        for (i=0;i<cinfo.image_width; i++) {
+        for (i=0;i< (int) cinfo.image_width; i++) {
             pBuf[i*3]   = pImage->data[i + row_offset].L;
             pBuf[i*3+1] = pImage->data[i + row_offset].A;
             pBuf[i*3+2] = pImage->data[i + row_offset].B;
