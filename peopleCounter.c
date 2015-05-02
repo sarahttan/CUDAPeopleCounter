@@ -170,16 +170,6 @@ int frameSubtractionOmp(frame_t *frame, frame_t *frame2, frame_t *res){
                 printf("frameSubtraction: pixel is null (%d, %d)\n", i, j);
                 // return 1;
             }
-            //Get L values
-            // frameL = frame->image->data[i * frameWidth + j].L;
-            // frame2L = frame2->image->data[i * frameWidth + j].L;
-            // //Get A values
-            // frameA = frame->image->data[i * frameWidth + j].A;
-            // frame2A = frame2->image->data[i * frameWidth + j].A;
-            // //Get B values
-            // frameB = frame->image->data[i * frameWidth + j].B;
-            // frame2B = frame2->image->data[i * frameWidth + j].B;
-            //Set pixel values in res
             res->image->data[i * frameWidth + j].L = abs(frame2->image->data[i * frameWidth + j].L - frame->image->data[i * frameWidth + j].L);
             res->image->data[i * frameWidth + j].A = abs(frame2->image->data[i * frameWidth + j].A - frame->image->data[i * frameWidth + j].A);
             res->image->data[i * frameWidth + j].B = abs(frame2->image->data[i * frameWidth + j].B - frame->image->data[i * frameWidth + j].B);
@@ -382,20 +372,21 @@ int thresholdImage(frame_t *frame, frame_t *res) {
 
     if ((frame == NULL) || (res == NULL)) {
         printf("thresholdImage: failure because frame not initialized\n");
-        return 1;
+        //return 1;
     }
     if ((frame->image == NULL) || (res->image == NULL)) {
         printf("thresholdImage: failure because frame->image not initialized\n");
-        return 1;
+        //return 1;
     }
     if ((res->image->width != frame->image->width) || (res->image->height != frame->image->height)) {
         printf("thresholdImage: failure because res and frame image sizes are not the same\n");
-        return 1;
+        //return 1;
     } 
 
 
     int value;
-    pixel_t *P; 
+    pixel_t *P;
+
     for(int i = 0; i < frameHeight; i++){
         for(int j = 0; j < frameWidth; j++){
             // for now we work in RGB, 
@@ -406,6 +397,55 @@ int thresholdImage(frame_t *frame, frame_t *res) {
                 res->image->data[i * frameWidth + j].L = 255;
             else
                 res->image->data[i * frameWidth + j].L = 0;          
+            
+            res->image->data[i*frameWidth+j].A = 0;
+            res->image->data[i*frameWidth+j].B = 0;
+            res->image->data[i*frameWidth+j].S = 0;
+            res->image->data[i*frameWidth+j].label = 0;
+        }
+    }
+    return 0;
+}
+
+int thresholdImageOmp(frame_t *frame, frame_t *res) {
+    int frameWidth = frame->image->width;
+    int frameHeight = frame->image->height;
+    int sigDiff = THRESHOLD_INIT_VALUE;
+
+    // Add blurring before thresholding 
+    //      --- equivalent to imfill in Matlab
+
+    if ((frame == NULL) || (res == NULL)) {
+        printf("thresholdImage: failure because frame not initialized\n");
+        //return 1;
+    }
+    if ((frame->image == NULL) || (res->image == NULL)) {
+        printf("thresholdImage: failure because frame->image not initialized\n");
+        //return 1;
+    }
+    if ((res->image->width != frame->image->width) || (res->image->height != frame->image->height)) {
+        printf("thresholdImage: failure because res and frame image sizes are not the same\n");
+        //return 1;
+    } 
+
+
+    int value;
+
+    #pragma omp parallel for num_threads(4) 
+    for(int i = 0; i < frameHeight; i++){
+        for(int j = 0; j < frameWidth; j++){
+
+            pixel_t *P;
+
+            // for now we work in RGB, 
+            P = &frame->image->data[i * frameWidth + j];
+            value = P->L + P->A + P->B;
+        
+            if(value > sigDiff)
+                res->image->data[i * frameWidth + j].L = 255;
+            else
+                res->image->data[i * frameWidth + j].L = 0;          
+            
             res->image->data[i*frameWidth+j].A = 0;
             res->image->data[i*frameWidth+j].B = 0;
             res->image->data[i*frameWidth+j].S = 0;
@@ -550,6 +590,153 @@ int segmentImage(frame_t *frame, frame_t *res, unsigned long *largestLabel)  {
     return 0;
 }
 
+int segmentImageOmp(frame_t *frame, frame_t *res, unsigned long *largestLabel)  {
+    //segment the image (label each connected component a different label)
+    if (thresholdImage(frame, res) != 0) {
+        printf("segmentImage: thresholdImage failure code\n");
+        return 1;
+    }
+
+    // DISCLAIMERS: L channel - binary map after thresholding image
+    //                        - contains segmented image following this func
+    //              A channel - must be 0s after threshold
+    //                        - "in stack" binary map use in this func only
+    //              B channel - must be 0s after threshold
+
+    // Segmentation code here - watershed
+    //      START LABELS AT 1 (non-labeled remains at 0)
+    int i, j;
+    unsigned long label = 1;
+    int rWidth = res->image->width;
+    int rHeight = res->image->height;
+    
+    int x, y;
+    createStack();
+
+    #pragma omp parallel for
+    for (i = 0; i < rHeight; i++) {
+        for (j = 0; j < rWidth; j++) {
+
+        pixel_t *P;
+        pixel_t *nP;
+
+        //pValH = i;
+        //pValW = j;
+        // Using pVal, we'll segment surrounding pixels with the same label.
+        if (res->image->data[i*rWidth + j].L == 0) {
+            // Pixel did not have a value
+            //LOG_ERR("segmentImage: Continuing with seeds, pixel off at (w,h) -> (%d, %d)\n", pValW, pValH);
+        } else {
+            if (res->image->data[i*rWidth + j].label >= 1) {
+            //LOG_ERR("segmentImage: Continuing with seeds, pixel already labeled at (w,h) -> (%d, %d)\n", pValW, pValH);
+            } else {
+            //LOG_ERR("segmentImage: Labeling connected pixels starting at (w,h) -> (%d, %d)\n", pValW, pValH);
+                // Add pixels to stack
+                #pragma omp critical (resQueue)
+                push(&res->image->data[i * rWidth + j], j, i);
+
+                res->image->data[i*rWidth+j].S = 1; 
+                while(isEmpty() != 0) {
+
+                    #pragma omp critical (popXY)
+                    P = pop(&x, &y);
+
+                    if (((P->label != label) && (P->L != 0))) {
+                        P->label = label;
+                        //printf("\nAdding label to (%d, %d) to get (%d, %d, %d, %d, %lu)\n", y, x, P->L,P->A,P->B,P->S, P->label);
+                    // Add neighboring pixels within the bounds to the stack
+                        if (y-1 >= 0) {
+                            nP = &res->image->data[(y-1)*rWidth+x];
+                            // Check if the pixel has been in the stack
+                            if (nP->S != 1) {
+                                // Check if the pixel has a value
+                                if(nP->L != 0 && nP->label != label){
+                                    #pragma omp critical (pushXYm1)
+                                    push(nP, x, y-1);
+                                    nP->S = 1;
+                                }
+                            }
+                        }
+                        if (y+1 < rHeight) {
+                            nP = &res->image->data[(y+1)*rWidth+x];
+                            if (nP->S != 1) {
+                                if(nP->L != 0 && nP->label != label){
+                                    #pragma omp critical (pushXYp1)
+                                    push(nP, x, y+1);
+                                    nP->S = 1;
+                                }
+                            } 
+                        }   
+                        if (x-1 >= 0) {
+                            nP = &res->image->data[y*rWidth+(x-1)];
+                            if (nP->S != 1) {
+                                if(nP->L != 0 && nP->label != label){
+                                    #pragma omp critical (pushXm1Y)
+                                    push(nP, x-1, y);
+                                    nP->S = 1;
+                                }
+                            }    
+                        }
+                        if (x+1 < rWidth) {
+                            nP = &res->image->data[y*rWidth+(x+1)];
+                            if (nP->S != 1) {
+                                if(nP->L != 0 && nP->label != label){
+                                    #pragma omp critical (pushXp1Y)
+                                    push(nP, x+1, y);
+                                    nP->S = 1;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+        label++;
+        }
+    }
+}
+#pragma omp barrier
+// Other method of labelling pixels - sequential algo
+#if 0
+    // segment remaining pixels by looking for neighbor nearby or creating new label
+    int val1, val2, val3, val4; 
+    for (i = 0; i <rHeight; i++){
+        for (j = 0; j < rWidth; j++) {
+            val1 = 0;
+            val2 = 0;
+            val3 = 0;
+            val4 = 0;
+            // pixel has not been labelled yet
+            if (res->image->data[i*rWidth+j].L == 1) {
+                // give the current pixel the label of its neighbor or new label
+                if (i-1 >= 0) 
+                    val1 = res->image->data[(i-1)*rWidth+j].L;
+                if (i+1 < rHeight)
+                    val2 = res->image->data[(i+1)*rWidth+j].L;
+                if (j-1 >= 0)
+                    val3 = res->image->data[i*rWidth+(j-1)].L;
+                if (j+1 < rWidth)
+                    val4 = res->image->data[i*rWidth+(j+1)].L;
+                if (val1 > 1){
+                    res->image->data[i*rWidth+j].L = val1;
+                } else if (val2 > 1) {
+                    res->image->data[i*rWidth+j].L = val2;
+                } else if (val3 > 1) {
+                    res->image->data[i*rWidth+j].L = val3;
+                } else if (val4 > 1) {
+                    res->image->data[i*rWidth+j].L = val4;
+                } else {
+                    res->image->data[i*rWidth+j].L = label;
+                    label++;
+                }
+            }
+        }
+    }
+#endif
+
+    *largestLabel = label;
+    return 0;
+}
 
 int minBlob(int width, int height, int cx, int cy){
     // for a given centroid position, check if bbox is within min size
@@ -641,6 +828,7 @@ int blobDetection(frame_t *frame){
             printf("ERROR: data is null\n");
         }
 
+        //#pragma omp parallel for num_threads(4)
         for (i = 0; i < frame->image->height; i++){
             for (j = 0; j < frame->image->width; j++){
                 
@@ -710,6 +898,138 @@ int blobDetection(frame_t *frame){
     return 0;
 }
 
+int blobDetectionOmp(frame_t *frame){
+    //detect blobs in the current frame and fill out the box struct
+    //      --- look into segmentation of images (blur the image first then segment)
+    // don't add a blob smaller than a certain size.
+    unsigned long largestLabel;
+    
+    printf("at blobDetection, about to segment Image\n");
+    if (segmentImage(frame, frame, &largestLabel) != 0) {
+        printf("blobDetection: segmentImage failed\n");
+        return 1;
+    }
+    printf("at blobDetection, segmentImage finished\n");
+
+    box_t *box = frame->boxes;
+
+    if (box != NULL) {
+        printf("blobDetection: frame already has bounding boxes filled in!!\n");
+        printf("                free boxes before calling this function\n");
+        return 1;
+    }
+
+    int i, j;
+    int left, right, up, down; 
+    int x=0,y=0,count=0;
+    int tag=1;
+    int w, h, cx, cy;
+    int centerx,centery;
+    int done = 0;
+    //detect blobs based on size - mean of pixels connected together
+    // Check the segmented pixels and create a bounding box for each segment
+    while(done == 0) {
+        // Add blobs based on the segment - we're done when we've looked 
+        //  through the whole list of segmentations
+        // Based on segmentation, decide what the centroid, width, height        
+        //      We're going to go through the image by each tag to find the 
+        //          corresponding left, right, up, and down of the box.
+        //      THIS IS COMPUTATIONALLY EXPENSIVE
+        // TODO: change this operation to look around the area instead of
+        //          the entire image.
+
+        left = frame->image->width;
+        right = 0;
+        up = frame->image->height;
+        down = 0;
+        tag++;       
+        count = 0;
+        x = 0;
+        y = 0;
+
+        if (frame->image->data == NULL) {
+            printf("ERROR: data is null\n");
+        }
+
+        #pragma omp parallel for
+        for (i = 0; i < frame->image->height; i++){
+            for (j = 0; j < frame->image->width; j++){
+                
+                pixel_t p;
+                p = frame->image->data[i*frame->image->width+j];
+
+                if (p.label == tag) {
+                    // The pixel has label we're looking for, so we include it
+                    //  Find the left, right, up, and down most values for the label
+
+                    if (j < left) {
+                        #pragma omp critical
+                        left = j;
+                    }
+                    if (j > right) {
+                        #pragma omp critical
+                        right = j;
+                    }
+                    if (i < up) {
+                        #pragma omp critical
+                        up = i;
+                    }
+                    if (i > down) {
+                        #pragma omp critical
+                        down = i;
+                    }
+                    #pragma omp atomic
+                    x+=j;
+                    #pragma omp atomic
+                    y+=i;
+                    #pragma omp atomic
+                    count++;
+                }
+                if (tag > largestLabel) {
+                    // If we looked through the largest tag value, then we're done
+                    done = 1;
+                }
+            }
+        }
+        
+        #pragma omp barrier
+
+        if (count == 0) {
+            continue;
+        }        
+        printf("loop done, tag = %d, count = %d\n",tag, count);
+
+        // update the corresponding values for the blob
+        cx = x/count;
+        cy = y/count;
+        centerx = (right-left)/2 + left;
+        centery = (up - down)/2 + down;
+        w = abs(right - left);
+        h = abs(up - down);
+
+/*
+        // Remove all blobs which do not fit within the constraints. 
+        // Update the centroid and get min and max width and height of blob
+        if (minBlob(w,h,centerx,centery) != 0) {
+            LOG_ERR("Blob too small, Removing blob at (cx, cy) -> (%d, %d)\n", centerx, centery);
+        } else if (maxBlob(w,h,centerx,centery) != 0) {
+            LOG_ERR("Blob too large, Splitting blob at (cx,cy) -> (%d, %d)\n", centerx, centery);
+            // TODO: Check if we can split the blob into multiple boxes or not
+            //  for now, we'll just add the box to the list
+            createNewBox(frame, cx, cy, centerx, centery, h, w);         
+        } else {
+            createNewBox(frame, cx, cy, centerx, centery, h, w);
+        }
+*/        
+        if (count > 30) {
+            printf("adding new box at (%d,%d) centroid = (%d,%d) (w,h) = (%d,%d)\n",
+                left,up, centerx,centery, w, h);
+            createNewBox(frame, cx, cy, left, up, w, h);
+        }
+    }
+
+    return 0;
+}
 
 
 
