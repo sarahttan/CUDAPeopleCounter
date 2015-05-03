@@ -4,7 +4,7 @@
 #include "stack.h"
 
 typedef struct box_s {
-    int startx;	    // left most coordinate of the box
+    int startx;     // left most coordinate of the box
     int starty;     // top most coordinate of the box 
     int centroid_x; // center of mass x-component of bounding box (pixels)
     int centroid_y; // center of mass y-component of bounding box (pixels)
@@ -49,13 +49,16 @@ int frameSubtractionOmp(frame_t *frame, frame_t *frame2, frame_t *res);
 
 int thresholdImage(frame_t *frame, frame_t *res);
 
+int thresholdImageOmp(frame_t *frame, frame_t *res);
+
 int segmentImage(frame_t *frame, frame_t *res, unsigned long *largestLabel);
+int segmentImageOmp(frame_t *frame, frame_t *res, unsigned long *largestLabel);
 
 // detect blobs in the image
 // INPUT: frame - image to detect blobs
 // OUTPUT: 1 - if an error occurred, 0 - otherwise
 int blobDetection(frame_t *frame);
-
+int blobDetectionOmp(frame_t *frame);
 // merge similar+close blobs together
 // INPUT: frame - frame to merge blobs
 // OUTPUT: 1 - if an error occurred, 0 - otherwise
