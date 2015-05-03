@@ -738,8 +738,20 @@ int blobDetection(frame_t *frame){
     // we already have the maximum number of elements in 
     // largest label
     map = (unsigned char *) malloc( sizeof(char) * (largestLabel+1) );
+    if (map == NULL) {
+        printf("ERROR: out of memory, cannot allocate map in blobDetection\n");
+        return 1;
+    }
     // zero it
     memset(map, 0, largestLabel+1);
+    
+    unsigned char *map2;
+    map2 = (unsigned char *) malloc( sizeof(char) * (largestLabel+1) );
+    if (map2 == NULL) {
+        printf("ERROR: out of memory, cannot allocate map2 in blobDetection\n");
+        return 1;
+    }
+
     
     // loop through the image
     int label;
@@ -753,7 +765,23 @@ int blobDetection(frame_t *frame){
     }
     
     dTime = CycleTimer::currentSeconds() - sTime;
+    
+    //TODO: change this to a parallel prefix sum
+    // collapse the map using sequential methods for now
+    int map2maxIdx;
+    map2maxIdx = 0;
+    for (i=0; i<(int) largestLabel+1; i++) {
+        if (map[i] == 1) {
+            map2[map2maxIdx] = i;
+            map2maxIdx++;
+        }
+    }
+    
+    double d2Time = CycleTimer::currentSeconds() - sTime - dTime;    
+    
     printf("at blobDetection, map finished, time = %f\n",dTime);    
+    printf("at blobDetection, map2 finished, map2maxIdx = %d, time = %f\n",
+                map2maxIdx, d2Time);    
     
     if (frame->image->data == NULL) {
         printf("ERROR: data is null\n");
