@@ -755,6 +755,11 @@ int blobDetection(frame_t *frame){
     dTime = CycleTimer::currentSeconds() - sTime;
     printf("at blobDetection, map finished, time = %f\n",dTime);    
     
+    if (frame->image->data == NULL) {
+        printf("ERROR: data is null\n");
+        return 1;
+    }
+
     
     int left, right, up, down; 
     int x=0,y=0,count=0;
@@ -762,10 +767,10 @@ int blobDetection(frame_t *frame){
     pixel_t p;
     int w, h, cx, cy;
 //    int centerx,centery;
-    int done = 0;
+//    int done = 0;
     //detect blobs based on size - mean of pixels connected together
     // Check the segmented pixels and create a bounding box for each segment
-    while(done == 0) {
+    for (tag = 1; tag <= largestLabel; tag++) {
         // Add blobs based on the segment - we're done when we've looked 
         //  through the whole list of segmentations
         // Based on segmentation, decide what the centroid, width, height        
@@ -775,23 +780,20 @@ int blobDetection(frame_t *frame){
         // TODO: change this operation to look around the area instead of
         //          the entire image.
 
-        left = frame->image->width;
-        right = 0;
-        up = frame->image->height;
-        down = 0;
-        tag++;   
         // check if we need to check this tag
         if (map[tag] == 0) {
             continue;
         }
+
+        left = frame->image->width;
+        right = 0;
+        up = frame->image->height;
+        down = 0;
             
         count = 0;
         x = 0;
         y = 0;
 
-        if (frame->image->data == NULL) {
-            printf("ERROR: data is null\n");
-        }
 
         for (i = 0; i < frame->image->height; i++){
             for (j = 0; j < frame->image->width; j++){
@@ -816,10 +818,6 @@ int blobDetection(frame_t *frame){
                     x+=j;
                     y+=i;
                     count++;
-                }
-                if (tag > largestLabel) {
-                    // If we looked through the largest tag value, then we're done
-                    done = 1;
                 }
             }
         }
