@@ -317,10 +317,11 @@ int mergeBoxes(frame_t *frame)
         return 1;
     }
     
-    box_t *temp1 = frame->boxes;
+    box_t *temp1;
     box_t *temp2;
     int boxUpdated;
     boxUpdated = 1;
+    
     
     int i,j;
 
@@ -331,7 +332,7 @@ int mergeBoxes(frame_t *frame)
             if (temp1->isValid == 0) {
                 continue;
             }
-            for ( j=i; j<frame->numBoxes; j++ ) {
+            for ( j=i+1; j<frame->numBoxes; j++ ) {
                 temp2 = &frame->arBoxes[j];
                 if (temp2->isValid == 0) {
                     continue;
