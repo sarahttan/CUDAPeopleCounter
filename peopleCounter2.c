@@ -770,7 +770,7 @@ int blobDetection(frame_t *frame){
     // collapse the map using sequential methods for now
     int map2maxIdx;
     map2maxIdx = 0;
-    for (i=0; i<(int) largestLabel+1; i++) {
+    for (i=1; i<(int) largestLabel+1; i++) {
         if (map[i] == 1) {
             map2[map2maxIdx] = i;
             map2maxIdx++;
