@@ -8,16 +8,16 @@ copyFrame: Creating new frame
 copyFrame: Copying over all image data
 copyFrame: Creating new frame
 copyFrame: Copying over all image data
-CopyFrame finished, elapsed time = 0.019463 seconds
-FrameSubtraction finished, time = 0.008927 seconds
-thresholdImage finished, time = 0.005832 seconds
+CopyFrame finished, elapsed time = 0.019668 seconds
+FrameSubtraction finished, time = 0.008981 seconds
+thresholdImage finished, time = 0.005796 seconds
 at blobDetection, about to segment Image
-at blobDetection, segmentImage finished, time = 0.007885
-at blobDetection, map finished, time = 0.001895
-at blobDetection, map2 finished, map2maxIdx = 261, time = 0.000026
+at blobDetection, segmentImage finished, time = 0.007877
+at blobDetection, map finished, time = 0.002181
+at blobDetection, map2 finished, map2maxIdx = 260, time = 0.000027
 createNewBox: unable to create box of width/height less than 5
 createNewBox: unable to create box of width/height less than 5
-BlobDetection Finished, time = 0.491993 seconds
+BlobDetection Finished, time = 0.539913 seconds
 drawing box at (584,312) (w,h)=(12,9)
 drawing box at (579,279) (w,h)=(12,6)
 drawing box at (635,267) (w,h)=(21,12)
@@ -54,7 +54,7 @@ drawing box at (234,39) (w,h)=(51,123)
 drawing box at (122,8) (w,h)=(8,12)
 Writing frame
 Write to frame complete, please check file = full5.jpg
-mergeBoxes Finished, time = 0.000015 seconds
+mergeBoxes Finished, time = 0.000016 seconds
 drawing box at (584,312) (w,h)=(12,9)
 drawing box at (579,248) (w,h)=(77,39)
 drawing box at (527,198) (w,h)=(8,6)

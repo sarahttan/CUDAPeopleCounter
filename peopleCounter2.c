@@ -745,8 +745,8 @@ int blobDetection(frame_t *frame){
     // zero it
     memset(map, 0, largestLabel+1);
     
-    unsigned char *map2;
-    map2 = (unsigned char *) malloc( sizeof(char) * (largestLabel+1) );
+    unsigned int *map2;
+    map2 = (unsigned int *) malloc( sizeof(unsigned int) * (largestLabel+1) );
     if (map2 == NULL) {
         printf("ERROR: out of memory, cannot allocate map2 in blobDetection\n");
         return 1;
@@ -768,11 +768,12 @@ int blobDetection(frame_t *frame){
     
     //TODO: change this to a parallel prefix sum
     // collapse the map using sequential methods for now
-    int map2maxIdx;
+    unsigned int map2maxIdx;
+    unsigned int k;
     map2maxIdx = 0;
-    for (i=1; i<(int) largestLabel+1; i++) {
-        if (map[i] == 1) {
-            map2[map2maxIdx] = i;
+    for (k=1; k< largestLabel+1; k++) {
+        if (map[k] == 1) {
+            map2[map2maxIdx] = k;
             map2maxIdx++;
         }
     }
@@ -787,18 +788,19 @@ int blobDetection(frame_t *frame){
         printf("ERROR: data is null\n");
         return 1;
     }
-
     
     int left, right, up, down; 
     int x=0,y=0,count=0;
     unsigned int tag=1;
     pixel_t p;
     int w, h, cx, cy;
+    unsigned int idx;
 //    int centerx,centery;
 //    int done = 0;
     //detect blobs based on size - mean of pixels connected together
     // Check the segmented pixels and create a bounding box for each segment
-    for (tag = 1; tag <= largestLabel; tag++) {
+//    for (tag = 1; tag <= largestLabel; tag++) {
+    for (idx = 0; idx < map2maxIdx; idx++) {
         // Add blobs based on the segment - we're done when we've looked 
         //  through the whole list of segmentations
         // Based on segmentation, decide what the centroid, width, height        
@@ -809,9 +811,9 @@ int blobDetection(frame_t *frame){
         //          the entire image.
 
         // check if we need to check this tag
-        if (map[tag] == 0) {
-            continue;
-        }
+//        if (map[tag] == 0) {
+//            continue;
+//        }
 
         left = frame->image->width;
         right = 0;
@@ -828,7 +830,8 @@ int blobDetection(frame_t *frame){
                 
                 p = frame->image->data[i*frame->image->width+j];
 
-                if (p.label == tag) {
+//                if (p.label == tag) {
+                if (p.label == map2[idx]) {
                     // The pixel has label we're looking for, so we include it
                     //  Find the left, right, up, and down most values for the label
                     if (j < left) {
