@@ -737,9 +737,9 @@ int blobDetection(frame_t *frame){
     // allocate memory for it
     // we already have the maximum number of elements in 
     // largest label
-    map = (unsigned char *) malloc( sizeof(char) * largestLabel );
+    map = (unsigned char *) malloc( sizeof(char) * (largestLabel+1) );
     // zero it
-    memset(map, 0, largestLabel);
+    memset(map, 0, largestLabel+1);
     
     // loop through the image
     int label;
