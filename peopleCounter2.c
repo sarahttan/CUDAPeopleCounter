@@ -706,7 +706,26 @@ int blobDetection(frame_t *frame){
     //detect blobs in the current frame and fill out the box struct
     //      --- look into segmentation of images (blur the image first then segment)
     // don't add a blob smaller than a certain size.
+
+
+    if (frame == NULL) {
+        printf("ERROR: frame is NULL in blobDetection\n");
+        return 1;
+    }
+
+    if (frame->image == NULL) {
+        printf("ERROR: frame->image is NULL in blobDetection\n");
+        return 1;
+    }
+
+    if (frame->image->data == NULL) {
+        printf("ERROR: frame->image->data is NULL in blobDetection\n");
+        return 1;
+    }
+
+
     unsigned long largestLabel;
+
     
     printf("at blobDetection, about to segment Image\n");
     double sTime = CycleTimer::currentSeconds(); 
@@ -745,10 +764,12 @@ int blobDetection(frame_t *frame){
     // zero it
     memset(map, 0, largestLabel+1);
     
+    // allocated memory for map reduction
     unsigned int *map2;
     map2 = (unsigned int *) malloc( sizeof(unsigned int) * (largestLabel+1) );
     if (map2 == NULL) {
         printf("ERROR: out of memory, cannot allocate map2 in blobDetection\n");
+        free(map);
         return 1;
     }
 
@@ -784,14 +805,9 @@ int blobDetection(frame_t *frame){
     printf("at blobDetection, map2 finished, map2maxIdx = %d, time = %f\n",
                 map2maxIdx, d2Time);    
     
-    if (frame->image->data == NULL) {
-        printf("ERROR: data is null\n");
-        return 1;
-    }
-    
     int left, right, up, down; 
     int x=0,y=0,count=0;
-    unsigned int tag=1;
+//    unsigned int tag=1;
     pixel_t p;
     int w, h, cx, cy;
     unsigned int idx;
@@ -875,6 +891,10 @@ int blobDetection(frame_t *frame){
             createNewBox(frame, cx, cy, left, up, w, h);
         }
     }
+    
+    // clean up memory
+    free(map);
+    free(map2);
 
     return 0;
 }
