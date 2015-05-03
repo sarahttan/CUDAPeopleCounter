@@ -48,17 +48,22 @@ int freeFrame(frame_t *frame){
         }
         free(frame->image);
     }
-
-    if (frame->boxes != NULL) {
-        box_t *temp = frame->boxes->next;
-        box_t *temp2;
-        while(temp != NULL){
-            temp2 = temp;
-            temp = temp->next;
-            free(temp2);
-        }  
-        free(frame->boxes);
+    
+    if (frame->arBoxes != NULL) {
+        free(frame->arBoxes);
     }
+
+//    if (frame->boxes != NULL) {
+//        box_t *temp = frame->boxes->next;
+//        box_t *temp2;
+//        while(temp != NULL){
+//            temp2 = temp;
+//            temp = temp->next;
+//            free(temp2);
+//        }  
+//        free(frame->boxes);
+//    }
+
     free(frame);
     return 0;
 }
@@ -79,6 +84,7 @@ int readImageFrame(frame_t *frame, char *fileName){
     // Initialize the other variables in the structure
     frame->boxes = NULL;
     
+    frame->arBoxes = NULL;
 
     LOG_ERR("readImageFrame: Image height = %d, width = %d\n", img->height, img->width);
     return 0;
@@ -223,7 +229,7 @@ int boxesIntersect(box_t *box1, box_t *box2, int tolerance)
 
 
 
-
+/*
 // Create a new box with centroid (c_x, c_y), and center (center_x, center_y) height and width
 int createNewBox(frame_t *frame, int c_x, int c_y, int start_x, int start_y, int width, int height) {
     //create a new bounding box in the frame
@@ -293,6 +299,7 @@ int deleteBox(frame_t *frame, box_t *b){
     printf("deleteBox: Unable to find box to delete\n");
     return 1;
 }
+*/
 
 //
 // mergeBoxes - merge overlapping boxes
@@ -305,19 +312,30 @@ int mergeBoxes(frame_t *frame)
         printf("ERROR: mergeBoxes called with frame == NULL\n");
         return 1;
     }
+    if (frame->arBoxes == NULL) {
+        printf("ERROR: mergeBoxes called with frame->arBoxes == NULL\n");
+        return 1;
+    }
     
     box_t *temp1 = frame->boxes;
     box_t *temp2;
-    box_t *temp3;
     int boxUpdated;
     boxUpdated = 1;
+    
+    int i,j;
 
     while (boxUpdated) {    
-        temp1 = frame->boxes;
         boxUpdated = 0;
-        while (temp1 != NULL) {
-            temp2 = temp1->next;
-            while (temp2 != NULL) {
+        for ( i=0; i<frame->numBoxes; i++ ) {
+            temp1 = &frame->arBoxes[i];
+            if (temp1->isValid == 0) {
+                continue;
+            }
+            for ( j=i; j<frame->numBoxes; j++ ) {
+                temp2 = &frame->arBoxes[j];
+                if (temp2->isValid == 0) {
+                    continue;
+                }
                 if (boxesIntersect(temp1, temp2, 10)) {
                     // boxes intersect, merge them
                     int endy, endy1, endy2;
@@ -340,23 +358,13 @@ int mergeBoxes(frame_t *frame)
                     temp1->width = endx - startx;
                     temp1->height = endy - starty;
 
-                    // get the next pointer first before we delete it
-                    temp3 = temp2->next;
-                    
                     // delete the 2nd box
-                    if (deleteBox(frame, temp2) != 0) {
-                        printf("mergeBoxes: ERROR - could not delete box from frame\n");
-                        return 1;
-                    }
-                    // update the temp2
-                    temp2 = temp3;
+                    temp2->isValid = 0;
+
                     // set the update flag so we rescan the boxes
                     boxUpdated = 1;
-                } else {
-                    temp2 = temp2->next;
                 }
             }
-            temp1 = temp1->next;
         }
     }
     return 0;
@@ -587,119 +595,6 @@ int maxBlob(int width, int height, int cx, int cy){
     return 0;
 }
 
-//TODO: testing in progress
-int blobDetectionOriginal(frame_t *frame){
-    //detect blobs in the current frame and fill out the box struct
-    //      --- look into segmentation of images (blur the image first then segment)
-    // don't add a blob smaller than a certain size.
-    unsigned long largestLabel;
-    
-    printf("at blobDetection, about to segment Image\n");
-    double sTime = CycleTimer::currentSeconds(); 
-    if (segmentImage(frame, frame, &largestLabel) != 0) {
-        printf("blobDetection: segmentImage failed\n");
-        return 1;
-    }
-    double dTime = CycleTimer::currentSeconds() - sTime;
-    printf("at blobDetection, segmentImage finished, time = %f\n", dTime);
-
-    box_t *box = frame->boxes;
-
-    if (box != NULL) {
-        printf("blobDetection: frame already has bounding boxes filled in!!\n");
-        printf("                free boxes before calling this function\n");
-        return 1;
-    }
-
-    int i, j;
-    int left, right, up, down; 
-    int x=0,y=0,count=0;
-    unsigned int tag=1;
-    pixel_t p;
-    int w, h, cx, cy;
-//    int centerx,centery;
-    int done = 0;
-    //detect blobs based on size - mean of pixels connected together
-    // Check the segmented pixels and create a bounding box for each segment
-    while(done == 0) {
-        // Add blobs based on the segment - we're done when we've looked 
-        //  through the whole list of segmentations
-        // Based on segmentation, decide what the centroid, width, height        
-        //      We're going to go through the image by each tag to find the 
-        //          corresponding left, right, up, and down of the box.
-        //      THIS IS COMPUTATIONALLY EXPENSIVE
-        // TODO: change this operation to look around the area instead of
-        //          the entire image.
-
-        left = frame->image->width;
-        right = 0;
-        up = frame->image->height;
-        down = 0;
-        tag++;       
-        count = 0;
-        x = 0;
-        y = 0;
-
-        if (frame->image->data == NULL) {
-            printf("ERROR: data is null\n");
-        }
-
-        for (i = 0; i < frame->image->height; i++){
-            for (j = 0; j < frame->image->width; j++){
-                
-                p = frame->image->data[i*frame->image->width+j];
-
-                if (p.label == tag) {
-                    // The pixel has label we're looking for, so we include it
-                    //  Find the left, right, up, and down most values for the label
-                    if (j < left) {
-                        left = j;
-                    }
-                    if (j > right) {
-                        right = j;
-                    }
-                    if (i < up) {
-                        up = i;
-                    }
-                    if (i > down) {
-                        down = i;
-                    }
-                    x+=j;
-                    y+=i;
-                    count++;
-                }
-                if (tag > largestLabel) {
-                    // If we looked through the largest tag value, then we're done
-                    done = 1;
-                }
-            }
-        }
-        
-
-        if (count == 0) {
-            continue;
-        }        
-//        printf("loop done, tag = %d, count = %d\n",tag, count);
-
-        // update the corresponding values for the blob
-        cx = x/count;
-        cy = y/count;
-//        centerx = (right-left)/2 + left;
-//        centery = (up - down)/2 + down;
-        w = abs(right - left);
-        h = abs(up - down);
-
-        // very simple noise remover, just count blobs with more
-        // than 30 pixels
-        if (count > 30) {
-//            printf("adding new box at (%d,%d) centroid = (%d,%d) (w,h) = (%d,%d)\n",
-//                left,up, centerx,centery, w, h);
-            createNewBox(frame, cx, cy, left, up, w, h);
-        }
-    }
-
-    return 0;
-}
 
 //TODO: testing in progress
 int blobDetection(frame_t *frame){
@@ -707,7 +602,7 @@ int blobDetection(frame_t *frame){
     //      --- look into segmentation of images (blur the image first then segment)
     // don't add a blob smaller than a certain size.
 
-
+    // Sanity checks
     if (frame == NULL) {
         printf("ERROR: frame is NULL in blobDetection\n");
         return 1;
@@ -722,10 +617,14 @@ int blobDetection(frame_t *frame){
         printf("ERROR: frame->image->data is NULL in blobDetection\n");
         return 1;
     }
+    
+    if (frame->arBoxes != NULL) {
+        printf("ERROR: frame->arBoxes is NOT NULL in blobDetection\n");
+        return 1;
+    }
 
 
     unsigned long largestLabel;
-
     
     printf("at blobDetection, about to segment Image\n");
     double sTime = CycleTimer::currentSeconds(); 
@@ -736,13 +635,13 @@ int blobDetection(frame_t *frame){
     double dTime = CycleTimer::currentSeconds() - sTime;
     printf("at blobDetection, segmentImage finished, time = %f\n", dTime);
 
-    box_t *box = frame->boxes;
+//    box_t *box = frame->boxes;
 
-    if (box != NULL) {
-        printf("blobDetection: frame already has bounding boxes filled in!!\n");
-        printf("                free boxes before calling this function\n");
-        return 1;
-    }
+//    if (box != NULL) {
+//        printf("blobDetection: frame already has bounding boxes filled in!!\n");
+//        printf("                free boxes before calling this function\n");
+//        return 1;
+//    }
     
     // first build a list of labels found in the image
     // we build it in a character array bitmap instead of a 
@@ -800,22 +699,42 @@ int blobDetection(frame_t *frame){
     }
     
     double d2Time = CycleTimer::currentSeconds() - sTime - dTime;    
+
+    // Allocate memory for arBoxes (array of boxes)
+    frame->arBoxes = (box_t *) calloc(sizeof(box_t), map2maxIdx);
+    if (frame->arBoxes == NULL) {
+        printf("ERROR: cannot allocate arBoxes in blobDetection\n");
+        free(map);
+        free(map2);
+        return 1;
+    }
+    // set the number of boxes
+    frame->numBoxes = map2maxIdx;
+    
+    // set all the valid flags to 0
+    // TODO: change this to memset?
+    // NVM, used calloc instead based on 
+    // http://stackoverflow.com/questions/2688466/why-mallocmemset-is-slower-than-calloc?lq=1
+    // 
+    unsigned int idx;
+
+//    for ( idx=0; idx<map2maxIdx; idx++ ) {
+//        frame->arBoxes[idx].isValid = 0;
+//    }
+    
+    double d3Time = CycleTimer::currentSeconds() - sTime - d2Time;
     
     printf("at blobDetection, map finished, time = %f\n",dTime);    
     printf("at blobDetection, map2 finished, map2maxIdx = %d, time = %f\n",
                 map2maxIdx, d2Time);    
+    printf("at blobDetection, arBoxes malloc finished, time = %f\n",d3Time);    
     
     int left, right, up, down; 
     int x=0,y=0,count=0;
-//    unsigned int tag=1;
     pixel_t p;
     int w, h, cx, cy;
-    unsigned int idx;
-//    int centerx,centery;
-//    int done = 0;
     //detect blobs based on size - mean of pixels connected together
     // Check the segmented pixels and create a bounding box for each segment
-//    for (tag = 1; tag <= largestLabel; tag++) {
     for (idx = 0; idx < map2maxIdx; idx++) {
         // Add blobs based on the segment - we're done when we've looked 
         //  through the whole list of segmentations
@@ -825,11 +744,6 @@ int blobDetection(frame_t *frame){
         //      THIS IS COMPUTATIONALLY EXPENSIVE
         // TODO: change this operation to look around the area instead of
         //          the entire image.
-
-        // check if we need to check this tag
-//        if (map[tag] == 0) {
-//            continue;
-//        }
 
         left = frame->image->width;
         right = 0;
@@ -846,7 +760,6 @@ int blobDetection(frame_t *frame){
                 
                 p = frame->image->data[i*frame->image->width+j];
 
-//                if (p.label == tag) {
                 if (p.label == map2[idx]) {
                     // The pixel has label we're looking for, so we include it
                     //  Find the left, right, up, and down most values for the label
@@ -878,17 +791,31 @@ int blobDetection(frame_t *frame){
         // update the corresponding values for the blob
         cx = x/count;
         cy = y/count;
-//        centerx = (right-left)/2 + left;
-//        centery = (up - down)/2 + down;
         w = abs(right - left);
         h = abs(up - down);
 
         // very simple noise remover, just count blobs with more
         // than 30 pixels
-        if (count > 30) {
+        if ((count > 30) && (w > 5) && (h > 5)) {
 //            printf("adding new box at (%d,%d) centroid = (%d,%d) (w,h) = (%d,%d)\n",
 //                left,up, centerx,centery, w, h);
-            createNewBox(frame, cx, cy, left, up, w, h);
+//            createNewBox(frame, cx, cy, left, up, w, h);
+            box_t *pB;
+            pB = &frame->arBoxes[idx];
+            // set it to valid
+            pB->isValid = 1;  
+            // save the coordinates          
+            pB->startx = left;
+            pB->starty = up;
+            pB->centroid_x = cx;
+            pB->centroid_y = cy;
+            pB->width = w;
+            pB->height = h;
+            pB->dir = 0;
+            // these two are probably not needed
+            pB->tag = idx;
+            pB->next = NULL;
+            
         }
     }
     
@@ -902,7 +829,7 @@ int blobDetection(frame_t *frame){
 
 
 
-
+/*
 //TODO: testing and writing
 int mergeBlobs(frame_t *frame){
     // given the image and the bounding boxes, merge close by ones
@@ -943,7 +870,7 @@ int mergeBlobs(frame_t *frame){
     }
     return 0;
 }
-
+*/
 int findBlobDirection(frame_t *frame, frame_t *frame2, frame_t *res){
     //based on the distance and similarities between blobs in the two images, associate the closest blob to each other and then update the direction
     if ((frame == NULL) || (frame2 == NULL) || (res == NULL)){
@@ -1221,25 +1148,32 @@ int drawBoxOnImage(frame_t *frame, frame_t *res) {
     }
 
     // initialize
-    box_t *head = frame->boxes;
-    box_t *tmp = head;
+//    box_t *head = frame->boxes;
+//    box_t *tmp = head;
     int fWidth = frame->image->width;
     int fHeight = frame->image->height;
     int cx;
     int cy;
+    
+    int i;
+    box_t *pB;
+    
+    for ( i=0; i<frame->numBoxes; i++) {
 
-    // Check if there are boxes available
-    if (head == NULL){
-        LOG_ERR("drawBoxOnImage: No boxes found in frame\n");
-        return 1;
-    }
-    while (tmp != NULL){
+        // point to the box
+        pB = &frame->arBoxes[i];
+
+        // check if it is a valid box        
+        if (pB->isValid == 0) {
+            continue;
+        }
+        
         //get width, height, and centroid of each box
-        cx = tmp->centroid_x;
-        cy = tmp->centroid_y;
+        cx = pB->centroid_x;
+        cy = pB->centroid_y;
         
         printf("drawing box at (%d,%d) (w,h)=(%d,%d)\n",
-            tmp->startx, tmp->starty, tmp->width, tmp->height);
+            pB->startx, pB->starty, pB->width, pB->height);
   
         // draw centroid into the result frame 
         //  box should be at least a 5 square pixels in order to view
@@ -1256,10 +1190,9 @@ int drawBoxOnImage(frame_t *frame, frame_t *res) {
             }
         }
         
-        drawBox(res, tmp->startx, tmp->starty, tmp->width, tmp->height, 4,
+        // draw the box!        
+        drawBox(res, pB->startx, pB->starty, pB->width, pB->height, 4,
                     117, 196, 117);
-        // process the next box in the list
-        tmp = tmp->next;
     }
     return 0;
 }

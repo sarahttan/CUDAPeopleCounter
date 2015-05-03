@@ -10,6 +10,7 @@
 
 - tweak threshold values a little bit to capture similar colored pants
 
+- to get the timing code, run ./doTesh.sh and use 'grep time.=result*.txt' to extract timing results
 
 ############################# 
 COMPLETED ITEMS BELOW

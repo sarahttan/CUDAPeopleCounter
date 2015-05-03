@@ -14,12 +14,15 @@ typedef struct box_s {
     int width;      // width of bounding box (pixels)
     int dir;        // direction of box travel (degrees)
     int tag;        // tag of the bounding box
+    int isValid;    // flag to indicate box is valid
     struct box_s *next;
 } box_t;
 
 typedef struct frame_s {
-    Image_t *image;   //image this frame represents
-    box_t *boxes;   //linked list of bounding boxes in frame
+    Image_t *image;  	// image this frame represents
+    box_t *boxes;  	// linked list of bounding boxes in frame
+    box_t *arBoxes; 	// array of boxes
+    int numBoxes;	// number of arBoxes
 } frame_t;
 
 // extract frames from movie and save them in a folder
