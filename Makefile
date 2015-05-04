@@ -36,8 +36,14 @@ segmentImageTest: tests/segmentImageTest.c readjpeg.c stack.c peopleCounter.c
 drawBoxOnImageTest: tests/drawBoxOnImageTest.c readjpeg.c stack.c peopleCounter.c
 	gcc -ljpeg -Wall -std=c99 -lm -o drawBoxOnImageTest -fopenmp readjpeg.c stack.c peopleCounter.c tests/drawBoxOnImageTest.c
 
+fullTestSOL: tests/fullTestSOL.cpp readjpeg.c stack.c peopleCounter.c
+	g++ -ljpeg -Wall -lm -fopenmp -o fullTestSOL readjpeg.c stack.c peopleCounter.c tests/fullTestSOL.cpp
+
 fullTest: tests/fullTest.cpp readjpeg.c stack.c peopleCounter2.c
 	g++ -ljpeg -Wall -lm -fopenmp -o fullTest readjpeg.c stack.c peopleCounter2.c tests/fullTest.cpp
+
+fullTestOMP: tests/fullTestOMP.cpp readjpeg.c stack.c peopleCounterOMP.c
+	g++ -ljpeg -Wall -lm -fopenmp -o fullTestOMP readjpeg.c stack.c peopleCounterOMP.c tests/fullTestOMP.cpp
 
 clean:
 	rm readjpeg readImageTest blobDirTest boxCreateDelete frameSubTest frameSubTestOmp copyFrameTest writeImageTest stackTest segmentImageTest drawBoxOnImageTest fullTest

@@ -48,17 +48,15 @@ int readImageFrame(frame_t *frame, char *fileName);
 // OUTPUT: 1 - if an error occurred, 0 - otherwise
 int frameSubtraction(frame_t *frame, frame_t *frame2, frame_t *res);
 
-int frameSubtractionOmp(frame_t *frame, frame_t *frame2, frame_t *res);
+int frameSubtractionOMP(frame_t *frame, frame_t *frame2, frame_t *res);
 
-int thresholdImage(frame_t *frame, frame_t *res);
+int thresholdImageOMP(frame_t *frame, frame_t *res);
 
 int segmentImage(frame_t *frame, frame_t *res, unsigned long *largestLabel);
 
 // detect blobs in the image
 // INPUT: frame - image to detect blobs
 // OUTPUT: 1 - if an error occurred, 0 - otherwise
-int blobDetection(frame_t *frame);
-
 int blobDetectionOMP(frame_t *frame);
 
 // merge similar+close blobs together

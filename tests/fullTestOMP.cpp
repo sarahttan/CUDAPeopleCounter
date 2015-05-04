@@ -50,7 +50,7 @@ int main(int argc, char *argv[]){
 
     startTime = CycleTimer::currentSeconds();
 
-    if (frameSubtraction(frame1, frame2, res1) != 0) {
+    if (frameSubtractionOMP(frame1, frame2, res1) != 0) {
         printf("Error in frame subtraction\n");
     }
     
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]){
 
     startTime = CycleTimer::currentSeconds();
     
-    if (thresholdImage(res1, res2) != 0) {
+    if (thresholdImageOMP(res1, res2) != 0) {
         printf("Error in thresholdImage\n");
     }
 

@@ -146,7 +146,7 @@ int frameSubtraction(frame_t *frame, frame_t *frame2, frame_t *res){
     return 0;
 }
 
-int frameSubtractionOmp(frame_t *frame, frame_t *frame2, frame_t *res){
+int frameSubtractionOMP(frame_t *frame, frame_t *frame2, frame_t *res){
     //subtract two frames and give back the resulting frame
     //Frames are not the same size and we're screwed
     if ((frame == NULL) || (frame2 == NULL) || (res == NULL)) {
@@ -382,7 +382,7 @@ int blurImage(frame_t *frame) {
 }
 
 //TODO: testing in progress
-int thresholdImage(frame_t *frame, frame_t *res) {
+int thresholdImageOMP(frame_t *frame, frame_t *res) {
     int frameWidth = frame->image->width;
     int frameHeight = frame->image->height;
     int sigDiff = THRESHOLD_INIT_VALUE;
@@ -404,43 +404,34 @@ int thresholdImage(frame_t *frame, frame_t *res) {
     } 
 
 
-    int value;
-    pixel_t *P; 
-    for(int i = 0; i < frameHeight; i++){
-        for(int j = 0; j < frameWidth; j++){
-            // for now we work in RGB, 
-            P = &frame->image->data[i * frameWidth + j];
-            value = P->L + P->A + P->B;
+    int ind;
+    #pragma omp parallel for
+    for(ind = 0; ind < frameHeight*frameWidth; ind++){
+        // for now we work in RGB, 
+        pixel_t *P = &frame->image->data[ind];
+        int value = P->L + P->A + P->B;
         
-            if(value > sigDiff)
-                res->image->data[i * frameWidth + j].L = 255;
-            else
-                res->image->data[i * frameWidth + j].L = 0;          
-            res->image->data[i*frameWidth+j].A = 0;
-            res->image->data[i*frameWidth+j].B = 0;
-            res->image->data[i*frameWidth+j].S = 0;
-            res->image->data[i*frameWidth+j].label = 0;
-        }
+        if(value > sigDiff)
+            res->image->data[ind].L = 255;
+        else
+            res->image->data[ind].L = 0;          
+        res->image->data[ind].A = 0;
+        res->image->data[ind].B = 0;
+        res->image->data[ind].S = 0;
+        res->image->data[ind].label = 0;
     }
     return 0;
 }
 
 int segmentImage(frame_t *frame, frame_t *res, unsigned long *largestLabel)  {
     //segment the image (label each connected component a different label)
-    if (thresholdImage(frame, res) != 0) {
+    if (thresholdImageOMP(frame, res) != 0) {
         printf("segmentImage: thresholdImage failure code\n");
         return 1;
     }
 
-    // DISCLAIMERS: L channel - binary map after thresholding image
-    //                        - contains segmented image following this func
-    //              A channel - must be 0s after threshold
-    //                        - "in stack" binary map use in this func only
-    //              B channel - must be 0s after threshold
-
     // Segmentation code here - watershed
     //      START LABELS AT 1 (non-labeled remains at 0)
-    int i, j, pValW, pValH;
     unsigned long label = 1;
     int rWidth = res->image->width;
     int rHeight = res->image->height;
@@ -449,10 +440,11 @@ int segmentImage(frame_t *frame, frame_t *res, unsigned long *largestLabel)  {
     pixel_t *nP;
     int x, y;
     createStack();
-    for (i = 0; i < rHeight; i++) {
-        for (j = 0; j < rWidth; j++) {
-        pValH = i;
-        pValW = j;
+    int ind;
+    for (ind = 0; ind < rHeight*rWidth; ind++) {
+        int pValW = ind % frame->image->width; // column value
+        int pValH = ind/frame->image->width; //row value
+
         // Using pVal, we'll segment surrounding pixels with the same label.
         if (res->image->data[pValH*rWidth + pValW].L == 0) {
             // Pixel did not have a value
@@ -514,9 +506,9 @@ int segmentImage(frame_t *frame, frame_t *res, unsigned long *largestLabel)  {
             }
 
         label++;
+        
         }
     }
-}
 
 // Other method of labelling pixels - sequential algo
 #if 0
@@ -739,12 +731,6 @@ int blobDetectionOMP(frame_t *frame){
         // Add blobs based on the segment - we're done when we've looked 
         //  through the whole list of segmentations
         // Based on segmentation, decide what the centroid, width, height        
-        //      We're going to go through the image by each tag to find the 
-        //          corresponding left, right, up, and down of the box.
-        //      THIS IS COMPUTATIONALLY EXPENSIVE
-        // TODO: change this operation to look around the area instead of
-        //          the entire image.
-
         left = frame->image->width;
         right = 0;
         up = frame->image->height;
@@ -767,20 +753,11 @@ int blobDetectionOMP(frame_t *frame){
                 i = (ind -j)/frame->image->width; //row value
                 #pragma omp critical
                 {
-                    if (j < left) {
-                        left = j;
-                    }
-                    if (j > right) {
-                        right = j;
-                    }
-                    if (i < up) {
-                        up = i;
-                    }
-                    if (i > down) {
-                        down = i;
-                    }
+                    left = MIN(j, left);
+                    right = MAX(j, right);
+                    up = MIN(i, up);
+                    down = MAX(i, down);
                 }
-                //TODO: April 3, fix the center of mass off
                 #pragma omp atomic update
                 x+=j;
                 #pragma omp atomic update
@@ -805,7 +782,7 @@ int blobDetectionOMP(frame_t *frame){
         // very simple noise remover, just count blobs with more
         // than 30 pixels
         if ((count > 30) && (w > 5) && (h > 5)) {
-        printf("BlobDetection: x = %d, y = %d,  count = %d, left = %d, right = %d, up = %d, down = %d\n", x,y,count,left,right,up,down);
+        //printf("BlobDetection: x = %d, y = %d,  count = %d, left = %d, right = %d, up = %d, down = %d\n", x,y,count,left,right,up,down);
 
 //            printf("adding new box at (%d,%d) centroid = (%d,%d) (w,h) = (%d,%d)\n",
 //                left,up, centerx,centery, w, h);
