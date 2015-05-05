@@ -730,8 +730,29 @@ int blobDetection(frame_t *frame){
                 map2maxIdx, d2Time);    
     printf("at blobDetection, arBoxes malloc finished, time = %f\n",d3Time);    
     
-    int left, right, up, down; 
-    int x=0,y=0,count=0;
+//    int left, right, up, down; 
+//    int x=0,y=0,count=0;
+
+    int *left, *right, *up, *down;
+    int *x, *y, *count;
+    
+    left = (int *) malloc(sizeof(int) * map2maxIdx);
+    right = (int *) malloc(sizeof(int) * map2maxIdx);
+    up = (int *) malloc(sizeof(int) * map2maxIdx);
+    down = (int *) malloc(sizeof(int) * map2maxIdx);
+
+    x = (int *) malloc(sizeof(int) * map2maxIdx);
+    y = (int *) malloc(sizeof(int) * map2maxIdx);
+    count = (int *) malloc(sizeof(int) * map2maxIdx);
+    
+    if ((left == NULL) || (right == NULL) || (up == NULL) ||
+        (down == NULL) || (x == NULL) || (y == NULL) || (count == NULL)) {
+        printf("ERROR in blobDetection, out of memory\n");
+        return 1;
+    }                
+
+
+
     pixel_t p;
     int w, h, cx, cy;
     //detect blobs based on size - mean of pixels connected together
@@ -746,14 +767,14 @@ int blobDetection(frame_t *frame){
         // TODO: change this operation to look around the area instead of
         //          the entire image.
 
-        left = frame->image->width;
-        right = 0;
-        up = frame->image->height;
-        down = 0;
+        left[idx] = frame->image->width;
+        right[idx] = 0;
+        up[idx] = frame->image->height;
+        down[idx] = 0;
             
-        count = 0;
-        x = 0;
-        y = 0;
+        count[idx] = 0;
+        x[idx] = 0;
+        y[idx] = 0;
         unsigned int label;
 
         label = map2[idx];
@@ -779,44 +800,44 @@ int blobDetection(frame_t *frame){
                 if (p.label == label) {
                     // The pixel has label we're looking for, so we include it
                     //  Find the left, right, up, and down most values for the label
-                    left = MIN(left, j);
+                    left[idx] = MIN(left[idx], j);
 //                    if (j < left) {
 //                        left = j;
 //                    }
-                    right = MAX(right,j);
+                    right[idx] = MAX(right[idx],j);
 //                    if (j > right) {
 //                        right = j;
 //                    }
-                    up = MIN(up, i);
+                    up[idx] = MIN(up[idx], i);
 //                    if (i < up) {
 //                        up = i;
 //                    }
-                    down = MAX(down, i);
+                    down[idx] = MAX(down[idx], i);
 //                    if (i > down) {
 //                        down = i;
 //                    }
-                    x+=j;
-                    y+=i;
-                    count++;
+                    x[idx] +=j;
+                    y[idx] +=i;
+                    count[idx]++;
                 }
             }
         }
         
 
-        if (count == 0) {
+        if (count[idx] == 0) {
             continue;
         }        
 //        printf("loop done, tag = %d, count = %d\n",tag, count);
 
         // update the corresponding values for the blob
-        cx = x/count;
-        cy = y/count;
-        w = abs(right - left);
-        h = abs(up - down);
+        cx = x[idx]/count[idx];
+        cy = y[idx]/count[idx];
+        w = abs(right[idx] - left[idx]);
+        h = abs(down[idx] - up[idx]);
 
         // very simple noise remover, just count blobs with more
         // than 30 pixels
-        if ((count > 30) && (w > 5) && (h > 5)) {
+        if ((count[idx] > 30) && (w > 5) && (h > 5)) {
 //            printf("adding new box at (%d,%d) centroid = (%d,%d) (w,h) = (%d,%d)\n",
 //                left,up, centerx,centery, w, h);
 //            createNewBox(frame, cx, cy, left, up, w, h);
@@ -827,8 +848,8 @@ int blobDetection(frame_t *frame){
             // set it to valid
             pB->isValid = 1;  
             // save the coordinates          
-            pB->startx = left;
-            pB->starty = up;
+            pB->startx = left[idx];
+            pB->starty = up[idx];
             pB->centroid_x = cx;
             pB->centroid_y = cy;
             pB->width = w;
@@ -844,6 +865,15 @@ int blobDetection(frame_t *frame){
     // clean up memory
     free(map);
     free(map2);
+    
+    free(left);
+    free(right);
+    free(up);
+    free(down);
+    free(x);
+    free(y);
+    free(count);
+    
 
     return 0;
 }
