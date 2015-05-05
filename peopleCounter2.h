@@ -2,6 +2,7 @@
 #define PPL_COUNTER
 #include "image.h"
 #include "stack.h"
+#include "CycleTimer.h"
 
 typedef struct box_s {
     int startx;	    // left most coordinate of the box

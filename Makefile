@@ -21,8 +21,8 @@ frameSubTest: tests/frameSubTest.c readjpeg.c stack.c peopleCounter.c
 frameSubTestOmp: tests/frameSubTestOmp.c readjpeg.c stack.c peopleCounter.c
 	gcc -ljpeg -Wall -std=c99 -lm -o frameSubTestOmp -fopenmp readjpeg.c stack.c peopleCounter.c tests/frameSubTestOmp.c
 
-copyFrameTest: tests/copyFrameTest.c readjpeg.c stack.c peopleCounter.c
-	gcc -ljpeg -Wall -std=c99 -lm -o copyFrameTest -fopenmp readjpeg.c stack.c peopleCounter.c tests/copyFrameTest.c
+copyFrameTest: tests/copyFrameTest.cpp readjpeg.c stack.c peopleCounter2.c
+	g++ -ljpeg -Wall -lm -o copyFrameTest -fopenmp readjpeg.c stack.c peopleCounter2.c tests/copyFrameTest.cpp
 
 writeImageTest: tests/writeImageTest.c readjpeg.c stack.c peopleCounter.c
 	gcc -ljpeg -Wall -std=c99 -lm -o writeImageTest -fopenmp readjpeg.c stack.c peopleCounter.c tests/writeImageTest.c
@@ -45,5 +45,32 @@ fullTest: tests/fullTest.cpp readjpeg.c stack.c peopleCounter2.c
 fullTestOMP: tests/fullTestOMP.cpp readjpeg.c stack.c peopleCounterOMP.c
 	g++ -ljpeg -Wall -lm -fopenmp -o fullTestOMP readjpeg.c stack.c peopleCounterOMP.c tests/fullTestOMP.cpp
 
+
 clean:
 	rm readjpeg readImageTest blobDirTest boxCreateDelete frameSubTest frameSubTestOmp copyFrameTest writeImageTest stackTest segmentImageTest drawBoxOnImageTest fullTest
+
+
+
+OBJDIR=objs
+COBJDIR=objs
+CXX=g++ -m64
+CXXFLAGS=-O3 -Wall
+
+LDFLAGS=-L/usr/local/cuda/lib64/ -lcudart -ljpeg
+NVCC=nvcc
+NVCCFLAGS=-O3 -m64
+
+
+OBJS=$(OBJDIR)/fullTestCUDA.o  $(OBJDIR)/readjpeg.o $(OBJDIR)/stack.o $(OBJDIR)/peopleCounterCUDA.o
+
+fullTestCUDA: $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJS) $(LDFLAGS)
+	
+$(OBJDIR)/%.o: %.c
+	$(CXX) $< $(CXXFLAGS) -c -o $@
+	
+$(OBJDIR)/%.o: %.cu
+	$(NVCC) $< $(NVCCFLAGS) -c -o $@
+			
+$(OBJDIR)/%.o: tests/%.cu
+	$(NVCC) $< $(NVCCFLAGS) -c -o $@

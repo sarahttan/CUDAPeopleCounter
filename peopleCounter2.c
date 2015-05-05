@@ -170,7 +170,7 @@ int frameSubtractionOmp(frame_t *frame, frame_t *frame2, frame_t *res){
 
     //printf("Frame->image->data length = %lx\n", sizeof(frame->image->data)/(sizeof(struct pixel_s)));
 
-    #pragma omp parallel for num_threads(4)
+    #pragma omp parallel for 
     for(int i = 0; i < frameHeight; i++){
         for(int j = 0; j < frameWidth; j++){
             if ((&frame->image->data[i*frameWidth+j] == NULL) || (&frame2->image->data[i*frameWidth+j] == NULL) || (&res->image->data[i*frameWidth+j] == NULL)) {
@@ -568,11 +568,11 @@ int minBlob(int width, int height, int cx, int cy){
     int minH = 400;
 
     if (width < minW) {
-        LOG_ERR("blob at (%d, %d) with size [w,h] -> [%d,%d] < min dim of [%d, %d]\n", cx, cy, width, height, minW, minH);
+        //LOG_ERR("blob at (%d, %d) with size [w,h] -> [%d,%d] < min dim of [%d, %d]\n", cx, cy, width, height, minW, minH);
         return 1;
     }
     if (height < minH) {
-        LOG_ERR("blob at (%d, %d) with size [w,h] -> [%d,%d] < min dim of [%d, %d]\n", cx, cy, width, height, minW, minH);
+        //LOG_ERR("blob at (%d, %d) with size [w,h] -> [%d,%d] < min dim of [%d, %d]\n", cx, cy, width, height, minW, minH);
         return 1; 
     }
     return 0;
@@ -584,12 +584,12 @@ int maxBlob(int width, int height, int cx, int cy){
     int maxH = 800;
 
     if (height > maxH) {
-        LOG_ERR("blob at (%d, %d) with size [w,h] -> [%d,%d] > max dim of [%d, %d]\n", cx, cy, width, height, maxW, maxH);
+        //LOG_ERR("blob at (%d, %d) with size [w,h] -> [%d,%d] > max dim of [%d, %d]\n", cx, cy, width, height, maxW, maxH);
         return 1;
     }
 
     if (width > maxW) {
-        LOG_ERR("blob at (%d, %d) with size [w,h] -> [%d,%d] > max dim of [%d, %d]\n", cx, cy, width, height, maxW, maxH);
+        //LOG_ERR("blob at (%d, %d) with size [w,h] -> [%d,%d] > max dim of [%d, %d]\n", cx, cy, width, height, maxW, maxH);
         return 1;
     }
 
@@ -801,6 +801,8 @@ int blobDetection(frame_t *frame){
 //            printf("adding new box at (%d,%d) centroid = (%d,%d) (w,h) = (%d,%d)\n",
 //                left,up, centerx,centery, w, h);
 //            createNewBox(frame, cx, cy, left, up, w, h);
+            //printf("BlobDetection: x = %d, y = %d,  count = %d, left = %d, right = %d, up = %d, down = %d\n", x,y,count,left,right,up,down);
+
             box_t *pB;
             pB = &frame->arBoxes[idx];
             // set it to valid
@@ -808,6 +810,8 @@ int blobDetection(frame_t *frame){
             // save the coordinates          
             pB->startx = left;
             pB->starty = up;
+            pB->center_x = 0;
+            pB->center_y = 0;
             pB->centroid_x = cx;
             pB->centroid_y = cy;
             pB->width = w;
@@ -826,6 +830,8 @@ int blobDetection(frame_t *frame){
 
     return 0;
 }
+
+
 
 
 
@@ -928,6 +934,45 @@ box_t *copyBoundingBoxes(frame_t *frame) {
     return head;
 }
 
+box_t *copyBBoxes(frame_t *frame) {
+    //based on the image, get the bounding boxes and return them
+    //mallocs a new set of boxes for the array of boxes
+    if (frame == NULL){
+        printf("copyBBoxes: Can't get bounding box, frame is NULL\n");
+        return NULL;
+    }
+    if (frame->arBoxes == NULL){
+        LOG_ERR("copyBBoxes: no bounding boxes found\n");
+        return NULL;
+    }
+
+    int numBoxes = frame->numBoxes;
+    box_t *tmp = frame->arBoxes;
+    //LOG_ERR("Creating %d boxes\n", numBoxes);
+    box_t *res = (box_t *) malloc(sizeof(struct box_s)*numBoxes);
+    /*
+    int i;
+    for (i = 0; i < numBoxes; i++) {
+        res[i].startx = tmp[i].startx;
+        res[i].starty = tmp[i].starty;
+        res[i].centroid_x = tmp[i].centroid_x;
+        res[i].centroid_y = tmp[i].centroid_y;
+        res[i].center_x = tmp[i].center_x;
+        res[i].center_x = tmp[i].center_x;
+        res[i].height = tmp[i].height;
+        res[i].width = tmp[i].width;
+        res[i].dir = tmp[i].dir;
+        res[i].tag = tmp[i].tag;
+        res[i].isValid = tmp[i].isValid;
+    }
+    */
+    memcpy((void *) res, (const void *) tmp, sizeof(struct box_s)*numBoxes);
+    //LOG_ERR("Copied over boxes\n");
+
+    return res;
+}
+
+
 frame_t *copyFrame(frame_t *frame) {
     if (frame == NULL) {
         LOG_ERR("copyFrame: frame is NULL\n");
@@ -936,11 +981,13 @@ frame_t *copyFrame(frame_t *frame) {
 
     LOG_ERR("copyFrame: Creating new frame\n");
     frame_t *newF = (frame_t *)malloc(sizeof(struct frame_s));
-    if (frame->boxes == NULL) {
-        newF->boxes = NULL;
+    if (frame->arBoxes == NULL) {
+        newF->arBoxes = NULL;
+        newF->numBoxes = 0;
     } else {
         LOG_ERR("copyFrame: Copying over existing boxes\n");
-        newF->boxes = copyBoundingBoxes(frame);
+        newF->arBoxes = copyBBoxes(frame);
+        newF->numBoxes = frame->numBoxes;
     }
     if (frame->image == NULL) {
         newF->image = NULL;
