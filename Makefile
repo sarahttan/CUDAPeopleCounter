@@ -21,8 +21,8 @@ frameSubTest: tests/frameSubTest.c readjpeg.c stack.c peopleCounter.c
 frameSubTestOmp: tests/frameSubTestOmp.c readjpeg.c stack.c peopleCounter.c
 	gcc -ljpeg -Wall -std=c99 -lm -o frameSubTestOmp -fopenmp readjpeg.c stack.c peopleCounter.c tests/frameSubTestOmp.c
 
-copyFrameTest: tests/copyFrameTest.cpp readjpeg.c stack.c peopleCounter2.c
-	g++ -ljpeg -Wall -lm -o copyFrameTest -fopenmp readjpeg.c stack.c peopleCounter2.c tests/copyFrameTest.cpp
+copyFrameTest: tests/copyFrameTest.cpp readjpeg.c stack.c peopleCounterOMP.c
+	g++ -ljpeg -Wall -lm -o copyFrameTest -fopenmp readjpeg.c stack.c peopleCounterOMP.c tests/copyFrameTest.cpp
 
 writeImageTest: tests/writeImageTest.c readjpeg.c stack.c peopleCounter.c
 	gcc -ljpeg -Wall -std=c99 -lm -o writeImageTest -fopenmp readjpeg.c stack.c peopleCounter.c tests/writeImageTest.c

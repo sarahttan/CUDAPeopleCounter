@@ -794,6 +794,8 @@ int blobDetectionOMP(frame_t *frame){
             // save the coordinates          
             pB->startx = left;
             pB->starty = up;
+            pB->center_x = 0;
+            pB->center_y = 0;
             pB->centroid_x = cx;
             pB->centroid_y = cy;
             pB->width = w;
@@ -913,8 +915,97 @@ box_t *copyBoundingBoxes(frame_t *frame) {
 
     return head;
 }
+box_t *copyBBoxes(frame_t *frame) {
+    //based on the image, get the bounding boxes and return them
+    //mallocs a new set of boxes for the array of boxes
+    if (frame == NULL){
+        printf("copyBBoxes: Can't get bounding box, frame is NULL\n");
+        return NULL;
+    }
+    if (frame->arBoxes == NULL){
+        LOG_ERR("copyBBoxes: no bounding boxes found\n");
+        return NULL;
+    }
+
+    int numBoxes = frame->numBoxes;
+    box_t *tmp = frame->arBoxes;
+    //LOG_ERR("Creating %d boxes\n", numBoxes);
+    box_t *res = (box_t *) malloc(sizeof(struct box_s)*numBoxes);
+    /*
+    int i;
+    for (i = 0; i < numBoxes; i++) {
+        res[i].startx = tmp[i].startx;
+        res[i].starty = tmp[i].starty;
+        res[i].centroid_x = tmp[i].centroid_x;
+        res[i].centroid_y = tmp[i].centroid_y;
+        res[i].center_x = tmp[i].center_x;
+        res[i].center_x = tmp[i].center_x;
+        res[i].height = tmp[i].height;
+        res[i].width = tmp[i].width;
+        res[i].dir = tmp[i].dir;
+        res[i].tag = tmp[i].tag;
+        res[i].isValid = tmp[i].isValid;
+    }
+    */
+    memcpy((void *) res, (const void *) tmp, sizeof(struct box_s)*numBoxes);
+    //LOG_ERR("Copied over boxes\n");
+
+    return res;
+}
+
 
 frame_t *copyFrame(frame_t *frame) {
+    if (frame == NULL) {
+        LOG_ERR("copyFrame: frame is NULL\n");
+        return NULL;
+    }
+
+    LOG_ERR("copyFrame: Creating new frame\n");
+    frame_t *newF = (frame_t *)malloc(sizeof(struct frame_s));
+    if (frame->arBoxes == NULL) {
+        newF->arBoxes = NULL;
+        newF->numBoxes = 0;
+    } else {
+        LOG_ERR("copyFrame: Copying over existing boxes\n");
+        newF->arBoxes = copyBBoxes(frame);
+        newF->numBoxes = frame->numBoxes;
+    }
+    if (frame->image == NULL) {
+        newF->image = NULL;
+    } else {
+        newF->image = (Image_t *)malloc(sizeof(struct Image_s));
+        newF->image->width = frame->image->width;
+        newF->image->height = frame->image->height;
+        if (frame->image->data == NULL) {
+            newF->image->data = NULL;
+        } else {
+            LOG_ERR("copyFrame: Copying over all image data\n");
+            // copy over all of the image data in single for loop
+            //  - will be really slow
+            // **fixed using memcpy
+
+            int imageSizeInPixels;
+            imageSizeInPixels = (frame->image->width)*(frame->image->height);
+            int imageSizeInBytes;
+            imageSizeInBytes = imageSizeInPixels * sizeof(pixel_t);
+
+            newF->image->data = (pixel_t *)(malloc(imageSizeInBytes));
+            /*
+            int i;
+            for (i = 0; i < frame->image->width*frame->image->height; i++){
+                newF->image->data[i].L = frame->image->data[i].L;
+                newF->image->data[i].A = frame->image->data[i].A;
+                newF->image->data[i].B = frame->image->data[i].B;
+            }
+            */
+            memcpy(newF->image->data, frame->image->data, imageSizeInBytes);
+        }
+    }
+    return newF;
+}
+
+
+frame_t *copyFrameOLD(frame_t *frame) {
     if (frame == NULL) {
         LOG_ERR("copyFrame: frame is NULL\n");
         return NULL;
