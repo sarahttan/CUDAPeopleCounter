@@ -32,7 +32,7 @@
 
 // Input: movie file name
 //          - use imagemagick to get frames and put them in a folder.
-int extractFrames(char *fileName){
+int extractFrames(const char *fileName){
     // TODO: extractFrames from movie here
     return 0;
 }
@@ -68,7 +68,7 @@ int freeFrame(frame_t *frame){
     return 0;
 }
 
-int readImageFrame(frame_t *frame, char *fileName){
+int readImageFrame(frame_t *frame, const char *fileName){
     // Load image into the structure
     Image_t *img = (Image_t *)(malloc(sizeof(struct Image_s))); 
     if (img == NULL) {
@@ -82,8 +82,6 @@ int readImageFrame(frame_t *frame, char *fileName){
     frame->image = img;
    
     // Initialize the other variables in the structure
-    frame->boxes = NULL;
-    
     frame->arBoxes = NULL;
 
     LOG_ERR("readImageFrame: Image height = %d, width = %d\n", img->height, img->width);
@@ -810,17 +808,14 @@ int blobDetection(frame_t *frame){
             // save the coordinates          
             pB->startx = left;
             pB->starty = up;
-            pB->center_x = 0;
-            pB->center_y = 0;
             pB->centroid_x = cx;
             pB->centroid_y = cy;
             pB->width = w;
             pB->height = h;
             pB->dir = 0;
-            // these two are probably not needed
             pB->tag = idx;
-            pB->next = NULL;
-            
+            pB->timeLastSeen = 0;
+            pB->numPixels = count;
         }
     }
     
@@ -884,54 +879,10 @@ int findBlobDirection(frame_t *frame, frame_t *frame2, frame_t *res){
         printf("findBlobDirection: Can't find Blob dir - frame is not initialized\n");
     }
 
-    if ((frame->boxes == NULL) || (frame2->boxes == NULL) || (res->boxes == NULL)){
-        printf("findBlobDirection: Can't find blob dir - frame->boxes not initialized\n");
-    }
+    //x1,y1,y2,x2 need to be updated
 
-    int x1 = frame->boxes->centroid_x;
-    int y1 = frame->boxes->centroid_y;
-    int x2 = frame2->boxes->centroid_x;
-    int y2 = frame2->boxes->centroid_y;
-
-    res->boxes->dir = atan2((y2-y1),(x2-x1))* 180 / PI * -1;
+    // formula for dir = atan2((y2-y1),(x2-x1))* 180 / PI * -1;
     return 0;
-}
-
-box_t *copyBoundingBoxes(frame_t *frame) {
-    //based on the image, get the bounding boxes and return them 
-    //mallocs a new set of boxes
-    if (frame == NULL){
-        printf("getBoundingBoxes: Can't get bounding box, frame is NULL\n");
-        return NULL;
-    }
-    if (frame->boxes == NULL){
-        LOG_ERR("getBoundingBoxes: no bounding boxes found\n");
-        return NULL;
-    }
-
-    box_t *tmp = frame->boxes;
-    box_t *head;
-    box_t *newB;
-
-    while(tmp != NULL) {
-        newB = (box_t *)(malloc(sizeof(struct box_s)));
-        newB->centroid_x = tmp->centroid_x;
-        newB->centroid_y = tmp->centroid_y;
-        newB->center_x = tmp->center_x;
-        newB->center_y = tmp->center_y;
-        newB->height = tmp->height;
-        newB->width = tmp->width;
-        newB->dir = tmp->dir;
-        newB->tag = tmp->tag;
-        newB->next = tmp->next;
-
-        if (tmp == frame->boxes){
-            head = newB;    
-        }
-        tmp = tmp->next;
-    }    
-
-    return head;
 }
 
 box_t *copyBBoxes(frame_t *frame) {
@@ -1245,11 +1196,98 @@ int drawBoxOnImage(frame_t *frame, frame_t *res) {
     return 0;
 }
 
-//TODO: testing
 int frameToJPG(frame_t *frame, const char *filename){
     if (saveJpg(filename, frame->image) != 0) {
         return 0;
     } else {
         return 1;
     }
+}
+
+
+//TODO: add timing code here
+int saveBBoxes(frame_t *frame, const char *filename) {
+    FILE *pFBox = fopen(filename, "w");
+    if (pFBox == NULL) {
+        LOG_ERR("saveBBoxes: Unable to open file for writing bounding boxes\n");
+        return 1;
+    }
+    char line[1000]; //each line will be a maximum of 1000 bytes long
+    const char *fLine = line;
+    box_t *arBoxes = frame->arBoxes;
+    int nBoxes = frame->numBoxes;
+
+    // Write a line containing how many lines (bounding boxes) 
+    //  are contained in the file
+    sprintf(line, "%d BBoxes %s", nBoxes, "[startx,starty,centroid_x,centroid_y,numPixels,height,width,dir,tag,isValid,timeLastSeen]\n");
+    if (fputs(fLine, pFBox) < 0) {
+        LOG_ERR("saveBBoxes: Unable to write starter line to file\n");
+        fclose(pFBox);
+        return 1;
+    }
+
+    int i;
+    // Copy data for each bounding box to a new line in the file
+    for (i = 0; i < nBoxes; i++) {
+        sprintf(line, "%d: %d %d %d %d %d %d %d %d %d %d %d\n", i, 
+                arBoxes[i].startx, arBoxes[i].starty, arBoxes[i].centroid_x, 
+                arBoxes[i].centroid_y, arBoxes[i].numPixels,
+                arBoxes[i].height, arBoxes[i].width, arBoxes[i].dir, 
+                arBoxes[i].tag, arBoxes[i].isValid, arBoxes[i].timeLastSeen);
+        if (fputs(fLine, pFBox) < 0) {
+            LOG_ERR("saveBBoxes: Unable to write line to file\n");
+            fclose(pFBox);
+            return 1;
+        }
+    }
+
+    fclose(pFBox);
+    return 0;
+}
+
+box_t *loadBBoxes(const char *filename) {
+    FILE *pFBox = fopen(filename, "r");
+    if (pFBox == NULL) {
+        LOG_ERR("loadBBoxes: Unable to open file for reading bounding boxes\n");
+        return NULL;
+    }
+    const char *lineFormat = "%d: %d %d %d %d %d %d %d %d %d %d %d\n";
+    int nBoxes=0;
+    char tempL[1000];
+
+    // read the first line of the file to see how many lines we'll be reading
+    if (fscanf(pFBox, "%d %s %s\n", &nBoxes, tempL, tempL)!=3) {
+        LOG_ERR("loadBBoxes: Unable to read first line\n");
+        return NULL;
+    }
+    LOG_ERR("Found %d boxes, read %s before new line\n", nBoxes, tempL);
+
+    // allocate enough memory to hold all the boxes
+    box_t *arBoxes = (box_t *)malloc(sizeof(struct box_s)*nBoxes);
+
+    // read each line of the file to the specified number of boxes
+    int i, temp=0, temp2=0;
+    for(i=0; i < nBoxes; i++) {
+        temp2 =fscanf(pFBox, lineFormat, &temp, 
+                &arBoxes[i].startx, &arBoxes[i].starty, &arBoxes[i].centroid_x,
+                &arBoxes[i].centroid_y, &arBoxes[i].numPixels, 
+                &arBoxes[i].height, &arBoxes[i].width, &arBoxes[i].dir,
+                &arBoxes[i].tag, &arBoxes[i].isValid, &arBoxes[i].timeLastSeen
+            );
+        if (temp2 != 12) {
+            LOG_ERR("loadBBoxes: Unable to read line %d at box %d, got %d/12 args\n", i+1, temp, temp2);
+            return NULL;
+        }
+    }
+
+    fclose(pFBox);
+    return arBoxes;
+}
+
+// reassociate boxes that are close to each other as the same boxes
+//  once that is done, apply the direction of travel onto the boxes
+int reassociateBoxes(box_t *origBox, box_t *newBox, box_t *resBox, int nBoxes){
+    int L1_maxDist = 50; // maximum L1 distance should be apart from another box (pixels)
+    
+    return 0;
 }

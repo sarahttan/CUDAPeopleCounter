@@ -82,7 +82,7 @@ int readImageFrame(frame_t *frame, const char *fileName){
     frame->image = img;
    
     // Initialize the other variables in the structure
-    frame->boxes = NULL;
+//    frame->boxes = NULL;
     
     frame->arBoxes = NULL;
 
@@ -596,6 +596,14 @@ int maxBlob(int width, int height, int cx, int cy){
     return 0;
 }
 
+__global__ void hello(char *a, int *b)
+{
+    a[threadIdx.x] += b[threadIdx.x];
+}
+
+
+
+
 
 //TODO: testing in progress
 int blobDetection(frame_t *frame){
@@ -751,6 +759,22 @@ int blobDetection(frame_t *frame){
         return 1;
     }                
 
+    cudaDeviceProp prop;
+    cudaGetDeviceProperties(&prop,0);
+    printf("Found CUDA device %s\n", prop.name);
+    printf("  Memory Clock Rate (KHz): %d\n",
+         prop.memoryClockRate);
+    printf("  Memory Bus Width (bits): %d\n",
+         prop.memoryBusWidth);
+    printf("  Peak Memory Bandwidth (GB/s): %f\n\n",
+         2.0*prop.memoryClockRate*(prop.memoryBusWidth/8)/1.0e6);
+
+
+
+
+
+
+
 
 
     pixel_t p;
@@ -850,8 +874,8 @@ int blobDetection(frame_t *frame){
             // save the coordinates          
             pB->startx = left[idx];
             pB->starty = up[idx];
-            pB->center_x = 0;
-            pB->center_y = 0;
+//            pB->center_x = 0;
+//            pB->center_y = 0;
             pB->centroid_x = cx;
             pB->centroid_y = cy;
             pB->width = w;
@@ -859,7 +883,7 @@ int blobDetection(frame_t *frame){
             pB->dir = 0;
             // these two are probably not needed
             pB->tag = idx;
-            pB->next = NULL;
+//            pB->next = NULL;
             
         }
     }
@@ -931,19 +955,20 @@ int findBlobDirection(frame_t *frame, frame_t *frame2, frame_t *res){
         printf("findBlobDirection: Can't find Blob dir - frame is not initialized\n");
     }
 
-    if ((frame->boxes == NULL) || (frame2->boxes == NULL) || (res->boxes == NULL)){
+    if ((frame->arBoxes == NULL) || (frame2->arBoxes == NULL) || (res->arBoxes == NULL)){
         printf("findBlobDirection: Can't find blob dir - frame->boxes not initialized\n");
     }
 
-    int x1 = frame->boxes->centroid_x;
-    int y1 = frame->boxes->centroid_y;
-    int x2 = frame2->boxes->centroid_x;
-    int y2 = frame2->boxes->centroid_y;
+//    int x1 = frame->boxes->centroid_x;
+//    int y1 = frame->boxes->centroid_y;
+//    int x2 = frame2->boxes->centroid_x;
+//    int y2 = frame2->boxes->centroid_y;
 
-    res->boxes->dir = atan2((y2-y1),(x2-x1))* 180 / PI * -1;
+//    res->boxes->dir = atan2((y2-y1),(x2-x1))* 180 / PI * -1;
     return 0;
 }
 
+/*
 box_t *copyBoundingBoxes(frame_t *frame) {
     //based on the image, get the bounding boxes and return them 
     //mallocs a new set of boxes
@@ -964,13 +989,13 @@ box_t *copyBoundingBoxes(frame_t *frame) {
         newB = (box_t *)(malloc(sizeof(struct box_s)));
         newB->centroid_x = tmp->centroid_x;
         newB->centroid_y = tmp->centroid_y;
-        newB->center_x = tmp->center_x;
-        newB->center_y = tmp->center_y;
+//        newB->center_x = tmp->center_x;
+//        newB->center_y = tmp->center_y;
         newB->height = tmp->height;
         newB->width = tmp->width;
         newB->dir = tmp->dir;
         newB->tag = tmp->tag;
-        newB->next = tmp->next;
+//        newB->next = tmp->next;
 
         if (tmp == frame->boxes){
             head = newB;    
@@ -980,6 +1005,7 @@ box_t *copyBoundingBoxes(frame_t *frame) {
 
     return head;
 }
+*/
 
 box_t *copyBBoxes(frame_t *frame) {
     //based on the image, get the bounding boxes and return them
@@ -1069,53 +1095,6 @@ frame_t *copyFrame(frame_t *frame) {
     return newF;
 }
 
-frame_t *copyFrameOLD(frame_t *frame) {
-    if (frame == NULL) {
-        LOG_ERR("copyFrame: frame is NULL\n");
-        return NULL;
-    }
-
-    LOG_ERR("copyFrame: Creating new frame\n");
-    frame_t *newF = (frame_t *)malloc(sizeof(struct frame_s));
-    if (frame->boxes == NULL) {
-        newF->boxes = NULL;
-    } else {
-        LOG_ERR("copyFrame: Copying over existing boxes\n");
-        newF->boxes = copyBoundingBoxes(frame);
-    }
-    if (frame->image == NULL) {
-        newF->image = NULL;
-    } else {
-        newF->image = (Image_t *)malloc(sizeof(struct Image_s));
-        newF->image->width = frame->image->width;
-        newF->image->height = frame->image->height;
-        if (frame->image->data == NULL) {
-            newF->image->data = NULL;
-        } else {
-            LOG_ERR("copyFrame: Copying over all image data\n");
-            // copy over all of the image data in single for loop
-            //  - will be really slow
-            // **fixed using memcpy
-            
-            int imageSizeInPixels;
-            imageSizeInPixels = (frame->image->width)*(frame->image->height);
-            int imageSizeInBytes;
-            imageSizeInBytes = imageSizeInPixels * sizeof(pixel_t);
-            
-            newF->image->data = (pixel_t *)(malloc(imageSizeInBytes));
-            /*
-            int i;
-            for (i = 0; i < frame->image->width*frame->image->height; i++){
-                newF->image->data[i].L = frame->image->data[i].L;
-                newF->image->data[i].A = frame->image->data[i].A;
-                newF->image->data[i].B = frame->image->data[i].B;
-            }
-            */
-            memcpy(newF->image->data, frame->image->data, imageSizeInBytes);
-        }
-    }
-    return newF; 
-}
 
 
 //

@@ -10,7 +10,10 @@
 
 - tweak threshold values a little bit to capture similar colored pants
 
-- to get the timing code, run ./doTesh.sh and use 'grep time.=result*.txt' to extract timing results
+- copy changes to bounding box structure to the peopleCounterCUDA and peopleCounterOMP
+    --> use copyFrameTestCUDA and copyFrameTest with the header file changed to peopleCounterOMP to test the structure was updated (and add update to the initialization values)
+
+- to get the timing code, run ./doTesh.sh and use 'grep time.= result*.txt' to extract timing results
 
 ############################# 
 COMPLETED ITEMS BELOW

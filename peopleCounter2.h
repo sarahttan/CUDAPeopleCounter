@@ -9,19 +9,18 @@ typedef struct box_s {
     int starty;     // top most coordinate of the box 
     int centroid_x; // center of mass x-component of bounding box (pixels)
     int centroid_y; // center of mass y-component of bounding box (pixels)
-    int center_x;   // center x of bounding box (pixels)
-    int center_y;   // center y of bounding box (pixels)
+    int numPixels;  // number of pixels within the box
     int height;     // height of bounding box (pixels)
     int width;      // width of bounding box (pixels)
     int dir;        // direction of box travel (degrees)
     int tag;        // tag of the bounding box
     int isValid;    // flag to indicate box is valid
-    struct box_s *next;
+    int timeLastSeen; //how long the bounding box has been on the 
+                      //    image since its been seen last
 } box_t;
 
 typedef struct frame_s {
     Image_t *image;  	// image this frame represents
-    box_t *boxes;  	// linked list of bounding boxes in frame
     box_t *arBoxes; 	// array of boxes
     int numBoxes;	// number of arBoxes
 } frame_t;
