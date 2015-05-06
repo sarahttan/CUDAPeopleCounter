@@ -14,7 +14,7 @@ typedef struct box_s {
     int width;      // width of bounding box (pixels)
     int dir;        // direction of box travel (degrees)
     int tag;        // tag of the bounding box
-    int isValid;    // flag to indicate box is valid
+    int isValid;    // flag to indicate box is valid (1 is valid, 0 is invalid)
     int timeLastSeen; //how long the bounding box has been on the 
                       //    image since its been seen last
 } box_t;

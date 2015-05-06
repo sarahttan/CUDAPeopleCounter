@@ -759,23 +759,66 @@ int blobDetection(frame_t *frame){
         return 1;
     }                
 
-    cudaDeviceProp prop;
-    cudaGetDeviceProperties(&prop,0);
-    printf("Found CUDA device %s\n", prop.name);
-    printf("  Memory Clock Rate (KHz): %d\n",
-         prop.memoryClockRate);
-    printf("  Memory Bus Width (bits): %d\n",
-         prop.memoryBusWidth);
-    printf("  Peak Memory Bandwidth (GB/s): %f\n\n",
-         2.0*prop.memoryClockRate*(prop.memoryBusWidth/8)/1.0e6);
+    sTime = CycleTimer::currentSeconds();
+
+    // allocate memory in CUDA
+    
+    pixel_t *d_imageData;
+    
+    int numPixels;
+    numPixels = frame->image->width * frame->image->height;
+
+    cudaError cudaStatus;
+
+    // Allocate memory for the image on the CUDA device
+    // TODO: optimize this by moving the label data in a different
+    //       data structure so that we only need to copy that structure    
+    cudaStatus = cudaMalloc( (void **) &d_imageData, sizeof(pixel_t) * numPixels );
+    if (cudaStatus != cudaSuccess) {
+        printf("Error: Could not malloc d_imageData on the device!\n"); 
+        // TODO: free all allocated memory
+        return 1;
+    }
+
+    // Copy the image data over 
+    cudaStatus = cudaMemcpy( d_imageData, frame->image->data, 
+                    numPixels * sizeof(pixel_t), cudaMemcpyHostToDevice );
+    if (cudaStatus != cudaSuccess) {
+        printf("Error: Could not cudaMemcpy image to d_imageData on the device!\n"); 
+        // TODO: free all allocated memory
+        return 1;
+    }
 
 
 
+    // Allocate memory on the CUDA device for the resulting boxes
+    box_t *d_boxes;
+    cudaStatus = cudaMalloc( (void **) &d_boxes, sizeof(box_t) * map2maxIdx );
+    if (cudaStatus != cudaSuccess) {
+        printf("Error: Could not malloc d_boxes on the device!\n"); 
+        // TODO: free all allocated memory
+        return 1;
+    }
+    
+    
+    // allocate host memory for a copy of the resulting boxes
+    box_t *cudaBoxes;
+    cudaBoxes = (box_t *) calloc(sizeof(box_t), map2maxIdx);
+    if (cudaBoxes == NULL) {
+        printf("Error: could not malloc cudaBoxes\n");
+        // TODO: free all allocated memory
+        return 1;
+    }
 
-
-
-
-
+    dTime = CycleTimer::currentSeconds() - sTime;
+    printf("CUDA malloc and memcpy done, time = %f\n",dTime);
+        
+    // now actually call the CUDA code
+    
+    
+    // Free the cuda memory
+    cudaFree( d_imageData );
+    cudaFree( d_boxes );
 
     pixel_t p;
     int w, h, cx, cy;
@@ -803,18 +846,8 @@ int blobDetection(frame_t *frame){
 
         label = map2[idx];
         //TODO:
-        // change x,y, left, right, up, down to arrays of size idx
-        // use CUDA (and OpenMP) to calculate each of them locally, as well as arBoxes
-        // since each one is independent based upon idx
-        // therefore, no locks are needed.
-        //
         // do some tests to see if MIN/MAX vs if is actually better or not
         //
-        // In theory, CUDA should give about a 200x speedup minus the overhead
-        // of copying data back and forth
-        //
-        
-
 
         for (i = 0; i < frame->image->height; i++){
             for (j = 0; j < frame->image->width; j++){
@@ -860,13 +893,9 @@ int blobDetection(frame_t *frame){
         h = abs(down[idx] - up[idx]);
 
         // very simple noise remover, just count blobs with more
-        // than 30 pixels
+        // than 30 pixels and width and height > 5
         if ((count[idx] > 30) && (w > 5) && (h > 5)) {
-//            printf("adding new box at (%d,%d) centroid = (%d,%d) (w,h) = (%d,%d)\n",
-//                left,up, centerx,centery, w, h);
-//            createNewBox(frame, cx, cy, left, up, w, h);
-            //printf("BlobDetection: x = %d, y = %d,  count = %d, left = %d, right = %d, up = %d, down = %d\n", x,y,count,left,right,up,down);
-
+            // Add a valid box
             box_t *pB;
             pB = &frame->arBoxes[idx];
             // set it to valid
@@ -874,16 +903,12 @@ int blobDetection(frame_t *frame){
             // save the coordinates          
             pB->startx = left[idx];
             pB->starty = up[idx];
-//            pB->center_x = 0;
-//            pB->center_y = 0;
             pB->centroid_x = cx;
             pB->centroid_y = cy;
             pB->width = w;
             pB->height = h;
             pB->dir = 0;
-            // these two are probably not needed
             pB->tag = idx;
-//            pB->next = NULL;
             
         }
     }
