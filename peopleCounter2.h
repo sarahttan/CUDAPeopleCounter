@@ -29,7 +29,7 @@ typedef struct frame_s {
 // extract frames from movie and save them in a folder
 // INPUT: fileName - filename of movie
 // OUTPUT: 1 - if an error occurred, 0 - otherwise
-int extractFrames(char *fileName);
+int extractFrames(const char *fileName);
 
 // free the frame structure
 // INPUT: frame - frame structure
@@ -40,7 +40,7 @@ int freeFrame(frame_t *frame);
 // INPUT: frame - frame structure to load image into
 //        fileName - filename of image to read from
 // OUTPUT: 1 - if an error occurred, 0 - otherwise
-int readImageFrame(frame_t *frame, char *fileName);
+int readImageFrame(frame_t *frame, const char *fileName);
 
 // subtract two frames and save them in the resulting frame
 // INPUT: frame - 1st image
@@ -106,10 +106,20 @@ int drawBoxOnImage(frame_t *frame, frame_t *res);
 // OUTPUT: 1 - if an error occurred, 0 - otherwise
 int frameToJPG(frame_t *frame, const char *filename);
 
-
 // merge intersecting boxes
 // INPUT: frame - image frame
 // OUTPUT: 1 - if error, 0 - success
 int mergeBoxes(frame_t *frame);
+
+// save bounding box data to a file
+// INPUT: frame - image frame
+//        filename - name of file to save bounding box data
+// OUTPUT: 1 - if error, 0 - success
+int saveBBoxes(frame_t *frame, const char *filename);
+
+// load bounding box data from a file
+// INPUT: filename - name of file to load bounding box data from
+// OUTPUT: box - box_t data structure containing data from file
+box_t *loadBBoxes(const char *filename);
 
 #endif

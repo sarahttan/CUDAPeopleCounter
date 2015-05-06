@@ -66,9 +66,14 @@ NVCCFLAGS=-O3 -m64
 
 OBJS=$(OBJDIR)/fullTestCUDA.o  $(OBJDIR)/readjpeg.o $(OBJDIR)/stack.o $(OBJDIR)/peopleCounterCUDA.o
 
+OBJScpTest=$(OBJDIR)/copyFrameTestCUDA.o  $(OBJDIR)/readjpeg.o $(OBJDIR)/stack.o $(OBJDIR)/peopleCounterCUDA.o
+
 fullTestCUDA: $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS) $(LDFLAGS)
 	
+copyFrameTestCUDA: $(OBJScpTest)
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJScpTest) $(LDFLAGS)
+
 $(OBJDIR)/%.o: %.c
 	$(CXX) $< $(CXXFLAGS) -c -o $@
 	
@@ -77,3 +82,6 @@ $(OBJDIR)/%.o: %.cu
 			
 $(OBJDIR)/%.o: tests/%.cu
 	$(NVCC) $< $(NVCCFLAGS) -c -o $@
+
+$(OBJDIR)/%.o: tests/%.cpp
+	$(CXX) $< $(CXXFLAGS) -c -o $@
