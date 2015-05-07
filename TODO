@@ -10,8 +10,14 @@
 
 - tweak threshold values a little bit to capture similar colored pants
 
-- copy changes to bounding box structure to the peopleCounterCUDA and peopleCounterOMP
-    --> use copyFrameTestCUDA and copyFrameTest with the header file changed to peopleCounterOMP to test the structure was updated (and add update to the initialization values)
+- copy changes to bounding box structure to the peopleCounterCUDA 
+    --> use copyFrameTestCUDA and copyFrameTest (and add update to the initialization values)
+
+- update peopleCounterOMP.h to peopleCounter2.h after completed serial version of box 
+
+- fix merge boxes to include centroid calculation - see reassociate boxes for details
+
+- parallelize mergeboxes in openMP
 
 - to get the timing code, run ./doTesh.sh and use 'grep time.= result*.txt' to extract timing results
 
@@ -22,6 +28,7 @@ COMPLETED ITEMS BELOW
 
 - fix mergeBoxes to loop until no more boxes need to be merged
 
+- add timing code to writing boxes and reading boxes
 
 
 (1) Write a test program (under test files) to test the function

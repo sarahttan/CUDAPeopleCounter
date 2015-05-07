@@ -6,19 +6,29 @@
 int main(int argc, char *argv[]){
     if (argc != 1) {
         printf("USAGE: ./copyFrameTest\n");
-        printf("            only works if blobDetection works\n");
         return 1;
     }
 
-    char *filename = "frames/diff/frame_1.jpg";
+    char *filename = "frames/frame01.jpg";
     frame_t *frame = malloc(sizeof(struct frame_s));
     if (readImageFrame(frame, filename) == 1) {
         printf("Unable to read frame at [%s]\n", filename);
         return 1;
     }
   
-    if (blobDetection(frame) == 1) {
-        printf("Unable to detect blobs\n");
+// Comment number of boxes we want out
+    if (createNewBox(frame, 100, 200, 100, 200,10, 20) != 0) {
+        printf("Unable to create box\n");
+        return 1;
+    }
+
+    if (createNewBox(frame, 100, 500, 100,500,80, 20) != 0) {
+        printf("Unable to create box\n");
+        return 1;
+    }
+
+    if (createNewBox(frame, 100, 800, 100, 800, 10, 500) != 0) {
+        printf("Unable to create box\n");
         return 1;
     }
 
@@ -41,22 +51,18 @@ int main(int argc, char *argv[]){
         }
     }
 
+    int null = 0;
 
-    if (frame->arBoxes == NULL) {
-        if (res->arBoxes != NULL) {
+    if (frame->boxes == NULL) {
+        if (res->boxes != NULL) {
             printf("Boxes not initialized correctly\n");
             return 1;
         }
+        null = 0;
     } else {
-        box_t *pFbox = frame->boxes;
-        box_t *pRbox = res->boxes;
-        if (frame->numBoxes != res->numBoxes) {
-            printf("Boxes are not equal in number\n");
-            return 1;
-        }
-        for (i = 0; i < frame->numBoxes; i++) {
-            box_t *box = &pFbox[i];
-            box_t *rbox = &pRbox[i];
+        box_t *box = frame->boxes;
+        box_t *rbox = res->boxes;
+        while(box != NULL) {
             if (box->centroid_x != rbox->centroid_x) {
                 printf("box centroid_x not initialized correctly\n");
                 return 1;
@@ -81,6 +87,9 @@ int main(int argc, char *argv[]){
                 printf("box tag not initialized correctly\n");
                 return 1;
             }
+            box = box->next;
+            rbox = rbox->next;
+            null++;
         }
     }
 
@@ -92,13 +101,24 @@ int main(int argc, char *argv[]){
     }
 
     box_t *tmp = res->boxes;
-    if ((res->numBoxes == 0) && (tmp != NULL)) {
+    int count = 0;
+    if (null == 0) {
+        if (tmp != NULL) {
             printf("Box copy failure after free\n");
-    } else if ((tmp == NULL) || (sizeof(tmp)/sizeof(tmp[0]) != res->numBoxes)) {
+            return 1;
+        }
+    } else {
+        while(tmp != NULL) {
+            count ++;
+            tmp = tmp->next;
+        }
+        if (count != null) {
             printf("Box copy failure - not same num boxes after free\n");
-    }  else { 
-        printf("Frames copied correctly\n"); 
-    }
+        }
+    }   
+
+    printf("Frames copied correctly\n"); 
+ 
 
     printf("Freeing copy frame\n");
     if (freeFrame(res) == 1) {

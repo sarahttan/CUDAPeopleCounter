@@ -91,7 +91,7 @@ int deleteBox(frame_t *frame, box_t *b);
 // copy and return the bounding box information from the frame
 // INPUT: frame - image frame to copy boxes from
 // OUTPUT: boxes linked list (malloced)
-box_t *copyBoundingBoxes(frame_t *frame);
+box_t *copyBBoxes(frame_t *frame);
 
 // copy and return a new frame from the given frame
 // INPUT: frame - image frame to copy
@@ -118,7 +118,10 @@ int saveBBoxes(frame_t *frame, const char *filename);
 
 // load bounding box data from a file
 // INPUT: filename - name of file to load bounding box data from
+//        numBoxes - number of boxes loaded back from file
 // OUTPUT: box - box_t data structure containing data from file
-box_t *loadBBoxes(const char *filename);
+box_t *loadBBoxes(const char *filename, int *numBoxes);
+
+int reassociateBoxes(box_t *origBox, box_t *newBox, int nOrigBoxes, int nNewBoxes, int *numBoxesAfter);
 
 #endif

@@ -1,4 +1,4 @@
-all: readjpeg readImageTest blobDirTest boxCreateDelete frameSubTest frameSubTestOmp copyFrameTest writeImageTest stackTest segmentImageTest drawTest drawBoxOnImageTest saveLoadBBoxesTest fullTest
+all: readjpeg readImageTest blobDirTest boxCreateDelete frameSubTest frameSubTestOmp copyFrameTest writeImageTest stackTest segmentImageTest drawTest drawBoxOnImageTest saveLoadBBoxesTest reassociateBoxesTest fullTest
 
 drawTest: readjpeg.c tests/drawTest.c peopleCounter.c stack.c
 	gcc -ljpeg -Wall -std=c99 -lm -fopenmp -o drawTest stack.c peopleCounter.c readjpeg.c tests/drawTest.c
@@ -38,6 +38,9 @@ drawBoxOnImageTest: tests/drawBoxOnImageTest.c readjpeg.c stack.c peopleCounter.
 
 saveLoadBBoxesTest: tests/saveLoadBBoxesTest.cpp readjpeg.c stack.c peopleCounter2.c
 	g++ -ljpeg -Wall -lm -o saveLoadBBoxes -fopenmp readjpeg.c stack.c peopleCounter2.c tests/saveLoadBBoxesTest.cpp
+
+reassociateBoxesTest: tests/reassociateBoxesTest.cpp readjpeg.c stack.c peopleCounter2.c
+	g++ -ljpeg -Wall -lm -o reassociateBoxes -fopenmp readjpeg.c stack.c peopleCounter2.c tests/reassociateBoxesTest.cpp
 
 fullTestSOL: tests/fullTestSOL.cpp readjpeg.c stack.c peopleCounter.c
 	g++ -ljpeg -Wall -lm -fopenmp -o fullTestSOL readjpeg.c stack.c peopleCounter.c tests/fullTestSOL.cpp

@@ -55,7 +55,7 @@ reassociateBoxes: newBox is too large adding seperate boxes
 addBoxNonValid: adding new box to tag 1
 box 0 startx not initialized correctly
 box 0 starty not initialized correctly
-box 0 centroid_x not initialized correctly (original, copied) -> (2046975704, 0)
+box 0 centroid_x not initialized correctly (original, copied) -> (100806360, 0)
 box 0 centroid_y not initialized correctly
 box 0 center_y not initialized correctly
 box 0 width not initialized correctly
@@ -71,7 +71,7 @@ box 2 center_y not initialized correctly
 box 2 width not initialized correctly
 box 2 dir not initialized correctly
 box 3 dir not initialized correctly
-box 4 centroid_x not initialized correctly (original, copied) -> (2046964992, 0)
+box 4 centroid_x not initialized correctly (original, copied) -> (100795648, 0)
 box 4 centroid_y not initialized correctly
 box 12 startx not initialized correctly
 box 12 centroid_x not initialized correctly (original, copied) -> (7232, 0)

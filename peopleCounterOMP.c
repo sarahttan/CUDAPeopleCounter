@@ -32,7 +32,7 @@
 
 // Input: movie file name
 //          - use imagemagick to get frames and put them in a folder.
-int extractFrames(char *fileName){
+int extractFrames(const char *fileName){
     // TODO: extractFrames from movie here
     return 0;
 }
@@ -68,7 +68,7 @@ int freeFrame(frame_t *frame){
     return 0;
 }
 
-int readImageFrame(frame_t *frame, char *fileName){
+int readImageFrame(frame_t *frame, const char *fileName){
     // Load image into the structure
     Image_t *img = (Image_t *)(malloc(sizeof(struct Image_s))); 
     if (img == NULL) {
@@ -82,8 +82,6 @@ int readImageFrame(frame_t *frame, char *fileName){
     frame->image = img;
    
     // Initialize the other variables in the structure
-    frame->boxes = NULL;
-    
     frame->arBoxes = NULL;
 
     LOG_ERR("readImageFrame: Image height = %d, width = %d\n", img->height, img->width);
@@ -317,8 +315,6 @@ int mergeBoxes(frame_t *frame)
         return 1;
     }
     
-    box_t *temp1;
-    box_t *temp2;
     int boxUpdated;
     boxUpdated = 1;
     
@@ -327,16 +323,18 @@ int mergeBoxes(frame_t *frame)
 
     while (boxUpdated) {    
         boxUpdated = 0;
+        #pragma omp parallel for shared(boxUpdated) 
         for ( i=0; i<frame->numBoxes; i++ ) {
-            temp1 = &frame->arBoxes[i];
+            box_t *temp1 = &frame->arBoxes[i];
             if (temp1->isValid == 0) {
                 continue;
             }
             for ( j=i+1; j<frame->numBoxes; j++ ) {
-                temp2 = &frame->arBoxes[j];
+                box_t *temp2 = &frame->arBoxes[j];
                 if (temp2->isValid == 0) {
                     continue;
                 }
+                
                 if (boxesIntersect(temp1, temp2, 10)) {
                     // boxes intersect, merge them
                     int endy, endy1, endy2;
@@ -367,6 +365,7 @@ int mergeBoxes(frame_t *frame)
                 }
             }
         }
+        #pragma omp barrier
     }
     return 0;
 }
@@ -794,16 +793,15 @@ int blobDetectionOMP(frame_t *frame){
             // save the coordinates          
             pB->startx = left;
             pB->starty = up;
-            pB->center_x = 0;
-            pB->center_y = 0;
             pB->centroid_x = cx;
             pB->centroid_y = cy;
             pB->width = w;
             pB->height = h;
             pB->dir = 0;
+            pB->numPixels = count;  
+            pB->timeLastSeen = 0;
             // these two are probably not needed
             pB->tag = idx;
-            pB->next = NULL;
             
         }
     }
@@ -866,55 +864,21 @@ int findBlobDirection(frame_t *frame, frame_t *frame2, frame_t *res){
         printf("findBlobDirection: Can't find Blob dir - frame is not initialized\n");
     }
 
-    if ((frame->boxes == NULL) || (frame2->boxes == NULL) || (res->boxes == NULL)){
+    if ((frame->arBoxes == NULL) || (frame2->arBoxes == NULL) || (res->arBoxes == NULL)){
         printf("findBlobDirection: Can't find blob dir - frame->boxes not initialized\n");
     }
 
+#if 0
     int x1 = frame->boxes->centroid_x;
     int y1 = frame->boxes->centroid_y;
     int x2 = frame2->boxes->centroid_x;
     int y2 = frame2->boxes->centroid_y;
 
     res->boxes->dir = atan2((y2-y1),(x2-x1))* 180 / PI * -1;
+#endif
     return 0;
 }
 
-box_t *copyBoundingBoxes(frame_t *frame) {
-    //based on the image, get the bounding boxes and return them 
-    //mallocs a new set of boxes
-    if (frame == NULL){
-        printf("getBoundingBoxes: Can't get bounding box, frame is NULL\n");
-        return NULL;
-    }
-    if (frame->boxes == NULL){
-        LOG_ERR("getBoundingBoxes: no bounding boxes found\n");
-        return NULL;
-    }
-
-    box_t *tmp = frame->boxes;
-    box_t *head;
-    box_t *newB;
-
-    while(tmp != NULL) {
-        newB = (box_t *)(malloc(sizeof(struct box_s)));
-        newB->centroid_x = tmp->centroid_x;
-        newB->centroid_y = tmp->centroid_y;
-        newB->center_x = tmp->center_x;
-        newB->center_y = tmp->center_y;
-        newB->height = tmp->height;
-        newB->width = tmp->width;
-        newB->dir = tmp->dir;
-        newB->tag = tmp->tag;
-        newB->next = tmp->next;
-
-        if (tmp == frame->boxes){
-            head = newB;    
-        }
-        tmp = tmp->next;
-    }    
-
-    return head;
-}
 box_t *copyBBoxes(frame_t *frame) {
     //based on the image, get the bounding boxes and return them
     //mallocs a new set of boxes for the array of boxes
@@ -1002,55 +966,6 @@ frame_t *copyFrame(frame_t *frame) {
         }
     }
     return newF;
-}
-
-
-frame_t *copyFrameOLD(frame_t *frame) {
-    if (frame == NULL) {
-        LOG_ERR("copyFrame: frame is NULL\n");
-        return NULL;
-    }
-
-    LOG_ERR("copyFrame: Creating new frame\n");
-    frame_t *newF = (frame_t *)malloc(sizeof(struct frame_s));
-    if (frame->boxes == NULL) {
-        newF->boxes = NULL;
-    } else {
-        LOG_ERR("copyFrame: Copying over existing boxes\n");
-        newF->boxes = copyBoundingBoxes(frame);
-    }
-    if (frame->image == NULL) {
-        newF->image = NULL;
-    } else {
-        newF->image = (Image_t *)malloc(sizeof(struct Image_s));
-        newF->image->width = frame->image->width;
-        newF->image->height = frame->image->height;
-        if (frame->image->data == NULL) {
-            newF->image->data = NULL;
-        } else {
-            LOG_ERR("copyFrame: Copying over all image data\n");
-            // copy over all of the image data in single for loop
-            //  - will be really slow
-            // **fixed using memcpy
-            
-            int imageSizeInPixels;
-            imageSizeInPixels = (frame->image->width)*(frame->image->height);
-            int imageSizeInBytes;
-            imageSizeInBytes = imageSizeInPixels * sizeof(pixel_t);
-            
-            newF->image->data = (pixel_t *)(malloc(imageSizeInBytes));
-            /*
-            int i;
-            for (i = 0; i < frame->image->width*frame->image->height; i++){
-                newF->image->data[i].L = frame->image->data[i].L;
-                newF->image->data[i].A = frame->image->data[i].A;
-                newF->image->data[i].B = frame->image->data[i].B;
-            }
-            */
-            memcpy(newF->image->data, frame->image->data, imageSizeInBytes);
-        }
-    }
-    return newF; 
 }
 
 

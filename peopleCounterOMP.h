@@ -4,23 +4,22 @@
 #include "stack.h"
 
 typedef struct box_s {
-    int startx;	    // left most coordinate of the box
-    int starty;     // top most coordinate of the box 
+    int startx;     // left most coordinate of the box
+    int starty;     // top most coordinate of the box
     int centroid_x; // center of mass x-component of bounding box (pixels)
     int centroid_y; // center of mass y-component of bounding box (pixels)
-    int center_x;   // center x of bounding box (pixels)
-    int center_y;   // center y of bounding box (pixels)
+    int numPixels;  // number of pixels within the box
     int height;     // height of bounding box (pixels)
     int width;      // width of bounding box (pixels)
     int dir;        // direction of box travel (degrees)
     int tag;        // tag of the bounding box
-    int isValid;    // flag to indicate box is valid
-    struct box_s *next;
+    int isValid;    // flag to indicate box is valid (1 is valid, 0 is invalid)
+    int timeLastSeen; //how long the bounding box has been on the
+                      //    image since its been seen last
 } box_t;
 
 typedef struct frame_s {
     Image_t *image;  	// image this frame represents
-    box_t *boxes;  	// linked list of bounding boxes in frame
     box_t *arBoxes; 	// array of boxes
     int numBoxes;	// number of arBoxes
 } frame_t;
@@ -28,7 +27,7 @@ typedef struct frame_s {
 // extract frames from movie and save them in a folder
 // INPUT: fileName - filename of movie
 // OUTPUT: 1 - if an error occurred, 0 - otherwise
-int extractFrames(char *fileName);
+int extractFrames(const char *fileName);
 
 // free the frame structure
 // INPUT: frame - frame structure
@@ -39,7 +38,7 @@ int freeFrame(frame_t *frame);
 // INPUT: frame - frame structure to load image into
 //        fileName - filename of image to read from
 // OUTPUT: 1 - if an error occurred, 0 - otherwise
-int readImageFrame(frame_t *frame, char *fileName);
+int readImageFrame(frame_t *frame, const char *fileName);
 
 // subtract two frames and save them in the resulting frame
 // INPUT: frame - 1st image

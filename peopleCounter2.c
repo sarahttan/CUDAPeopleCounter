@@ -1207,11 +1207,17 @@ int frameToJPG(frame_t *frame, const char *filename){
 
 //TODO: add timing code here
 int saveBBoxes(frame_t *frame, const char *filename) {
+    double sTime = CycleTimer::currentSeconds();
+    double dTime, nTime, cTime;
+
     FILE *pFBox = fopen(filename, "w");
     if (pFBox == NULL) {
         LOG_ERR("saveBBoxes: Unable to open file for writing bounding boxes\n");
         return 1;
     }
+    dTime = CycleTimer::currentSeconds() - sTime;
+    
+    printf("at saveBBoxes, opened bbox file for writing in = %f\n", dTime);
     char line[1000]; //each line will be a maximum of 1000 bytes long
     const char *fLine = line;
     box_t *arBoxes = frame->arBoxes;
@@ -1241,16 +1247,27 @@ int saveBBoxes(frame_t *frame, const char *filename) {
         }
     }
 
+    nTime = CycleTimer::currentSeconds() - sTime - dTime;
+    printf("at saveBBoxes, wrote all boxes in = %f\n", nTime);
+
     fclose(pFBox);
+    cTime = CycleTimer::currentSeconds() - sTime - dTime - nTime;
+    printf("at saveBBoxes, closed file in = %f\n", cTime);
     return 0;
 }
 
-box_t *loadBBoxes(const char *filename) {
+box_t *loadBBoxes(const char *filename, int *numBoxes) {
+    double sTime = CycleTimer::currentSeconds();
+    double dTime, nTime, cTime;
+
     FILE *pFBox = fopen(filename, "r");
     if (pFBox == NULL) {
         LOG_ERR("loadBBoxes: Unable to open file for reading bounding boxes\n");
         return NULL;
     }
+    dTime = CycleTimer::currentSeconds() - sTime;
+    printf("at loadBBoxes, opened bbox file for reading in = %f\n", dTime);
+
     const char *lineFormat = "%d: %d %d %d %d %d %d %d %d %d %d %d\n";
     int nBoxes=0;
     char tempL[1000];
@@ -1261,6 +1278,7 @@ box_t *loadBBoxes(const char *filename) {
         return NULL;
     }
     LOG_ERR("Found %d boxes, read %s before new line\n", nBoxes, tempL);
+    *numBoxes = nBoxes;
 
     // allocate enough memory to hold all the boxes
     box_t *arBoxes = (box_t *)malloc(sizeof(struct box_s)*nBoxes);
@@ -1279,15 +1297,241 @@ box_t *loadBBoxes(const char *filename) {
             return NULL;
         }
     }
+    nTime = CycleTimer::currentSeconds() - sTime - dTime;
+    printf("at loadBBoxes, read all boxes in = %f\n", nTime);
 
     fclose(pFBox);
+    cTime = CycleTimer::currentSeconds() - sTime - dTime - nTime;
+    printf("at loadBBoxes, closed file in = %f\n", cTime);
+   
     return arBoxes;
 }
 
+
+//TODO: testing
+int addBoxNonValid(box_t *box, box_t *arBoxes, int *arNonValid, int *arSize, int *numBoxes) {
+    int index = -1;
+    
+    // find the first nonValid box 
+    int i;
+    for (i = 0; i < *arSize; i++) {
+        if (arNonValid[i] > 0) {
+            index = i;
+            break;
+        }
+    }
+    
+    // if we couldn't find the first nonValid box, we have to allocate a newBox array
+    if (index == -1) {
+        LOG_ERR("addBoxNonValid: not enough available boxes for storage, adding new boxes\n");
+        // Using unbounded array style and allocating 10 more mem than needed
+        int addPaddingBoxes = 11;
+        box_t *newBoxes = (box_t *)malloc(sizeof(struct box_s)*(*numBoxes+addPaddingBoxes));
+        memcpy(newBoxes, arBoxes, sizeof(struct box_s)*(*numBoxes));
+
+        // set the new box to the next available index in the new array
+        index = *numBoxes+1;
+
+        // free old boxes array and reassociate to new boxes array
+        free(arBoxes);
+        arBoxes = newBoxes;
+        *numBoxes = *numBoxes +addPaddingBoxes;
+    
+        // Update the non-valid tag bits in the new boxes
+        int j;
+        for (j = *numBoxes; j < addPaddingBoxes; j++) {
+            arBoxes[j].isValid = 0;
+        }
+        
+        LOG_ERR("addBoxNonValid: updating the nonValid array for new allocated boxes arr\n");
+        // update non-valid array
+        int newArSize = *numBoxes;
+        int *newAr = (int *) malloc(sizeof(int)*(newArSize));
+        memcpy(newAr, arNonValid, sizeof(int)*(*arSize));
+        for (j = *arSize; j < newArSize; j++) {
+            newAr[j] = j;
+        }
+        *arSize = newArSize;
+        free(arNonValid);
+        arNonValid = newAr;
+    }
+    LOG_ERR("addBoxNonValid: adding new box to tag %d\n", index);
+    // Add the box to the found index
+    box->isValid = 1;
+    box->tag = index;
+    memcpy(&arBoxes[index], box, sizeof(box)*1);
+
+    return 0;
+}
+
+
+//TODO: testing
 // reassociate boxes that are close to each other as the same boxes
 //  once that is done, apply the direction of travel onto the boxes
-int reassociateBoxes(box_t *origBox, box_t *newBox, box_t *resBox, int nBoxes){
+int reassociateBoxes(box_t *origBox, box_t *newBox, int nOrigBoxes, int nNewBoxes, int *numBoxesAfter){
+    // Do error checking
+    if ((origBox == NULL) || (newBox == NULL)) {
+        LOG_ERR("reassociateBoxes: input boxes are empty and non-allocated\n");
+        return 1;
+    }
+
+    if ((nOrigBoxes < 0) || (nNewBoxes < 0)) {
+        LOG_ERR("reassociateBoxes: no boxes found\n");
+        return 1;
+    }
+
+    // --- PRE-DEFINED CONSTANTS
     int L1_maxDist = 50; // maximum L1 distance should be apart from another box (pixels)
+    int max_timeLastSeen = 4; // how many frames it's ok to go without seeing the person
+    int max_areaPerson = 200; // maximum area a person should take up
+    int min_areaPerson = 50;  // minimum area a person should take up
+
+    int arrNonValidSize = nNewBoxes;
+    int *arrNonValid = (int *)malloc(sizeof(int)*arrNonValidSize); 
+        //keep track of all non valid indicies of newBox
+    // Update the non-valid array
+    LOG_ERR("reassociateBoxes: creating a non-valid array \n");
+    int ind;
+    for (ind = 0; ind < arrNonValidSize; ind++) {
+        if (newBox[ind].isValid == 0) {
+            // if original box is not valid
+            arrNonValid[ind] = ind;
+        } else {
+            arrNonValid[ind] = 0;
+        }
+    }
+
+    int boxFound = 0;  // flag if we've found a box which is closeby
     
+    int i;
+    for (i=0; i<nOrigBoxes; i++) {
+        box_t box = origBox[i];
+        int minJ = 0;
+        int minDiff = L1_maxDist;
+        int distDiff = minDiff;
+        if (box.isValid == 0) {
+            // original box is not valid
+            continue;
+        }
+        if (box.timeLastSeen > max_timeLastSeen) {
+            // original box is stale on the screen
+            LOG_ERR("reassociateBoxes: original box exceed max time of %d between frames\n", max_timeLastSeen);
+            continue;
+        }
+
+        if (box.width*box.height > max_areaPerson) {
+            //the original box is too large to be the size of the person
+            //  so we'll just ignore the box
+            // DO WE NEED TO FIX THIS?
+            LOG_ERR("reassociateBoxes: original box larger than size of person\n");
+            continue;
+        }
+
+        LOG_ERR("reassociateBoxes: looking at box %d\n", i);
+         // associate each of the original boxes with a new box 
+         //     and label them with a tag
+         // If the original box isn't close to any of the new boxes, 
+         //     increment the timeLastSeen and add the box to the newBox pointer
+        int j;
+        for (j=0; j<nNewBoxes; j++) {
+            box_t nBox = newBox[j];
+            
+            distDiff = (nBox.centroid_x-box.centroid_x)
+                            +(nBox.centroid_y-box.centroid_y);
+            if (distDiff < minDiff) {
+                // find the closest new box nearby the original box
+                minJ = j;
+                minDiff = distDiff;
+                boxFound = 1;
+            } 
+        }
+
+        // Nearby box was found for merging
+        if (boxFound == 1) {
+            box_t nBox = newBox[minJ];
+            // TODO: check if box was heading in a direction that would
+            //          lead the box off screen, if it is and associated box
+            //          is a smaller size, then we should update bounding box to
+            //          take new bounding box values.  If the associated box is a
+            //          larger or equal size, we should leave the two boxes separate.
+            
+            LOG_ERR("reassociateBoxes: original box %d and new box %d to be merged\n",
+                        i,minJ);
+                // ---- Update new bounding box values ----
+            // Calculate bounding box new bounding box coordinates
+            int endy, endy1, endy2;
+            int endx, endx1, endx2;
+            endx1 = box.startx + box.width;
+            endx2 = nBox.startx + nBox.width;
+            endy1 = box.starty + box.height;
+            endy2 = nBox.starty + nBox.height;
+
+            endx = MAX(endx1, endx2);
+            endy = MAX(endy1, endy2);
+
+            int startx, starty;
+            startx = MIN(box.startx, nBox.startx);
+            starty = MIN(box.starty, nBox.starty);
+
+            // Calculate new bounding box width and height    
+            int width, height;
+            width = endx - startx;
+            height = endy - starty;
+
+            // expand the new box       
+                // Check if box size would make box larger than size of person
+                //          If so, add the box instead of merging new box
+            if ((width*height) > max_areaPerson) {
+                LOG_ERR("reassociateBoxes: newBox is too large adding seperate boxes\n");
+                box.timeLastSeen++;
+                nBox.timeLastSeen++;
+                addBoxNonValid(&box, newBox, arrNonValid, &arrNonValidSize, &nNewBoxes);
+            } else if ((width*height) < min_areaPerson) {
+                //box is too small to be a person, so we don't add the box 
+                //  and remove both boxes by making the boxes invalid in new arr
+                LOG_ERR("reassociateBoxes: newBox is too small to be a person, removing box\n");
+                nBox.isValid = 0;
+                arrNonValid[minJ] = minJ;
+            } else {
+                //box is within allowed size constraints
+                LOG_ERR("reassociateBoxes: found movement of newBox %d, updating\n", minJ);
+
+                // Update new position and size
+                nBox.startx = startx;
+                nBox.starty = starty;
+                nBox.width = width;
+                nBox.height = height;
+
+                // Update new centroid and nPixels
+                int nPixels=nBox.numPixels;
+                int oPixels=box.numPixels;
+                nBox.centroid_x = ((nBox.centroid_x*nPixels)
+                                    + (box.centroid_x*oPixels))/(nPixels+oPixels);
+                nBox.centroid_y = ((nBox.centroid_y*nPixels)
+                                    + (box.centroid_y*oPixels))/(nPixels+oPixels);
+                nBox.numPixels = nPixels+oPixels;
+
+                // Update time last seen of box 
+                nBox.timeLastSeen = 0;
+
+                // TODO: Update direction of travel of box
+                
+            }
+            // we've done our computation with the boxes
+            boxFound = 0;
+         } else {
+                //TODO: check if the box was heading in a direction that would lead box 
+                //          off screen.  If so, then we shouldn't add a bounding box
+
+                // no box nearby was found, add box to the newBox pointer
+                //  and increment lastSeen variable
+                LOG_ERR("reassociateBoxes: no box nearby to associate box with, adding box seperately\n");
+                box.timeLastSeen++;
+                addBoxNonValid(&box, newBox, arrNonValid, &arrNonValidSize, &nNewBoxes);
+         }        
+        
+    } 
+    *numBoxesAfter = nNewBoxes; 
+    free(arrNonValid);     
     return 0;
 }

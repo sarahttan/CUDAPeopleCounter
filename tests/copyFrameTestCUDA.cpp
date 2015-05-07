@@ -2,11 +2,11 @@
 #include <stdio.h>
 #include <string.h>
 #include "../CycleTimer.h"
-#include "../peopleCounterOMP.h"
+#include "../peopleCounter2.h"
 
 int main(int argc, char *argv[]){
     if (argc != 1) {
-        printf("USAGE: ./copyFrameTest\n");
+        printf("USAGE: ./copyFrameTestCUDA\n");
         printf("            only works if blobDetection works\n");
         return 1;
     }
@@ -18,7 +18,7 @@ int main(int argc, char *argv[]){
         return 1;
     }
   
-    if (blobDetectionOMP(frame) == 1) {
+    if (blobDetection(frame) == 1) {
         printf("Unable to detect blobs\n");
         return 1;
     }
@@ -78,11 +78,11 @@ int main(int argc, char *argv[]){
                 printf("box %d centroid_y not initialized correctly\n", i);
                 ///return 1;
             }
-            if (box->numPixels != rbox->numPixels) {
+            if (box->center_x != rbox->center_x) {
                 printf("box %d center_x not initialized correctly\n", i);
                 //return 1;
             }
-            if (box->timeLastSeen != rbox->timeLastSeen) {
+            if (box->center_y != rbox->center_y) {
                 printf("box %d center_y not initialized correctly\n", i);
                 //return 1;
             }
