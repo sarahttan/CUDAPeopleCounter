@@ -596,9 +596,84 @@ int maxBlob(int width, int height, int cx, int cy){
     return 0;
 }
 
-__global__ void hello(char *a, int *b)
+__global__ void blob_kernel(int width, int height, int map2maxIdx, 
+            const int * __restrict__ map2, const pixel_t * __restrict__  d_image, 
+            box_t * __restrict__ d_box, int * __restrict__ d_result)
 {
-    a[threadIdx.x] += b[threadIdx.x];
+    int left, right, up, down, count, x, y;
+    int id;
+    id = blockIdx.x * blockDim.x + threadIdx.x;
+
+    if (id < map2maxIdx) { 
+    
+        left = width;
+        right = 0;
+        up = height;
+        down = 0;
+            
+        count = 0;
+        x = 0;
+        y = 0;
+        unsigned int label;
+
+        label = map2[id];
+        //TODO:
+        // do some tests to see if MIN/MAX vs if is actually better or not
+        //
+        int i,j;
+        for (i = 0; i < height; i++){
+            for (j = 0; j < width; j++){
+                const pixel_t *p;
+                
+                p = &d_image[i*width+j];
+
+                if (p->label == label) {
+                    // The pixel has label we're looking for, so we include it
+                    //  Find the left, right, up, and down most values for the label
+                    left = MIN(left, j);
+                    right = MAX(right,j);
+                    up = MIN(up, i);
+                    down = MAX(down, i);
+                    x +=j;
+                    y +=i;
+                    count++;
+                }
+            }
+        }
+
+        d_box[id].isValid = 0;
+        
+        if (count > 30) {
+            int cx, cy, w, h;
+        
+            // update the corresponding values for the blob
+            cx = x/count;
+            cy = y/count;
+            w = abs(right - left);
+            h = abs(down - up);
+
+        // very simple noise remover, just count blobs with more
+        // than 30 pixels and width and height > 5
+            if ((w > 5) && (h > 5)) {
+                // Add a valid box
+                box_t *pB;
+                pB = &d_box[id];
+                // set it to valid
+                pB->isValid = 1;  
+                // save the coordinates          
+                pB->startx = left;
+                pB->starty = up;
+                pB->centroid_x = cx;
+                pB->centroid_y = cy;
+                pB->width = w;
+                pB->height = h;
+                pB->dir = 0;
+                pB->tag = id;
+            }
+        }
+        
+        d_result[id] = count;
+    }
 }
 
 
@@ -610,6 +685,7 @@ int blobDetection(frame_t *frame){
     //detect blobs in the current frame and fill out the box struct
     //      --- look into segmentation of images (blur the image first then segment)
     // don't add a blob smaller than a certain size.
+
 
     // Sanity checks
     if (frame == NULL) {
@@ -634,14 +710,18 @@ int blobDetection(frame_t *frame){
 
 
     unsigned long largestLabel;
+    double sTime;
+    double dTime;
+    double d2Time;
     
     printf("at blobDetection, about to segment Image\n");
-    double sTime = CycleTimer::currentSeconds(); 
+    sTime = CycleTimer::currentSeconds(); 
+    
     if (segmentImage(frame, frame, &largestLabel) != 0) {
         printf("blobDetection: segmentImage failed\n");
         return 1;
     }
-    double dTime = CycleTimer::currentSeconds() - sTime;
+    dTime = CycleTimer::currentSeconds() - sTime;
     printf("at blobDetection, segmentImage finished, time = %f\n", dTime);
 
 //    box_t *box = frame->boxes;
@@ -692,6 +772,7 @@ int blobDetection(frame_t *frame){
             map[label] = 1;
         }
     }
+
     
     dTime = CycleTimer::currentSeconds() - sTime;
     
@@ -707,7 +788,7 @@ int blobDetection(frame_t *frame){
         }
     }
     
-    double d2Time = CycleTimer::currentSeconds() - sTime - dTime;    
+    d2Time = CycleTimer::currentSeconds() - sTime - dTime;    
 
     // Allocate memory for arBoxes (array of boxes)
     frame->arBoxes = (box_t *) calloc(sizeof(box_t), map2maxIdx);
@@ -717,8 +798,10 @@ int blobDetection(frame_t *frame){
         free(map2);
         return 1;
     }
+
     // set the number of boxes
     frame->numBoxes = map2maxIdx;
+
     
     // set all the valid flags to 0
     // TODO: change this to memset?
@@ -737,6 +820,7 @@ int blobDetection(frame_t *frame){
     printf("at blobDetection, map2 finished, map2maxIdx = %d, time = %f\n",
                 map2maxIdx, d2Time);    
     printf("at blobDetection, arBoxes malloc finished, time = %f\n",d3Time);    
+
     
 //    int left, right, up, down; 
 //    int x=0,y=0,count=0;
@@ -788,6 +872,26 @@ int blobDetection(frame_t *frame){
         // TODO: free all allocated memory
         return 1;
     }
+    
+    int *d_map2;
+    
+    cudaStatus = cudaMalloc( (void **) &d_map2, sizeof(int) * map2maxIdx );
+    if (cudaStatus != cudaSuccess) {
+        printf("Error: Could not malloc d_map2 on the device!\n"); 
+        // TODO: free all allocated memory
+        return 1;
+    }
+
+    // Copy the image data over 
+    cudaStatus = cudaMemcpy( d_map2, map2, 
+                    sizeof(int) * map2maxIdx, cudaMemcpyHostToDevice );
+    if (cudaStatus != cudaSuccess) {
+        printf("Error: Could not cudaMemcpy map2 to d_map2 on the device!\n"); 
+        // TODO: free all allocated memory
+        return 1;
+    }
+    
+    
 
 
 
@@ -801,6 +905,7 @@ int blobDetection(frame_t *frame){
     }
     
     
+    
     // allocate host memory for a copy of the resulting boxes
     box_t *cudaBoxes;
     cudaBoxes = (box_t *) calloc(sizeof(box_t), map2maxIdx);
@@ -812,14 +917,86 @@ int blobDetection(frame_t *frame){
 
     dTime = CycleTimer::currentSeconds() - sTime;
     printf("CUDA malloc and memcpy done, time = %f\n",dTime);
-        
-    // now actually call the CUDA code
+
+    // cuda allocation for testing
+    int *d_count;
+    cudaStatus = cudaMalloc( (void **) &d_count, sizeof(int) * map2maxIdx );
+    if (cudaStatus != cudaSuccess) {
+        printf("Error: Could not malloc d_count on the device!\n"); 
+        // TODO: free all allocated memory
+        return 1;
+    }
     
+    // local (host) allocation
+    int *h_count;
+    h_count = (int *) calloc( sizeof(int), map2maxIdx );
+    if (h_count == NULL) {
+        printf("Error: calloc on h_count failed!\n");
+        // TODO: free all allocated memory
+        return 1;
+    }
+
+//    cudaStatus = cudaMallocHost( (void **) &h_count, sizeof(int) * map2maxIdx );
+//    if (cudaStatus != cudaSuccess) {
+//        printf("Error: Could not malloc h_count on the host!\n"); 
+//        // TODO: free all allocated memory
+//        return 1;
+//    }
+
+    
+
+    sTime = CycleTimer::currentSeconds();
+    
+    // Calculate the cuda block parameters
+    int cudaBlocks;
+    int cudaBlockSize;
+    
+    cudaBlockSize = 1024;
+    cudaBlocks = MAX(1, (map2maxIdx + cudaBlockSize - 1) / cudaBlockSize );
+    
+    // now actually call the CUDA code
+    blob_kernel<<<cudaBlocks, cudaBlockSize>>>(frame->image->width, frame->image->height, 
+                                    map2maxIdx, d_map2, d_imageData, d_boxes, d_count);
+    if (cudaPeekAtLastError() != cudaSuccess) {
+        printf("Error: cuda blob_kernel failed!\n");
+        // TODO: free all allocated memory
+        return 1;
+    }
+    cudaDeviceSynchronize();
+    
+    
+    dTime = CycleTimer::currentSeconds() - sTime;
+    
+    // copy the results back
+    cudaStatus = cudaMemcpy(h_count, d_count, sizeof(int) * map2maxIdx, 
+        cudaMemcpyDeviceToHost);
+    if (cudaStatus != cudaSuccess) {
+        printf("Error: cudaMemcpy failed on d_count back to host!\n"); 
+    }
+
+    // copy the results back
+    cudaStatus = cudaMemcpy(cudaBoxes, d_boxes, sizeof(box_t) * map2maxIdx, 
+        cudaMemcpyDeviceToHost);
+    if (cudaStatus != cudaSuccess) {
+        printf("Error: cudaMemcpy failed on d_boxes back to host!\n"); 
+    }
+
+    memcpy((void *) frame->arBoxes, (void *) cudaBoxes, sizeof(box_t) * map2maxIdx);
+    
+    d2Time = CycleTimer::currentSeconds() - sTime - dTime;
+
+    printf("CUDA done, kernel time = %f seconds, cudaMemcpy time = %f seconds\n",
+            dTime, d2Time);
+
+
+    cudaFree(d_count);
     
     // Free the cuda memory
     cudaFree( d_imageData );
     cudaFree( d_boxes );
+    cudaFree( d_map2 );
 
+/*
     pixel_t p;
     int w, h, cx, cy;
     //detect blobs based on size - mean of pixels connected together
@@ -833,7 +1010,7 @@ int blobDetection(frame_t *frame){
         //      THIS IS COMPUTATIONALLY EXPENSIVE
         // TODO: change this operation to look around the area instead of
         //          the entire image.
-
+ 
         left[idx] = frame->image->width;
         right[idx] = 0;
         up[idx] = frame->image->height;
@@ -912,6 +1089,36 @@ int blobDetection(frame_t *frame){
             
         }
     }
+    
+    int cudaFailed = 0;
+    for (i=0;i<map2maxIdx;i++) {
+        if (count[i] != h_count[i]) {
+            printf("cuda Count mismatch at i=%d, count=%d, cudaCount=%d\n",
+                i, count[i], h_count[i]);
+            cudaFailed = 1;
+        }
+        if (cudaBoxes[i].isValid != frame->arBoxes[i].isValid) {
+            printf("cuda mismatch on i=%d cudaBoxes.isValid = %d, arBoxes.isValid = %d\n",
+                i, cudaBoxes[i].isValid, frame->arBoxes[i].isValid);
+            cudaFailed = 1;
+        }
+        if (cudaBoxes[i].isValid) {
+            if (cudaBoxes[i].startx != frame->arBoxes[i].startx) {
+                printf("cuda mismatch on i=%d cudaBoxes.startx = %d, arBoxes.startx = %d\n",
+                    i, cudaBoxes[i].startx, frame->arBoxes[i].startx);
+                cudaFailed = 1;
+            }
+            if (cudaBoxes[i].starty != frame->arBoxes[i].starty) {
+                printf("cuda mismatch on i=%d cudaBoxes.starty = %d, arBoxes.starty = %d\n",
+                    i, cudaBoxes[i].starty, frame->arBoxes[i].starty);
+                cudaFailed = 1;
+            }
+        }
+    }
+    if (cudaFailed == 0) {
+        printf("CUDA counts match!!\n");
+    }
+*/    
     
     // clean up memory
     free(map);
