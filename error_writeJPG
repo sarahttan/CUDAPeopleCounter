@@ -1,8 +1,0 @@
-[sttan@unix1 ~/15418_Final]$ ./writeImageTest testFrame01.jpg
-Reading frame
-readImageFrame: Image height = 480, width = 704
-Checking all values in frame are initialized
-Writing frame
-Improper call to JPEG library in state 0
-Segmentation fault (core dumped)
-
