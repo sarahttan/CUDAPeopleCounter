@@ -1,0 +1,469 @@
+Found 164 boxes, read [startx,starty,centroid_x,centroid_y,numPixels,height,width,dir,tag,isValid,timeLastSeen] before new line
+Found 164 boxes, read [startx,starty,centroid_x,centroid_y,numPixels,height,width,dir,tag,isValid,timeLastSeen] before new line
+---- Testing the reassociation function ----
+Test 1: Testing reassociation on the same input and output boxes
+reassociateBoxes: creating a non-valid array 
+reassociateBoxes: original box larger than size of person
+reassociateBoxes: original box larger than size of person
+reassociateBoxes: original box larger than size of person
+reassociateBoxes: looking at box 41
+reassociateBoxes: original box 41 and new box 0 to be merged
+reassociateBoxes: newBox is too large adding seperate boxes
+addBoxNonValid: adding new box to tag 1
+reassociateBoxes: original box larger than size of person
+reassociateBoxes: original box larger than size of person
+reassociateBoxes: original box larger than size of person
+reassociateBoxes: original box larger than size of person
+reassociateBoxes: looking at box 75
+reassociateBoxes: original box 75 and new box 0 to be merged
+reassociateBoxes: newBox is too large adding seperate boxes
+addBoxNonValid: adding new box to tag 1
+reassociateBoxes: original box larger than size of person
+reassociateBoxes: looking at box 83
+reassociateBoxes: original box 83 and new box 0 to be merged
+reassociateBoxes: newBox is too large adding seperate boxes
+addBoxNonValid: adding new box to tag 1
+reassociateBoxes: original box larger than size of person
+reassociateBoxes: looking at box 94
+reassociateBoxes: original box 94 and new box 0 to be merged
+reassociateBoxes: newBox is too large adding seperate boxes
+addBoxNonValid: adding new box to tag 1
+reassociateBoxes: original box larger than size of person
+reassociateBoxes: looking at box 99
+reassociateBoxes: original box 99 and new box 0 to be merged
+reassociateBoxes: newBox is too large adding seperate boxes
+addBoxNonValid: adding new box to tag 1
+reassociateBoxes: original box larger than size of person
+reassociateBoxes: original box larger than size of person
+reassociateBoxes: looking at box 111
+reassociateBoxes: original box 111 and new box 0 to be merged
+reassociateBoxes: newBox is too large adding seperate boxes
+addBoxNonValid: adding new box to tag 1
+reassociateBoxes: original box larger than size of person
+reassociateBoxes: looking at box 137
+reassociateBoxes: original box 137 and new box 0 to be merged
+reassociateBoxes: newBox is too large adding seperate boxes
+addBoxNonValid: adding new box to tag 1
+reassociateBoxes: original box larger than size of person
+reassociateBoxes: looking at box 141
+reassociateBoxes: original box 141 and new box 0 to be merged
+reassociateBoxes: newBox is too large adding seperate boxes
+addBoxNonValid: adding new box to tag 1
+reassociateBoxes: looking at box 162
+reassociateBoxes: original box 162 and new box 0 to be merged
+reassociateBoxes: newBox is too large adding seperate boxes
+addBoxNonValid: adding new box to tag 1
+box 0 startx not initialized correctly
+box 0 starty not initialized correctly
+box 0 centroid_x not initialized correctly (original, copied) -> (100806360, 0)
+box 0 centroid_y not initialized correctly
+box 0 center_y not initialized correctly
+box 0 width not initialized correctly
+box 0 tag not initialized correctly
+box 0 isValid not initialized correctly
+box 1 startx not initialized correctly
+box 1 starty not initialized correctly
+box 1 dir not initialized correctly
+box 1 tag not initialized correctly
+box 1 isValid not initialized correctly
+box 2 center_x not initialized correctly
+box 2 center_y not initialized correctly
+box 2 width not initialized correctly
+box 2 dir not initialized correctly
+box 3 dir not initialized correctly
+box 4 centroid_x not initialized correctly (original, copied) -> (100795648, 0)
+box 4 centroid_y not initialized correctly
+box 12 startx not initialized correctly
+box 12 centroid_x not initialized correctly (original, copied) -> (7232, 0)
+box 13 center_x not initialized correctly
+box 13 height not initialized correctly
+box 26 startx not initialized correctly
+box 26 starty not initialized correctly
+box 26 centroid_x not initialized correctly (original, copied) -> (0, 279)
+box 26 centroid_y not initialized correctly
+box 26 center_x not initialized correctly
+box 26 height not initialized correctly
+box 26 width not initialized correctly
+box 26 tag not initialized correctly
+box 26 isValid not initialized correctly
+box 36 startx not initialized correctly
+box 36 starty not initialized correctly
+box 36 centroid_x not initialized correctly (original, copied) -> (0, 182)
+box 36 centroid_y not initialized correctly
+box 36 center_x not initialized correctly
+box 36 height not initialized correctly
+box 36 width not initialized correctly
+box 36 tag not initialized correctly
+box 36 isValid not initialized correctly
+box 37 startx not initialized correctly
+box 37 starty not initialized correctly
+box 37 centroid_x not initialized correctly (original, copied) -> (0, 210)
+box 37 centroid_y not initialized correctly
+box 37 center_x not initialized correctly
+box 37 height not initialized correctly
+box 37 width not initialized correctly
+box 37 tag not initialized correctly
+box 37 isValid not initialized correctly
+box 38 center_x not initialized correctly
+box 38 center_y not initialized correctly
+box 38 height not initialized correctly
+box 38 width not initialized correctly
+box 38 dir not initialized correctly
+box 38 tag not initialized correctly
+box 38 isValid not initialized correctly
+box 39 starty not initialized correctly
+box 39 centroid_x not initialized correctly (original, copied) -> (1, 0)
+box 41 startx not initialized correctly
+box 41 starty not initialized correctly
+box 41 centroid_x not initialized correctly (original, copied) -> (0, 206)
+box 41 centroid_y not initialized correctly
+box 41 center_x not initialized correctly
+box 41 height not initialized correctly
+box 41 width not initialized correctly
+box 41 tag not initialized correctly
+box 41 isValid not initialized correctly
+box 48 center_x not initialized correctly
+box 48 center_y not initialized correctly
+box 48 height not initialized correctly
+box 48 width not initialized correctly
+box 48 dir not initialized correctly
+box 48 tag not initialized correctly
+box 48 isValid not initialized correctly
+box 49 startx not initialized correctly
+box 49 starty not initialized correctly
+box 49 centroid_x not initialized correctly (original, copied) -> (1, 390)
+box 49 centroid_y not initialized correctly
+box 49 center_x not initialized correctly
+box 49 center_y not initialized correctly
+box 49 height not initialized correctly
+box 49 width not initialized correctly
+box 49 dir not initialized correctly
+box 49 tag not initialized correctly
+box 49 isValid not initialized correctly
+box 50 starty not initialized correctly
+box 50 centroid_x not initialized correctly (original, copied) -> (1, 0)
+box 53 center_x not initialized correctly
+box 53 center_y not initialized correctly
+box 53 height not initialized correctly
+box 53 width not initialized correctly
+box 53 dir not initialized correctly
+box 53 tag not initialized correctly
+box 53 isValid not initialized correctly
+box 54 starty not initialized correctly
+box 54 centroid_x not initialized correctly (original, copied) -> (1, 0)
+box 58 startx not initialized correctly
+box 58 starty not initialized correctly
+box 58 centroid_x not initialized correctly (original, copied) -> (0, 120)
+box 58 centroid_y not initialized correctly
+box 58 center_x not initialized correctly
+box 58 height not initialized correctly
+box 58 width not initialized correctly
+box 58 tag not initialized correctly
+box 58 isValid not initialized correctly
+box 61 center_x not initialized correctly
+box 61 center_y not initialized correctly
+box 61 height not initialized correctly
+box 61 width not initialized correctly
+box 61 dir not initialized correctly
+box 61 tag not initialized correctly
+box 61 isValid not initialized correctly
+box 62 starty not initialized correctly
+box 62 centroid_x not initialized correctly (original, copied) -> (1, 0)
+box 66 startx not initialized correctly
+box 66 starty not initialized correctly
+box 66 centroid_x not initialized correctly (original, copied) -> (0, 269)
+box 66 centroid_y not initialized correctly
+box 66 center_x not initialized correctly
+box 66 height not initialized correctly
+box 66 width not initialized correctly
+box 66 tag not initialized correctly
+box 66 isValid not initialized correctly
+box 70 center_x not initialized correctly
+box 70 center_y not initialized correctly
+box 70 height not initialized correctly
+box 70 width not initialized correctly
+box 70 dir not initialized correctly
+box 70 tag not initialized correctly
+box 70 isValid not initialized correctly
+box 71 starty not initialized correctly
+box 71 centroid_x not initialized correctly (original, copied) -> (1, 0)
+box 74 startx not initialized correctly
+box 74 starty not initialized correctly
+box 74 centroid_x not initialized correctly (original, copied) -> (0, 237)
+box 74 centroid_y not initialized correctly
+box 74 center_x not initialized correctly
+box 74 height not initialized correctly
+box 74 width not initialized correctly
+box 74 tag not initialized correctly
+box 74 isValid not initialized correctly
+box 75 startx not initialized correctly
+box 75 starty not initialized correctly
+box 75 centroid_x not initialized correctly (original, copied) -> (0, 161)
+box 75 centroid_y not initialized correctly
+box 75 center_x not initialized correctly
+box 75 height not initialized correctly
+box 75 width not initialized correctly
+box 75 tag not initialized correctly
+box 75 isValid not initialized correctly
+box 78 center_x not initialized correctly
+box 78 center_y not initialized correctly
+box 78 height not initialized correctly
+box 78 width not initialized correctly
+box 78 dir not initialized correctly
+box 78 tag not initialized correctly
+box 78 isValid not initialized correctly
+box 79 starty not initialized correctly
+box 79 centroid_x not initialized correctly (original, copied) -> (1, 0)
+box 80 startx not initialized correctly
+box 80 starty not initialized correctly
+box 80 centroid_x not initialized correctly (original, copied) -> (0, 369)
+box 80 centroid_y not initialized correctly
+box 80 center_x not initialized correctly
+box 80 height not initialized correctly
+box 80 width not initialized correctly
+box 80 tag not initialized correctly
+box 80 isValid not initialized correctly
+box 83 startx not initialized correctly
+box 83 starty not initialized correctly
+box 83 centroid_x not initialized correctly (original, copied) -> (0, 644)
+box 83 centroid_y not initialized correctly
+box 83 center_x not initialized correctly
+box 83 height not initialized correctly
+box 83 width not initialized correctly
+box 83 tag not initialized correctly
+box 83 isValid not initialized correctly
+box 86 center_x not initialized correctly
+box 86 center_y not initialized correctly
+box 86 height not initialized correctly
+box 86 width not initialized correctly
+box 86 dir not initialized correctly
+box 86 tag not initialized correctly
+box 86 isValid not initialized correctly
+box 87 starty not initialized correctly
+box 87 centroid_x not initialized correctly (original, copied) -> (1, 0)
+box 87 center_x not initialized correctly
+box 87 center_y not initialized correctly
+box 87 height not initialized correctly
+box 87 width not initialized correctly
+box 87 dir not initialized correctly
+box 87 tag not initialized correctly
+box 87 isValid not initialized correctly
+box 88 startx not initialized correctly
+box 88 starty not initialized correctly
+box 88 centroid_x not initialized correctly (original, copied) -> (1, 164)
+box 88 centroid_y not initialized correctly
+box 88 center_x not initialized correctly
+box 88 height not initialized correctly
+box 88 width not initialized correctly
+box 88 tag not initialized correctly
+box 88 isValid not initialized correctly
+box 92 center_x not initialized correctly
+box 92 center_y not initialized correctly
+box 92 height not initialized correctly
+box 92 width not initialized correctly
+box 92 dir not initialized correctly
+box 92 tag not initialized correctly
+box 92 isValid not initialized correctly
+box 93 starty not initialized correctly
+box 93 centroid_x not initialized correctly (original, copied) -> (1, 0)
+box 94 startx not initialized correctly
+box 94 starty not initialized correctly
+box 94 centroid_x not initialized correctly (original, copied) -> (0, 161)
+box 94 centroid_y not initialized correctly
+box 94 center_x not initialized correctly
+box 94 height not initialized correctly
+box 94 width not initialized correctly
+box 94 tag not initialized correctly
+box 94 isValid not initialized correctly
+box 95 center_x not initialized correctly
+box 95 center_y not initialized correctly
+box 95 height not initialized correctly
+box 95 width not initialized correctly
+box 95 dir not initialized correctly
+box 95 tag not initialized correctly
+box 95 isValid not initialized correctly
+box 96 starty not initialized correctly
+box 96 centroid_x not initialized correctly (original, copied) -> (1, 0)
+box 98 startx not initialized correctly
+box 98 starty not initialized correctly
+box 98 centroid_x not initialized correctly (original, copied) -> (0, 126)
+box 98 centroid_y not initialized correctly
+box 98 center_x not initialized correctly
+box 98 height not initialized correctly
+box 98 width not initialized correctly
+box 98 tag not initialized correctly
+box 98 isValid not initialized correctly
+box 99 startx not initialized correctly
+box 99 starty not initialized correctly
+box 99 centroid_x not initialized correctly (original, copied) -> (0, 139)
+box 99 centroid_y not initialized correctly
+box 99 center_x not initialized correctly
+box 99 height not initialized correctly
+box 99 width not initialized correctly
+box 99 tag not initialized correctly
+box 99 isValid not initialized correctly
+box 100 center_x not initialized correctly
+box 100 center_y not initialized correctly
+box 100 height not initialized correctly
+box 100 width not initialized correctly
+box 100 dir not initialized correctly
+box 100 tag not initialized correctly
+box 100 isValid not initialized correctly
+box 101 starty not initialized correctly
+box 101 centroid_x not initialized correctly (original, copied) -> (1, 0)
+box 104 startx not initialized correctly
+box 104 starty not initialized correctly
+box 104 centroid_x not initialized correctly (original, copied) -> (0, 242)
+box 104 centroid_y not initialized correctly
+box 104 center_x not initialized correctly
+box 104 height not initialized correctly
+box 104 width not initialized correctly
+box 104 tag not initialized correctly
+box 104 isValid not initialized correctly
+box 106 center_x not initialized correctly
+box 106 center_y not initialized correctly
+box 106 height not initialized correctly
+box 106 width not initialized correctly
+box 106 dir not initialized correctly
+box 106 tag not initialized correctly
+box 106 isValid not initialized correctly
+box 107 starty not initialized correctly
+box 107 centroid_x not initialized correctly (original, copied) -> (1, 0)
+box 109 startx not initialized correctly
+box 109 starty not initialized correctly
+box 109 centroid_x not initialized correctly (original, copied) -> (0, 163)
+box 109 centroid_y not initialized correctly
+box 109 center_x not initialized correctly
+box 109 height not initialized correctly
+box 109 width not initialized correctly
+box 109 tag not initialized correctly
+box 109 isValid not initialized correctly
+box 110 center_x not initialized correctly
+box 110 center_y not initialized correctly
+box 110 height not initialized correctly
+box 110 width not initialized correctly
+box 110 dir not initialized correctly
+box 110 tag not initialized correctly
+box 110 isValid not initialized correctly
+box 111 startx not initialized correctly
+box 111 starty not initialized correctly
+box 111 centroid_x not initialized correctly (original, copied) -> (1, 126)
+box 111 centroid_y not initialized correctly
+box 111 center_x not initialized correctly
+box 111 center_y not initialized correctly
+box 111 height not initialized correctly
+box 111 width not initialized correctly
+box 111 dir not initialized correctly
+box 111 tag not initialized correctly
+box 111 isValid not initialized correctly
+box 112 startx not initialized correctly
+box 112 starty not initialized correctly
+box 112 centroid_x not initialized correctly (original, copied) -> (1, 261)
+box 112 centroid_y not initialized correctly
+box 112 center_x not initialized correctly
+box 112 height not initialized correctly
+box 112 width not initialized correctly
+box 112 tag not initialized correctly
+box 112 isValid not initialized correctly
+box 116 center_x not initialized correctly
+box 116 center_y not initialized correctly
+box 116 height not initialized correctly
+box 116 width not initialized correctly
+box 116 dir not initialized correctly
+box 116 tag not initialized correctly
+box 116 isValid not initialized correctly
+box 117 starty not initialized correctly
+box 117 centroid_x not initialized correctly (original, copied) -> (1, 0)
+box 121 center_x not initialized correctly
+box 121 center_y not initialized correctly
+box 121 height not initialized correctly
+box 121 width not initialized correctly
+box 121 dir not initialized correctly
+box 121 tag not initialized correctly
+box 121 isValid not initialized correctly
+box 122 starty not initialized correctly
+box 122 centroid_x not initialized correctly (original, copied) -> (1, 0)
+box 123 center_x not initialized correctly
+box 123 center_y not initialized correctly
+box 123 height not initialized correctly
+box 123 width not initialized correctly
+box 123 dir not initialized correctly
+box 123 tag not initialized correctly
+box 123 isValid not initialized correctly
+box 124 starty not initialized correctly
+box 124 centroid_x not initialized correctly (original, copied) -> (1, 0)
+box 124 center_x not initialized correctly
+box 124 center_y not initialized correctly
+box 124 height not initialized correctly
+box 124 width not initialized correctly
+box 124 dir not initialized correctly
+box 124 tag not initialized correctly
+box 124 isValid not initialized correctly
+box 125 starty not initialized correctly
+box 125 centroid_x not initialized correctly (original, copied) -> (1, 0)
+box 137 startx not initialized correctly
+box 137 starty not initialized correctly
+box 137 centroid_x not initialized correctly (original, copied) -> (0, 638)
+box 137 centroid_y not initialized correctly
+box 137 center_x not initialized correctly
+box 137 height not initialized correctly
+box 137 width not initialized correctly
+box 137 tag not initialized correctly
+box 137 isValid not initialized correctly
+box 140 startx not initialized correctly
+box 140 starty not initialized correctly
+box 140 centroid_x not initialized correctly (original, copied) -> (0, 626)
+box 140 centroid_y not initialized correctly
+box 140 center_x not initialized correctly
+box 140 height not initialized correctly
+box 140 width not initialized correctly
+box 140 tag not initialized correctly
+box 140 isValid not initialized correctly
+box 141 startx not initialized correctly
+box 141 starty not initialized correctly
+box 141 centroid_x not initialized correctly (original, copied) -> (0, 589)
+box 141 centroid_y not initialized correctly
+box 141 center_x not initialized correctly
+box 141 height not initialized correctly
+box 141 width not initialized correctly
+box 141 tag not initialized correctly
+box 141 isValid not initialized correctly
+box 149 center_x not initialized correctly
+box 149 center_y not initialized correctly
+box 149 height not initialized correctly
+box 149 width not initialized correctly
+box 149 dir not initialized correctly
+box 149 tag not initialized correctly
+box 149 isValid not initialized correctly
+box 150 starty not initialized correctly
+box 150 centroid_x not initialized correctly (original, copied) -> (1, 0)
+box 152 center_x not initialized correctly
+box 152 center_y not initialized correctly
+box 152 height not initialized correctly
+box 152 width not initialized correctly
+box 152 dir not initialized correctly
+box 152 tag not initialized correctly
+box 152 isValid not initialized correctly
+box 153 starty not initialized correctly
+box 153 centroid_x not initialized correctly (original, copied) -> (1, 0)
+box 153 center_x not initialized correctly
+box 153 center_y not initialized correctly
+box 153 height not initialized correctly
+box 153 width not initialized correctly
+box 153 dir not initialized correctly
+box 153 tag not initialized correctly
+box 153 isValid not initialized correctly
+box 154 starty not initialized correctly
+box 154 centroid_x not initialized correctly (original, copied) -> (1, 0)
+box 162 startx not initialized correctly
+box 162 starty not initialized correctly
+box 162 centroid_x not initialized correctly (original, copied) -> (0, 590)
+box 162 centroid_y not initialized correctly
+box 162 center_x not initialized correctly
+box 162 height not initialized correctly
+box 162 width not initialized correctly
+box 162 tag not initialized correctly
+box 162 isValid not initialized correctly
+End of test 1
+readImageFrame: Image height = 480, width = 704
+----Freeing frame----

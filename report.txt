@@ -1,0 +1,93 @@
+
+
+Original data before map optimization
+
+result01-04.txt:CopyFrame finished, elapsed time = 0.018931 seconds
+result01-04.txt:FrameSubtraction finished, time = 0.008967 seconds
+result01-04.txt:thresholdImage finished, time = 0.005788 seconds
+result01-04.txt:at blobDetection, segmentImage finished, time = 0.007887
+result01-04.txt:BlobDetection Finished, time = 24.304682 seconds
+result01-04.txt:mergeBoxes Finished, time = 0.000015 seconds
+result04-07.txt:CopyFrame finished, elapsed time = 0.020754 seconds
+result04-07.txt:FrameSubtraction finished, time = 0.008945 seconds
+result04-07.txt:thresholdImage finished, time = 0.005817 seconds
+result04-07.txt:at blobDetection, segmentImage finished, time = 0.007884
+result04-07.txt:BlobDetection Finished, time = 23.106182 seconds
+result04-07.txt:mergeBoxes Finished, time = 0.000012 seconds
+result07-10.txt:CopyFrame finished, elapsed time = 0.020535 seconds
+result07-10.txt:FrameSubtraction finished, time = 0.008964 seconds
+result07-10.txt:thresholdImage finished, time = 0.005802 seconds
+result07-10.txt:at blobDetection, segmentImage finished, time = 0.007762
+result07-10.txt:BlobDetection Finished, time = 19.554835 seconds
+result07-10.txt:mergeBoxes Finished, time = 0.000004 seconds
+result10-13.txt:CopyFrame finished, elapsed time = 0.018970 seconds
+result10-13.txt:FrameSubtraction finished, time = 0.008979 seconds
+result10-13.txt:thresholdImage finished, time = 0.005781 seconds
+result10-13.txt:at blobDetection, segmentImage finished, time = 0.007651
+result10-13.txt:BlobDetection Finished, time = 17.326555 seconds
+result10-13.txt:mergeBoxes Finished, time = 0.000011 seconds
+result13-16.txt:CopyFrame finished, elapsed time = 0.019063 seconds
+result13-16.txt:FrameSubtraction finished, time = 0.008918 seconds
+result13-16.txt:thresholdImage finished, time = 0.005909 seconds
+result13-16.txt:at blobDetection, segmentImage finished, time = 0.007764
+result13-16.txt:BlobDetection Finished, time = 21.198725 seconds
+result13-16.txt:mergeBoxes Finished, time = 0.000006 seconds
+
+
+Summary of blobDetection
+[sttan@ghc43 CUDAPeopleCounter]$ grep time.= result*.txt | grep Blob
+result01-04.txt:BlobDetection Finished, time = 24.304682 seconds
+result04-07.txt:BlobDetection Finished, time = 23.106182 seconds
+result07-10.txt:BlobDetection Finished, time = 19.554835 seconds
+result10-13.txt:BlobDetection Finished, time = 17.326555 seconds
+result13-16.txt:BlobDetection Finished, time = 21.198725 seconds
+
+
+Summary after map optimization
+[sttan@ghc43 CUDAPeopleCounter]$ grep time.= result*.txt | grep Blob
+result01-04.txt:BlobDetection Finished, time = 0.542143 seconds
+result04-07.txt:BlobDetection Finished, time = 0.617771 seconds
+result07-10.txt:BlobDetection Finished, time = 0.545766 seconds
+result10-13.txt:BlobDetection Finished, time = 0.571774 seconds
+result13-16.txt:BlobDetection Finished, time = 0.533439 seconds
+
+
+Raw results after map optimization
+result01-04.txt:CopyFrame finished, elapsed time = 0.020035 seconds
+result01-04.txt:FrameSubtraction finished, time = 0.008999 seconds
+result01-04.txt:thresholdImage finished, time = 0.005832 seconds
+result01-04.txt:at blobDetection, segmentImage finished, time = 0.007913
+result01-04.txt:at blobDetection, map finished, time = 0.001776
+result01-04.txt:BlobDetection Finished, time = 0.542143 seconds
+result01-04.txt:mergeBoxes Finished, time = 0.000015 seconds
+result04-07.txt:CopyFrame finished, elapsed time = 0.020545 seconds
+result04-07.txt:FrameSubtraction finished, time = 0.008969 seconds
+result04-07.txt:thresholdImage finished, time = 0.005829 seconds
+result04-07.txt:at blobDetection, segmentImage finished, time = 0.007856
+result04-07.txt:at blobDetection, map finished, time = 0.001777
+result04-07.txt:BlobDetection Finished, time = 0.617771 seconds
+result04-07.txt:mergeBoxes Finished, time = 0.000013 seconds
+result07-10.txt:CopyFrame finished, elapsed time = 0.019121 seconds
+result07-10.txt:FrameSubtraction finished, time = 0.008941 seconds
+result07-10.txt:thresholdImage finished, time = 0.005859 seconds
+result07-10.txt:at blobDetection, segmentImage finished, time = 0.007753
+result07-10.txt:at blobDetection, map finished, time = 0.001778
+result07-10.txt:BlobDetection Finished, time = 0.545766 seconds
+result07-10.txt:mergeBoxes Finished, time = 0.000007 seconds
+result10-13.txt:CopyFrame finished, elapsed time = 0.019408 seconds
+result10-13.txt:FrameSubtraction finished, time = 0.008982 seconds
+result10-13.txt:thresholdImage finished, time = 0.005833 seconds
+result10-13.txt:at blobDetection, segmentImage finished, time = 0.007649
+result10-13.txt:at blobDetection, map finished, time = 0.001784
+result10-13.txt:BlobDetection Finished, time = 0.571774 seconds
+result10-13.txt:mergeBoxes Finished, time = 0.000012 seconds
+result13-16.txt:CopyFrame finished, elapsed time = 0.019089 seconds
+result13-16.txt:FrameSubtraction finished, time = 0.008924 seconds
+result13-16.txt:thresholdImage finished, time = 0.005845 seconds
+result13-16.txt:at blobDetection, segmentImage finished, time = 0.007754
+result13-16.txt:at blobDetection, map finished, time = 0.001778
+result13-16.txt:BlobDetection Finished, time = 0.533439 seconds
+result13-16.txt:mergeBoxes Finished, time = 0.000006 seconds
+
+
+

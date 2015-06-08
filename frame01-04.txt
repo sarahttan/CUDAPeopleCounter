@@ -1,0 +1,66 @@
+readImageFrame: Image height = 480, width = 704
+readImageFrame: Image height = 480, width = 704
+copyFrame: Creating new frame
+copyFrame: Copying over all image data
+copyFrame: Creating new frame
+copyFrame: Copying over all image data
+copyFrame: Creating new frame
+copyFrame: Copying over all image data
+copyFrame: Creating new frame
+copyFrame: Copying over all image data
+CopyFrame finished, elapsed time = 0.019680 seconds
+FrameSubtraction finished, time = 0.008997 seconds
+thresholdImage finished, time = 0.005795 seconds
+at blobDetection, about to segment Image
+at blobDetection, segmentImage finished
+createNewBox: unable to create box of width/height less than 5
+createNewBox: unable to create box of width/height less than 5
+BlobDetection Finished, time = 24.314396 seconds
+drawing box at (584,312) (w,h)=(12,9)
+drawing box at (579,279) (w,h)=(12,6)
+drawing box at (635,267) (w,h)=(21,12)
+drawing box at (581,256) (w,h)=(18,14)
+drawing box at (616,255) (w,h)=(20,32)
+drawing box at (598,252) (w,h)=(11,8)
+drawing box at (627,249) (w,h)=(22,7)
+drawing box at (609,248) (w,h)=(18,6)
+drawing box at (527,198) (w,h)=(8,6)
+drawing box at (227,183) (w,h)=(26,7)
+drawing box at (250,171) (w,h)=(18,11)
+drawing box at (115,166) (w,h)=(20,9)
+drawing box at (159,163) (w,h)=(8,28)
+drawing box at (228,146) (w,h)=(39,37)
+drawing box at (136,129) (w,h)=(14,15)
+drawing box at (158,127) (w,h)=(6,12)
+drawing box at (108,126) (w,h)=(38,43)
+drawing box at (373,121) (w,h)=(10,6)
+drawing box at (640,113) (w,h)=(8,18)
+drawing box at (229,107) (w,h)=(13,40)
+drawing box at (243,104) (w,h)=(15,48)
+drawing box at (359,103) (w,h)=(22,15)
+drawing box at (106,68) (w,h)=(29,51)
+drawing box at (159,65) (w,h)=(37,98)
+drawing box at (86,57) (w,h)=(6,13)
+drawing box at (379,55) (w,h)=(21,36)
+drawing box at (100,55) (w,h)=(6,11)
+drawing box at (136,52) (w,h)=(12,38)
+drawing box at (192,48) (w,h)=(33,71)
+drawing box at (202,47) (w,h)=(7,21)
+drawing box at (176,47) (w,h)=(13,17)
+drawing box at (372,43) (w,h)=(18,11)
+drawing box at (234,39) (w,h)=(51,123)
+drawing box at (122,8) (w,h)=(8,12)
+Writing frame
+Write to frame complete, please check file = full5.jpg
+mergeBoxes Finished, time = 0.000011 seconds
+drawing box at (584,312) (w,h)=(12,9)
+drawing box at (579,248) (w,h)=(77,39)
+drawing box at (527,198) (w,h)=(8,6)
+drawing box at (86,39) (w,h)=(199,152)
+drawing box at (359,103) (w,h)=(24,24)
+drawing box at (640,113) (w,h)=(8,18)
+drawing box at (372,43) (w,h)=(28,48)
+drawing box at (122,8) (w,h)=(8,12)
+Writing frame
+Write to frame complete, please check file = full6.jpg
+Freeing frames
