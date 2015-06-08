@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Security Camera Counter</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="css/grayscale.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-custom navbar-fixed-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand page-scroll" href="#page-top">
+                    Security Camera Counter
+                </a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse navbar-right navbar-main-collapse">
+                <ul class="nav navbar-nav">
+                    <!-- Hidden li included to remove active class from about link when scrolled up past about section -->
+                    <li class="hidden">
+                        <a href="#page-top"></a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#about">Final Report</a>
+                    </li>
+                    <li>
+                        <a href="/Security-Camera-Counter/full">Proposal</a>
+                    </li>
+                    <li>
+                        <a href="/Security-Camera-Counter/full">Progress Report</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Intro Header -->
+    <header class="intro">
+        <div class="intro-body">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2">
+                        <h1 class="brand-heading">Security Camera Counter</h1>
+                        <p class="intro-text">Our Final Report<br>Created by Sarah and Solon</p>
+                        <a href="#about" class="btn btn-circle page-scroll">
+                            <i class="fa fa-angle-double-down animated"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- About Section -->
+
+    <section id="about" class="container content-section">
+        <div class="row">
+                <center><img src="img/frame01.jpg" style="width:300px;height:150px" class="img-thumbnail">
+                <img src="img/frame04.jpg" style="width:300px;height:150px" class="img-thumbnail">
+                <img src="img/full3.jpg" style="width:300px;height:150px" class="img-thumbnail">
+                <img src="img/full4.jpg" style="width:300px;height:150px" class="img-thumbnail">
+                <img src="img/full5.jpg" style="width:300px;height:150px" class="img-thumbnail">
+                <img src="img/full6.jpg" style="width:300px;height:150px" class="img-thumbnail"></center>
+                <br>
+                <center><p><a href="http://scmao.github.io/Security-Camera-Counter/img/Security-Camera-Counter.pdf">Our presentation slides</a></p></center>
+                <br>
+            <div class="col-lg-8 col-lg-offset-2">
+                <center><h2>Summary</h2></center>
+                <p>
+                    We implemented a program that counts and tracks the number of people that appear in a frame. Using OpenMP on the Intel(R) Core(TM) i5-4590 CPU, we achieved an average speedup of 2.996x. Using CUDA on the GeForce GTX 750 Ti., we achieved an average speedup of 3.803x.
+                </p>
+            </div>
+            <div class="col-lg-8 col-lg-offset-2">
+                <center><h2>Background</h2></center>
+                <h3>The algorithm of counting and tracking the number of people in a frame is as follows: </h3>
+                <p>
+                    <ol>
+                        <li>Load two images from disk and into frames, which are stored in memory.</br>
+                        <center>Image 1 -> Frame 1:<br> <img src="img/frame01.jpg" style="width:500px;height:250px" class="img-thumbnail"><br>
+                        Image 2 -> Frame 2: <br><img src="img/frame04.jpg" style="width:500px;height:250px" class="img-thumbnail"></center></li><br>
+                        <li>Take the pixels in the later frame and subtract the corresponding pixel values in the previous frame. Store this into a results frame.</br>
+                        <center>The result of Frame 2 - Frame 1:<br> <img src="img/full3.jpg" style="width:500px;height:250px" class="img-thumbnail"></center>
+                        </li>
+                        <br>
+                        <li>Threshold each of our pixels. Basically for each pixel in the results frame, we check if the components are greater in value than our threshold value of T. If so, then we deem that the pixel has changed. If not, then we assume that the pixel did not change in value due to a person, but rather an environmental factor.<br>
+                        <center>Thresholding the result:<br><img src="img/full4.jpg" style="width:500px;height:250px" class="img-thumbnail"></center></li><br>
+                        <li>Detect the blobs(humans) in the frame by first segmenting the image.</li><br>
+                        <li>Create a bounding box for each labeled segment.
+                        <center>The Result after creating our bounding boxes:<br> <img src="img/full5.jpg" style="width:500px;height:250px" class="img-thumbnail"></center></li><br>
+                        <li>Merge overlapping bounding boxes and filter out the boxes that are smaller or larger than a particular size. This is done so that we only end up with the boxes that are around human size.<br>
+                        <center>The result after merging the boxes to detect humans:<br><img src="img/full6.jpg" style="width:500px;height:250px" class="img-thumbnail">
+                        </center></li><br>
+                        <li>Store boxes into a buffer of size 16 frames (for the serial implementation). Once the buffer is full, we track the people.<br>
+                        <center>The result after tracking boxes over three frames:<br><img src="img/boxTrack.jpg" style="width:500px;height:250px" class="img-thumbnail">
+                        </center></li><br>
+                        <li>Go back to step 1 for the next frame.</li>
+                    </ol>
+
+                </p>
+                <h3>The key data structures we have in our implementation are:</h3>
+                <p>
+                A stack for holding the nearby pixels for the watershed segmentation step. The stack is structured as follows:
+                <pre>
+                typedef struct stack_s {
+                    pixel_t *P;     // Value of the pixel
+                    int x;          // x position of pixel
+                    int y;          // y position of pixel
+                    struct stack_s *ptr; // pointer to next pixel
+                } stack_t;
+                </pre>
+                </p>
+                <p>
+                A box struct to representing bounding boxes. The box struct is structured as follows:
+                <pre>
+                typedef struct box_s {
+                    int startx;     // left most coordinate of the box
+                    int starty;     // top most coordinate of the box
+                    int centroid_x; // center of mass x-component of bounding box (pixels)
+                    int centroid_y; // center of mass y-component of bounding box (pixels)
+                    int numPixels;  // number of pixels within the box
+                    int height;     // height of bounding box (pixels)
+                    int width;      // width of bounding box (pixels)
+                    int dir;        // direction of box travel (degrees)
+                    int tag;        // tag of the bounding box
+                    int isValid;    // flag to indicate box is valid
+                    int timeLastSeen; //how long the bounding box has been on the
+                                      //    image since it has been seen last
+                } box_t;
+                </pre>
+                </p>
+                <p>
+                A frame struct to represent frames. The frame struct is structured as follows:
+                <pre>
+                typedef struct frame_s {
+                    Image_t *image;     // image this frame represents
+                    box_t *arBoxes;     // array of boxes
+                    int numBoxes;   // number of arBoxes
+                } frame_t;
+                </pre>
+                </p>
+                <h3>The key operations on these data structures are:</h3>
+                <p>
+                We subtract every pixel in the second frame from the corresponding pixel in the first frame. This takes 0.00952 seconds in the serial implementation. Similarly, we need to go through every pixel while thresholding the frame. This takes 0.00540 seconds in the serial implementation.
+                <br><br>
+                We need to insert and delete pixels into our stack for our implementation of the watershed method of segmentation. The watershed method ensures we segmented our frame by starting at a source pixel and flooding the rest of the pixels. The way this works is for every pixel we examine, we check if we already segmented its neighboring pixels. If not, we add them to the stack. If we have already seen a neighboring pixel, we do not add it to the stack. Thus, when the stack is empty, we have checked every pixel is a neighbor of some other pixel in our frame.
+                <br><br>
+                We operate on the array by adding bounding boxes. Furthermore, we operate on the array by checking that each bounding box is of a reasonable size. We filter out the boxes that are too big or too small.
+                </p>
+                <h3>Algorithm Inputs and Outputs:</h3>
+                <p>
+                The algorithm takes in two images of security camera footage within a few milliseconds of each other as an input, and outputs the corresponding data for the difference of the two inputted frames. We visualize the output by overlaying the boxes we calculate over our second inputted image.
+                </p>
+                <h3>Portions to Parallelize:</h3>
+                <p>
+                The portion of the algorithm that is computationally expensive and can benefit from parallelization is the image processing. In particular, segmentation and blob detection can benefit from parallelization.<br>
+                <br>
+                Segmentation of the image:<br>
+                Segmentation of the image is when we give each pixel a label. After segmentation, all of the pixels should be labeled 0 if the value of that pixel did not significantly change between the two frames we compared, or a label number that is greater than 0 if the pixel value did change significantly between the two frames.<br>
+                
+                <p>Below is a quick graphic to demonstrate the watershed method. The white pixels represent 0 labeled pixels, and green pixels represent a label number greater than 0:</p><center><img src="img/segment2.png" style="width:800px;height:800px" class="img-thumbnail"></center>
+                <br>
+                <p>We based our algorithm off of the watershed method.<br>
+                Thus, this portion of our process is computationally expensive as each pixel must first check its neighboring pixels. If they all have the same label, our current pixel takes that label. If some of them have not been labeled yet, then we must add them into our stack. Thus, we believed that the watershed method can benefit from parallelization by leveraging tiling as well as multiple starting points on the frame.
+                </p>
+                <p>
+                Blob detection:<br>
+                Based on the labeling of pixels on the frame, Blob detection will create boxes around clusters  of pixels with the same label. In other words, we are creating a bounding box for each segment of our frame. This is computationally expensive because for every tag/label, we have to search through the whole image to create the bounding box, which consists of the width, height, and center of mass of the blob. We believe that this can benefit for parallelization by tiling our frame and dividing our tag computations.<br>
+                <center><p>An example result after blob detection:<br></p> <img src="img/full5.jpg" style="width:500px;height:250px" class="img-thumbnail"></center></li><br>
+                </p>
+                <h3>Workload Breakdown:</h3>
+                <center><p>Below is a flow diagram showing our workload dependencies:</p></center>
+                <center><img src="img/Dependencies.png" style="width:800px;height:400px" class="img-thumbnail"></center>
+                <br>
+                <p>
+                There is significant parallelism in our program. Anytime there is an image, we can tile it. Furthermore, we can compute our frames independently of each other, as long as we are not computing within the dependencies that we have shown above. Our problem is data-parallel because we can compute multiple frames at one time. The locality of our problem is exploited in the segmentation and detection portions of our algorithm by putting the pixels in our current tile into cache or shared memory.
+                </p>
+            </div>
+            <div class="col-lg-8 col-lg-offset-2">
+                <center><h2>Approach</h2></center>
+                <p>
+                For our implementation, we used the coding language C. We did some preliminary testing on the NVIDIA GTX 780 GPU found on ghc41. For our final calculations we used the Intel(R) Core(TM) i5-4590 CPU and the NVIDIA GeForce GTX 750 Ti as they are recent off the shelf components that our target audience would be able to buy. <br>
+                <br>
+                We first aimed to create a serial implementation. The first thing we needed to do was create a way to import our images from disk and store them as frames in memory. To do this, we created a function that used the jpeglib.h library to read in a JPEG image and convert it to a yCbCr color space. Next, we created a subtract function that took in two frames, and using a double for loop, we went across the frame and subtracted the first frame's pixel values from the second frame's pixel values. To create the threshold function, we used a double for loop to compare the sum of each pixel's subvalues to a threshold value. For segmentation, we implemented our function based off of the watershed method. Thus, we created a stack struct as described in the background to hold the pixels as we "flood" the image as described in the background section of our writeup. To implement the detect portion of our program, we had a linked list of the labels that we created in segmentation. We then iterated through the whole linked list for each label to find the width, height, position, number of pixels, and centroid of each blob. For filter, we created a linked list to hold all of the boxes that we have found so far. For each element in the linked list, we went through our entire linked list to see which boxes the current one intersected with. We then merged the boxes that intersected.<br>
+                <br>
+                We changed our original serial implementation to enable more parallelization by changing our linked lists of bounding boxes to arrays. Originally, we planned on having each CUDA thread have a linked list and merging all of the lists at the end. We then determined that this would be a waste of overhead. However, having a single linked list would also be undesirable because we would need to implement some form of hand over hand locking. Thus, we re-wrote the linked-list of bounding boxes to an array of bounding boxes. At this point, we needed to account for the problem that arrays are of a fixed size. To find the size of the array, we first went through the segmented image and kept an array of whether or not each pixel was labeled. Then, we used prefix scan to find the total number of labels we needed. Furthermore, at this point, we added a tracking function which takes in two frames and determines the direction of each box.
+                <br>
+                <br>
+                <h4>When parallelizing for OpenMP, we mapped our problem to the Intel(R) Core(TM) i5-4590 CPU as follows:</h4>
+                <p>
+                For subtraction and threshold, the work is split amongst each of the cores equally. Thus, each core processes about ¼ of the pixels in the frame.<br><br>
+                For Segmentation, each core starts on one pixel that is in the frame and begins the "flooding" of the image as described in the background section. The stack structure is shared amongst all the cores. Thus, each time we push or pop from the stack, we are operating in a critical section.<br><br>
+                For Detect, each tag/label needs to find its boundaries. Thus for every tag/label, each core goes through approximately ¼ of the pixels in our frame looking for the edges, position, number of pixels, and centroid of each box. When we update the edge values, we update them in a critical section. Position, number of pixels, and centroid values are updated atomically. In order to determine the number of labels we need in our bounding box array, we implemented a parallel prefix sum similar to the way we did in Project 2.<br>
+
+                <h4>When parallelizing for CUDA, we mapped our problem to the NVIDIA GeForce GTX 750 Ti as follows:</h4>
+                <p>
+                For subtraction and threshold, we just map the pixels in our frames to threads in the GPU. Because our image size is (720 * 480), and we are running 1024 threads per block, we mapped our frames to (720 * 480) / 1024 = 338 blocks.<br>
+                <center><p>Below is an example of how we mapped our frames to blocks and threads:</p></center>
+                <center><img src="img/StructCUDASeperation.PNG" style="width:663px;height:406px" class="img-thumbnail"></center><br>
+                <p>For Segmentation, we tile our frame, and each block gets a tile. We make each block 14 x 14 pixels. Thus, we are running 196 threads per block and a total of 1764 blocks [This number was determined optimal by experimentation in reference 1]. Then each thread in each block starts at a pixel. From here, we run a kernel call so that each pixel looks at itself and its neighbors to the left and its neighbors below.<br><br>Our numbering scheme is as follows:<br>
+                If our pixel is off, then it labels itself 0.<br>
+                If one or more of the neighboring pixels is on and our current pixel is lower left corner on the border of our inner 14 x 14 tile, then we label our current pixel -2.<br>
+                We label all other pixels that have a neighboring left, lower, or lower-left pixel turned on -1.<br> 
+                <br>
+                Next, we place the edge rows and columns of each block into global memory, but keep the tiling to 14 x 14. Thus, we still have a total of 1764 blocks. However, each block looks at its adjacent rows and columns from global memory. Thus, we are looking at 16 x 16 pixels for each 14 x 14 blocks. The pixels we operate on are shown as the inner gray box below:<br>
+                <center><img src="img/StructImageBlockCUDA.PNG" style="width:400px;height:400px" class="img-thumbnail"></center>
+                <br>
+                <p>
+                Note, our numbering system only needs to consist of 0, -1, and -2 because our implementation just needs the lowest value and a representation of on and off pixels. At this point, we check each block's left and lower border in the 14 * 14 inner block with the extra column to the left and row to the bottom we have in our 16 x 16 pixel set. If the value on the edge rows are -1, then we set our current pixel to -1 as well. Using the shared rows, we guarantee that the lowest left pixel in our blob will be labeled -2 and all its other pixels will be labeled -1.
+                </p>
+                <p>
+                Now, we have eliminated many of our pixels so we can quickly run a sequential watershed method.
+                </p>
+                <h4>Parallel Iterations: </h4>
+                <p>
+                We went through several iterations of optimizing our parallel implementations. We made three notable mistakes while parallelizing our program.<br> 
+                <br>
+                The first mistake we made was we parallelized our filter function. Our sequential implementation only took 0.0000017 seconds to complete. After parallelization, our OpenMP implementation took 0.000075 seconds to complete. Our CUDA implementation took 0.000026 seconds to complete. The overhead of parallelization was more than the speedup, so we actually made our program slower! As a result, we just ran the filter function sequentially.<br>
+                <br>
+                The second mistake we made was by trying to parallelize the watershed portion of segmentation in our CUDA implementation. However, we quickly realized that we would have to remap and reassign all our pixel values to avoid stack conflicts. Because we have already assigned all of our off pixels to 0, remapping the data would not be beneficial unless almost every pixel has changed. Because this case is extremely unlikely, we found that just running a sequential watershed after parallelizing pixel labeling would be better.<br>
+                <br>
+                The third mistake we made was by trying to pipeline our process in OpenMP. However, the L3 cache size was only 6 MB, which meant that we could only fit one frame in the L3 cache as each image takes up 1.34 * 5 MB because we store 5 full arrays of information such as the 3 color channels, the label, and a binary value for if we have seen the pixel before. Thus, because we wanted to pipeline our tracking step, which requires 2 frames, we would have constant cache eviction by trying to operate on these two frames. As a result, we found that pipelining our process was not good for speedup.
+
+                </p>
+            </div>  
+            <div class="col-lg-8 col-lg-offset-2">
+                <center><h2>Results</h2></center>
+                <p>
+                    Overall, we believe we were relatively successful in implementing a parallel version of a person counter and tracker. Our serial implementation can analyze security camera footage at 2.31 frames per second. Our OpenMP implementation can analyze security camera footage at 11.22 frames per second. Finally, our CUDA implementation can analyze security camera footage at 8.23 frames per second.<br>
+                    <center>Below is the serial implementation running in real time:<br><img src="img/SerialPeopleTracker.gif" style="width:720px;height:480px" class="img-thumbnail"></center><br>
+
+                    <center>Below is the OpenMP implementation running in real time:<br><img src="img/OpenMP_PeopleTracker.gif" style="width:720px;height:480px" class="img-thumbnail"></center><br>
+
+                    <center>Below is the CUDA implementation running in real time:<br><img src="img/CUDA_PeopleTracker.gif" style="width:720px;height:480px" class="img-thumbnail"></center><br>
+
+                    <center>Below is a graph of the average frames per second of each implementation<br><img src="img/framesPerSec.png" style="width:720px;height:480px" class="img-thumbnail"></center>
+                    <br>
+                    <br>
+                    <p>
+                    We measured the performance of our algorithm by calculating speedup. We define speedup as (time it takes for serial implementation) / (time it takes for parallel implementation). Our serial implementation is our program written in C for one core with no optimizations other than changing the linked-lists to arrays as described in the approach section.<br>
+                    <br>
+                    <h4>Experimental setup:</h4>
+                    <p>
+                    Input two images of footage of size (720px x 480 px).<br>
+                    Run our person detection with timing code for the subtract, threshold, segmentation, detection, filtering, and tracking functions.<br>
+                    Our requests were generated by taking frames from continuous real world security camera footage.<br>
+                    <br>
+                    Using OpenMP on the Intel(R) Core(TM) i5-4590 CPU, we achieved an average speedup of 3.9183x. Using CUDA on the GeForce GTX 750 Ti, we achieved an average speedup of 4.261x.<br>
+                    <br>
+                    Below is a graph of our average speedup. The baseline is our serial implementation is our program written in C for one core with no optimizations other than changing the linked-lists to arrays as described in the approach section.<br>
+                    <center><img src="img/averageSpeedup.png" style="width:600px;height:371px" class="img-thumbnail"></center><br><br>
+                    <p>
+                    We do not believe that it is important to report results for different problem sizes for your project because on average, the number of pixels that will change for a security counter is reasonably close to what we tested. We did test our project on multiple different frames from multiple different footages and noticed that our speedups remained relatively constant.<br>
+                    
+                    <h4>Speedup Limitations</h4>
+                    <p>
+                    Overall, we believe our speedup was limited by dependencies, cache size, bandwidth, and data transfer.<br>
+                    <br>
+                    We believe our speedup was limited by dependencies between and within our functions. As described in our background section, each step in our algorithm is dependent upon the previous step. Furthermore, within some functions, such as segmentation, we need to synchronize our threads / procs before we can remap our frame pixel values.<br>
+                    <br>
+                    We believe that in OpenMP, we are limited by our cache size because we can only fit one frame in our L3 cache of size 6MB. As described above, the small cache prevents us from pipelining our algorithm as our tracking function needs to take in 2 frames. As stated above, the L3 cache size was only 6 MB, which meant that we could only fit one frame in the L3 cache as each image takes up 1.34 * 5 MB because we store 5 full arrays of information such as the 3 color channels, the label, and a binary value for if we have seen the pixel before. Thus, because we wanted to pipeline our tracking step, which requires 2 frames, we would have constant cache eviction by trying to operate on these two frames. However, this is only speculation.<br>
+                    <br>
+                    In CUDA, we believe our speedup is limited by being bandwidth bound. We noticed when we passed in less data, we observed a 3x speedup.<br><br>
+                    Finally, we believe our speedup may be limited by being bus transfer bound as we cannot read our images from disk fast enough.<br>
+                    <h4>Deeper Analysis</h4>
+                    <p>
+                    Below is a table of our speedup results for each function we parallelized. The baseline is our serial implementation is our program written in C for one core with no optimizations other than changing the linked-lists to arrays as described in the approach section.<br>
+                      <table class="table">
+                        <thead>
+                          <tr>
+                            <th>Function</th>
+                            <th>OpenMP</th>
+                            <th>CUDA</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>Initializing Frame</td>
+                            <td>1.006x</td>
+                            <td>0.635x</td>
+                          </tr>
+                          <tr>
+                            <td>Frame Subtraction</td>
+                            <td>3.868x</td>
+                            <td>5.211x</td>
+                          </tr>
+                          <tr>
+                            <td>Threshold Image</td>
+                            <td>4.688x</td>
+                            <td>3.868x</td>
+                          </tr>
+                          <tr>
+                            <td>Segment Image</td>
+                            <td>1.817x</td>
+                            <td>2.914x</td>
+                          </tr>
+                          <tr>
+                            <td>Blob Detection</td>
+                            <td>4.781x</td>
+                            <td>3.725x</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    <br>
+                    <p>Here is a graph of our speedups per function:</p>
+                    <center><center><img src="img/functionSpeedup.png" class="img-thumbnail"></center></center><br>
+                    <br>
+                    <p>
+                    Based on our timing code, we spend about 8.7% of our time in Frame Subtraction, 1.4% of our time in Threshold Image, and 89.9% of our time in Blob Detection.<br>
+                    <p>Below is a graph of our weighted average speedup for each parallel implementation. The baseline is our serial implementation is our program written in C for one core with no optimizations other than changing the linked-lists to arrays as described in the approach section.</p>
+                    <center><center><img src="img/weightedSpeedup.png" class="img-thumbnail"></center></center><br>
+                    <br>
+                    <p>
+                    <br>
+                    We believe that the main place in which we can improve is finding a more efficient way of calculating the width, height, position, number of pixels, and centroid of each blob, as the segmentation is already quite fast sequentially. Furthermore, from our research the speedup graph of the watershed method is as follows:<br>
+                   <center><img src="img/GraphAverageTimeComparison_Watershed.PNG" class="img-thumbnail"></center><br>
+                    <br>
+                    <p>
+                    Thus, we do not believe that much more speedup can be obtained from the segmentation portion of blob detection.<br>
+                    <br>
+                    Below are some pertinent stats for the machines we used.<br>
+                    Stats for Intel(R) Core(TM) i5-4590 CPU:<br>
+                    4 cores: 3.3 GHz <br>
+                    <br>
+                    Stats for GeForce GTX 750 Ti<br>
+                    Memory Clock Rate (KHz): 2700000<br>
+                    Memory Bus Width (bits): 128<br>
+                    Peak Memory Bandwidth (GB/s): 86.400000<br>
+                    <br>
+                </p>
+            </div>  
+            <div class="col-lg-8 col-lg-offset-2">
+                <center><h2>References</h2></center>
+                <p>
+                    [1] Vitor, Giovani Bernardes, Janito VaqueiroFerreira, and André Korbes. "Fastimage segmentation by watershed transform on graphical hardware."XXX Iberian Latin American Congress on Computational Methods in Engineering-CILAMCE 2009. Vol. 1. 2009.<br>
+                    [2] Jiang, Shu. "Parallelization of Image Segmentation Algorithms."<br>
+                    [3] Farhadi, Masoud, Seyed Ahmad Motamedi, and Saeed Sharifian. "Efficienthuman detection based on parallel implementation of gradient and texture feature extraction methods."Machine Vision and Image Processing (MVIP), 2011 7th Iranian. IEEE, 2011.<br>
+                    [4] Bilgic, Berkin, Berthold KP Horn, and Ichiro Masaki. "Fast human detection with cascaded ensembles on the GPU."Intelligent Vehicles Symposium (IV), 2010 IEEE. IEEE, 2010.<br>
+                    [5] Comaniciu, Dorin, Visvanathan Ramesh, and Peter Meer. "Kernel-based objecttracking." Pattern Analysis and Machine Intelligence, IEEE Transactions on25.5(2003): 564-577.
+                </p>
+                <center><p>Equal work was done by each person</p></center> 
+            </div> 
+        </div>
+    </section>
+
+    <!-- Download Section -->
+<!--     <section id="proposal" class="content-section text-center">
+        <div class="download-section">
+            <div class="container">
+                <div class="col-lg-8 col-lg-offset-2">
+                    <h2>Download Grayscale</h2>
+                    <p>You can download Grayscale for free on the preview page at Start Bootstrap.</p>
+                    <a href="http://startbootstrap.com/template-overviews/grayscale/" class="btn btn-default btn-lg">Visit Download Page</a>
+                </div>
+            </div>
+        </div>
+    </section> -->
+
+    <!-- Contact Section -->
+<!--     <section id="contact" class="container content-section text-center">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2">
+                <h2>Contact Start Bootstrap</h2>
+                <p>Feel free to email us to provide some feedback on our templates, give us suggestions for new templates and themes, or to just say hello!</p>
+                <p><a href="mailto:feedback@startbootstrap.com">feedback@startbootstrap.com</a>
+                </p>
+                <ul class="list-inline banner-social-buttons">
+                    <li>
+                        <a href="https://twitter.com/SBootstrap" class="btn btn-default btn-lg"><i class="fa fa-twitter fa-fw"></i> <span class="network-name">Twitter</span></a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/IronSummitMedia/startbootstrap" class="btn btn-default btn-lg"><i class="fa fa-github fa-fw"></i> <span class="network-name">Github</span></a>
+                    </li>
+                    <li>
+                        <a href="https://plus.google.com/+Startbootstrap/posts" class="btn btn-default btn-lg"><i class="fa fa-google-plus fa-fw"></i> <span class="network-name">Google+</span></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    Map Section -->
+    <!-- <div id="map"></div> -->
+
+    <!-- Footer -->
+    <footer>
+        <div class="container text-center">
+            <p>Copyright &copy; Sarah and Solon 2015</p>
+        </div>
+    </footer>
+
+    <!-- jQuery -->
+    <script src="js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="js/jquery.easing.min.js"></script>
+
+    <!-- Google Maps API Key - Use your own API key to enable the map feature. More information on the Google Maps API can be found at https://developers.google.com/maps/ -->
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRngKslUGJTlibkQ3FkfTxj3Xss1UlZDA&sensor=false"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="js/grayscale.js"></script>
+
+</body>
+
+</html>

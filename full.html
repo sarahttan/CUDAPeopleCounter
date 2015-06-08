@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Security Camera Counter</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="css/grayscale.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-custom navbar-fixed-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand page-scroll" href="#page-top">
+                    Security Camera Counter
+                </a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse navbar-right navbar-main-collapse">
+                <ul class="nav navbar-nav">
+                    <!-- Hidden li included to remove active class from about link when scrolled up past about section -->
+                    <li class="hidden">
+                        <a href="#page-top"></a>
+                    </li>
+                    <li>
+                        <a href="/Security-Camera-Counter/">Final Paper</a>
+                    </li>
+                     <li>
+                        <a class="page-scroll" href="#proposal">Proposal</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#pr">Progress Report</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- About Section -->
+
+    <section id="proposal" class="container content-section">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2">
+                <center><h2>Title</h2></center>
+                <p>
+                    Security Camera Counter.
+                </p>
+            </div>
+            <div class="col-lg-8 col-lg-offset-2">
+                <center><h2>Summary</h2></center>
+                <p>
+                    We are going to create a program that counts the number of people that appear and their direction of travel in near-real time. We plan on using a NVIDIA GTX 780 GPU along with CUDA to complete our project.
+                </p>
+            </div>
+            <div class="col-lg-8 col-lg-offset-2">
+                <center><h2>Background</h2></center>
+                <p> Our project is a program that given a video feed, counts the number of people that appear in the window or frame and creates a vector of movement travel. We need to be able to quickly compute the differences between frames to determine if people have entered or exited the frame and correctly identify people within frames. In order to be able to process video feeds in real time we need to be able to process large images at extremely fast speeds. 
+                </p>
+                <p> Serially, this would be a very difficult problem because the images are very large and we need to compare every pixel to see if the shading has changed, thus indicating someone moving into our field of view. As a result, it would be very difficult to have a serial implementation keep up with a real time feed, as the feed will have already changed before the serial implementation has finished analyzing the current frame.
+                </p>
+                <p>Thus, this problem can benefit from parallelism similar to the way that we parallelized our circle renderer in the way that we can divide our screen into tiles. This way we can more quickly compare the pixels in the current frame to the previous one. Also, the problem can benefit from parallelism by analyzing different frames in parallel.
+                </p>
+            </div>
+            <div class="col-lg-8 col-lg-offset-2">
+                <center><h2>The Challenge</h2></center>
+                <p>This program is not only challenging because we need to be able to analyze frames fast enough to deliver results in near real-time, but also because we hope to provide a reasonably accurate person detector. Thus, there must be some sort of synchronization between our tiles so that we can determine how large of a moving object we are observing. 
+                </p>
+                <p>This program is not only challenging because we need to be able to analyze frames fast enough to deliver results in near real-time, but also because we hope to provide a reasonably accurate person detector. Thus, there must be some sort of synchronization between our tiles so that we can determine how large of a moving object we are observing. 
+                </p>
+                <p>Since we plan on tiling the sections of the image to speedup the computation required, the memory accesses will be high in spatial locality.  In other words, if we were to load a section of an image into the cache, then, subsequent memory accesses would likely be cache hits.  Also, because we have to load a large amount of data (many images composing the video), we may have a high communication to computation ratio as well.
+                </p>
+                <p>Even after we analyze all of the tiles, we have dependences between the pixels that have significantly changed their value so we can determine the size of the object that has entered our frame. Furthermore, we are also challenged by determining what change in color value is significant, as lighting and other real world effects will indubitably change pixel values in every frame. In terms of speed, we expect that we will have to efficiently use shared memory in order to be able to analyze our frames fast enough.
+                </p>
+                <p>After computing multiple tiles of the images, we subsequently need to group them together to detect an entire person and his/her movement - keeping track of the previously known location of a person and creating a vector of his/her direction of movement.  One of the key challenges will be to accurately detect a person.  Tiling an image and splitting up the work between multiple processors would cause detecting features of a person to be difficult because we would require intercommunication in order to accurately find the location and features of a person.  Detecting a person will also be necessary in order to provide accurate statistics and counts of the people within the frame.
+                </p>
+            </div>  
+            <div class="col-lg-8 col-lg-offset-2">
+                <center><h2>Resources</h2></center>
+                <p>We are starting from scratch. We do not have a book or paper to use as a reference. We need the gates machines, in particular the NVIDIA GTX 780 GPU to complete our project as well as a way to gather a video feed for our project to analyze.
+                </p>
+            </div>
+            <div class="col-lg-8 col-lg-offset-2">
+                <center><h2>Goals and Deliverables</h2></center>
+                <p>Plan To Achieve:</br>We plan to be able to analyze our frames fast enough so that we can detect movement in real time with a very rudimentary area calculation that helps us determine if a human is in the frame or not. Thus, if a mass takes a certain amount of area, we will assume it is a human
+                </p>
+                <p>Hope To Achieve:</br>If all goes well, we would love to add more precise human detection. What we mean by this is we will not only look at the total area of the moving body, we will also look for it to be rectangular in shape, attempt to identify a head, etc.
+                </p>
+                <p>Furthermore, if this goes well, we would also be interested in having project account for camera tilts. This means that we would be able to make our human detection formulas account for the tilts of the camera. This would definitely be a stretch goal and the last thing we would try and do, because even small errors in our equations could result in drastically incorrect results.
+                </p>
+                <p>Demo:</br>We plan to run our project on prerecorded security camera footage as well as provide a live demonstration of it in class, where we will ask a student or teacher to walk past the screen. In addition to our live demonstration, we will have speedup graphs that show how much faster our parallel implementation is from the sequential one. If time permits, it we will run the sequential and live version of the program next to each other to show the difference in performance.
+                </p>
+            </div>
+            <div class="col-lg-8 col-lg-offset-2">
+                <center><h2>Platform</h2></center>
+                <p>We plan to use CUDA for our project needs. CUDA makes sense for the workload we have chosen because we are trying to process images at a very fast speed, something similar to what we tried to do in the circle renderer.
+                </p>
+            </div>   
+            <div class="col-lg-8 col-lg-offset-2">
+                <center><h2>Schedule</h2></center>
+                <p>March 29th - April 4th:</br>
+                    <ul>
+                        <li>Finish proposal</li>
+                        <li>Begin serial implementation</li>
+                    </ul>
+                </p>
+                <p>April 5th - April 11th:</br>
+                    <ul>
+                        <li>Work on serial implementation with a crude area calculation system to determine which objects that pass through our field of view are people.  </li>
+                        <li>Create benchmarks and graphs/statistics for counting people.</li>
+                    </ul>
+                </p>
+                <p>April 12th - April 18th:</br>
+                    <ul>
+                        <li>Finish serial implementation. </li>
+                        <li>Begin parallelization by determining how to distribute our frames and an efficient tiling mechanism.</li>
+                    </ul>
+                </p>
+                <p>April 19th - April 25th:</br>
+                    <ul>
+                        <li>Finish a correct parallel implementation that implements tiling. This means at this point we should be able to calculate the pixel differences in close to real time. </li>
+                    </ul>
+                </p>
+                <p>April 26th - May 2nd: </br>
+                    <ul>
+                        <li>Implement a parallel crude calculation system to determine which objects that pass through our field of view are people.</li>
+                        <li>Implement fine tweaks, the correct significance value in change of pixel shading: which pixels change due to the environment, and which ones are changing because objects have entered our field of view. </li>
+                        <li>Begin working on the final report and start implementing our hope to achieve goals.</li>
+                    </ul>
+                </p>
+                <p>May 3rd - May 9th: </br>
+                    <ul>
+                        <li>Demo testing</li>
+                        <li>Finish the final report</li>
+                        <li>Work on hope to achieve goals</li>
+                    </ul>
+                </p>
+            </div>      
+        </div>
+    </section>
+    <section id="pr" class="container content-section">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2">
+                <center><h2>Revised Schedule</h2></center>
+                <p>March 29th - April 4th:</br>
+                    <ul>
+                        <li>Finish proposal</li>
+                        <li>Begin serial implementation</li>
+                    </ul>
+                </p>
+                <p>April 5th - April 11th:</br>
+                    <ul>
+                        <li>Work on serial implementation with a crude area calculation system to determine which objects that pass through our field of view are people.  </li>
+                        <li>Create benchmarks and graphs/statistics for counting people.</li>
+                    </ul>
+                </p>
+                <p>April 12th - April 18th:</br>
+                    <ul>
+                        <li>Finish serial implementation. </li>
+                    </ul>
+                </p>
+                <p>April 19th - April 22th:</br>
+                    <ul>
+                        <li>Debug serial version. -Sarah</li>
+                        <li>Begin parallelization by determining how to distribute our frames and an efficient tiling mechanism. -Solon</li>
+                    </ul>
+                </p>
+                <p>April 22th - April 25th:</br>
+                    <ul>
+                        <li>Begin implementing functions in parallel-Solon and Sarah</li>
+                    </ul>
+                </p>
+                <p>April 26th - April 29th:</br>
+                    <ul>
+                        <li>Create watershed version-Sarah</li>
+                        <li>Create tiled version of segmentation-Solon</li>
+                    </ul>
+                </p>
+                                    
+                <p>April 30th - May 2nd: </br>
+                    <ul>
+                        <li>Debug-Solon and Sarah</li>
+                        <li>Implement fine tweaks, the correct significance value in change of pixel shading: which pixels change due to the environment, and which ones are changing because objects have entered our field of view.-Sarah </li>
+                        <li>Begin working on the final report.-Solon</li>
+                    </ul>
+                </p>
+                <p>May 3rd - May 9th: </br>
+                    <ul>
+                        <li>Demo testing-Sarah</li>
+                        <li>Finish the final report-Solon</li>
+                    </ul>
+                </p>
+            </div>
+            <div class="col-lg-8 col-lg-offset-2">
+                <center><h2>Work Completed so far</h2></center>
+                <p>We have completed most of the functions required to create a working serial implementation. Starting from scratch, we have created functions that can read and convert the a frame into a binary map that shows whether the pixel value has changed significantly. We have also completed a very crude implementation of blob detection, which allows us to count the number of "people" going through our frames.
+                </p>
+            </div>
+            <div class="col-lg-8 col-lg-offset-2">
+                <center><h2>Goals and Deliverables</h2></center>
+                <p>Although at this point it is hard to tell because we are slightly behind on creating the parallel implementation of our program, we still believe that we are on track to create a parallelized implementation that will be able to analyze these frames in close to real time.</br>
+                </br>
+                However, it does not appear like we will be able to reach our "nice to have" goals due to time constraints. The serial implementation took longer than we expected, and as a result, we are about a half week or so behind schedule. Furthermore, we believe that parallelizing our blob detection will take longer than we previously expected. The reason for this is we will be attempting two different parallel algorithms, each with drawbacks and interesting edge cases. Thus, we will need extra time to write and test these two implementations.
+                </p>
+            </div>
+            <div class="col-lg-8 col-lg-offset-2">
+                <center><h2>Preliminary Results</h2></center>
+                <p>
+                None at this point.
+                </p>
+            </div>  
+            <div class="col-lg-8 col-lg-offset-2">
+                <center><h2>Resources</h2></center>
+                <p>We are starting from scratch. We do not have a book or paper to use as a reference. We need the gates machines, in particular the NVIDIA GTX 780 GPU to complete our project as well as a way to gather a video feed for our project to analyze.
+                </p>
+            </div>
+            <div class="col-lg-8 col-lg-offset-2">
+                <center><h2>Concerns</h2></center>
+                <p>We are concerned that our serial implementation took longer to implement than we originally expected. As a result, we are about a week behind schedule. We definitely underestimated the difficulty of starting this project from scratch. Looking forward, we are mostly concerned with edge cases that can cause our parallel implementation to run slower than expected. The most difficult portion to parallelize will be segmentation, which we will write different implementations for. Time constraints are the biggest thing that makes completing the project difficult.
+                </p>
+            </div>
+        </div>
+    </section>
+    <!-- Download Section -->
+<!--     <section id="proposal" class="content-section text-center">
+        <div class="download-section">
+            <div class="container">
+                <div class="col-lg-8 col-lg-offset-2">
+                    <h2>Download Grayscale</h2>
+                    <p>You can download Grayscale for free on the preview page at Start Bootstrap.</p>
+                    <a href="http://startbootstrap.com/template-overviews/grayscale/" class="btn btn-default btn-lg">Visit Download Page</a>
+                </div>
+            </div>
+        </div>
+    </section> -->
+
+    <!-- Contact Section -->
+<!--     <section id="contact" class="container content-section text-center">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2">
+                <h2>Contact Start Bootstrap</h2>
+                <p>Feel free to email us to provide some feedback on our templates, give us suggestions for new templates and themes, or to just say hello!</p>
+                <p><a href="mailto:feedback@startbootstrap.com">feedback@startbootstrap.com</a>
+                </p>
+                <ul class="list-inline banner-social-buttons">
+                    <li>
+                        <a href="https://twitter.com/SBootstrap" class="btn btn-default btn-lg"><i class="fa fa-twitter fa-fw"></i> <span class="network-name">Twitter</span></a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/IronSummitMedia/startbootstrap" class="btn btn-default btn-lg"><i class="fa fa-github fa-fw"></i> <span class="network-name">Github</span></a>
+                    </li>
+                    <li>
+                        <a href="https://plus.google.com/+Startbootstrap/posts" class="btn btn-default btn-lg"><i class="fa fa-google-plus fa-fw"></i> <span class="network-name">Google+</span></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    Map Section -->
+    <!-- <div id="map"></div> -->
+
+    <!-- Footer -->
+    <footer>
+        <div class="container text-center">
+            <p>Copyright &copy; Sarah and Solon 2015</p>
+        </div>
+    </footer>
+
+    <!-- jQuery -->
+    <script src="js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="js/jquery.easing.min.js"></script>
+
+    <!-- Google Maps API Key - Use your own API key to enable the map feature. More information on the Google Maps API can be found at https://developers.google.com/maps/ -->
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRngKslUGJTlibkQ3FkfTxj3Xss1UlZDA&sensor=false"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="js/grayscale.js"></script>
+
+</body>
+
+</html>
